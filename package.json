@@ -10,7 +10,7 @@
     "build": "npx rollup -c",
     "dev": "npx rollup -c -w",
     "prod": "npm run test && npm run build",
-    "postinstall": "./bin/bitrix adjust --hg --silent"
+    "postinstall": "node ./bin/bitrix adjust --hg --silent"
   },
   "bin": {
     "bitrix": "./bin/bitrix"
