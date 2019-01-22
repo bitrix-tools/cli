@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [
+    "../../../../bitrix/test/utils/adjust-sourcemap/data/one-source.js",
+    "../../../../bitrix/test/utils/adjust-sourcemap/data/two-source.js"
+  ]
+}

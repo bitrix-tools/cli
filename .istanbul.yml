@@ -1,0 +1,13 @@
+instrumentation:
+  root: ./src
+  include-all-sources: true
+  default-excludes: false
+  excludes: [
+    '**/dist/**',
+    '**/templates/**/**',
+
+    '**/test.bootstrap.js',
+    '**/rollup.config.js'
+  ]
+  extensions:
+    - .js

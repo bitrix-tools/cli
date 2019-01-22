@@ -1,0 +1,5 @@
+[ui]
+username=Vladimir Belov
+
+[hooks]
+precommit.test='node -v'

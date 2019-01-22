@@ -1,0 +1,1 @@
+{"version":3,"sources":["../main.css"],"names":[],"mappings":"AAAA;CACC,WAAW;CACX;;AAED;CACC,qBAAc;CAAd,qBAAc;CAAd,cAAc;CACd","file":"app.bundle.css.map","sourcesContent":["body {\n\tcolor: red;\n}\n\n.container {\n\tdisplay: flex;\n}"]}
