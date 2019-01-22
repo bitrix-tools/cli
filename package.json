@@ -1,7 +1,7 @@
 {
   "name": "@bitrix/cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "scripts": {
     "test": "npx mocha --require @babel/register --timeout 5000 test/**/*.test.js",
@@ -15,7 +15,9 @@
   "bin": {
     "bitrix": "./bin/bitrix"
   },
-  "repository": {},
+  "repository": {
+    "git": "https://github.com/bitrix-tools/cli.git"
+  },
   "author": "Bitrix",
   "license": "MIT",
   "dependencies": {
@@ -68,5 +70,15 @@
     "rewire": "^4.0.1",
     "istanbul": "^1.1.0-alpha.1",
     "rollup-plugin-commonjs": "^9.2.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "bitrix",
+    "bitrix24",
+    "cli",
+    "builder",
+    "bundler"
+  ]
 }
