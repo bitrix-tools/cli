@@ -5,6 +5,7 @@ import { appRoot } from '../../constants';
 import buildExtensionName from '../../utils/build-extension-name';
 import bitrixFlow from '../../cli/bitrix.flow';
 import render from '../render';
+import slash from 'slash';
 
 const templatePath = resolve(appRoot, 'src/templates/extension');
 const configTemplatePath = resolve(templatePath, 'bundle.config.js');
@@ -48,8 +49,8 @@ export default function createExtension(directory, options = defaultOptions) {
 		input: configTemplatePath,
 		output: configPath,
 		data: {
-			input: relative(extensionPath, inputPath),
-			output: relative(extensionPath, outputPath)
+			input: slash(relative(extensionPath, inputPath)),
+			output: slash(relative(extensionPath, outputPath))
 		}
 	});
 

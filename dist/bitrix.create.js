@@ -5,7 +5,6 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var camelcase = _interopDefault(require('camelcase'));
 var os = _interopDefault(require('os'));
 var minimist = _interopDefault(require('minimist'));
-var slash = _interopDefault(require('slash'));
 var glob = require('fast-glob');
 var glob__default = _interopDefault(glob);
 var path = require('path');
@@ -13,6 +12,7 @@ var path__default = _interopDefault(path);
 var fs = require('fs');
 var mustache = require('mustache');
 var fse = _interopDefault(require('fs-extra'));
+var slash = _interopDefault(require('slash'));
 var inquirer = _interopDefault(require('inquirer'));
 var boxen = _interopDefault(require('boxen'));
 require('colors');
@@ -186,8 +186,8 @@ function createExtension(directory, options = defaultOptions) {
     input: configTemplatePath,
     output: configPath,
     data: {
-      input: path.relative(extensionPath, inputPath),
-      output: path.relative(extensionPath, outputPath)
+      input: slash(path.relative(extensionPath, inputPath)),
+      output: slash(path.relative(extensionPath, outputPath))
     }
   });
 
