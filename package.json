@@ -26,6 +26,7 @@
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-private-methods": "^7.2.3",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.0.0",
@@ -56,6 +57,7 @@
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-postcss-independed": "^1.7.1",
     "rollup-plugin-reporter": "^1.0.4",
     "rollup-plugin-simple-babel": "^1.0.5",
@@ -67,8 +69,8 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.2.0",
     "babel-plugin-rewire": "^1.2.0",
-    "rewire": "^4.0.1",
     "istanbul": "^1.1.0-alpha.1",
+    "rewire": "^4.0.1",
     "rollup-plugin-commonjs": "^9.2.0"
   },
   "directories": {

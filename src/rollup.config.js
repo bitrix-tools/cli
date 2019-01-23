@@ -5,6 +5,8 @@ import reporter from 'rollup-plugin-reporter';
 import babel from 'rollup-plugin-simple-babel';
 import bitrixReporter from './reporters/bitrix.reporter';
 import argv from './process/argv';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 import namespaceTransformer from './plugins/rollup/rollup-plugin-namespace-transformer/index';
 import mochaTestRunner from './plugins/rollup/rollup-plugin-mocha-test-runner/index';
 import resolvePackageModule from './utils/resolve-package-module';
@@ -20,6 +22,8 @@ export default function rollupConfig({ input, output }) {
 			],
 			treeshake: input.treeshake !== false,
 			plugins: [
+				resolve(),
+				commonjs(),
 				json(),
 				postcss({
 					extract: true,

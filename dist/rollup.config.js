@@ -11,6 +11,8 @@ require('colors');
 var logSymbols = _interopDefault(require('log-symbols'));
 var slash = _interopDefault(require('slash'));
 var minimist = _interopDefault(require('minimist'));
+var resolve = _interopDefault(require('rollup-plugin-node-resolve'));
+var commonjs = _interopDefault(require('rollup-plugin-commonjs'));
 var Mocha = _interopDefault(require('mocha'));
 var glob = _interopDefault(require('fast-glob'));
 var os = _interopDefault(require('os'));
@@ -344,10 +346,10 @@ async function testDirectory(dir, report = true) {
         mocha.addFile(test);
       });
       appendBootstrap();
-      await new Promise(resolve => {
+      await new Promise(resolve$$1 => {
         mocha.run(failures => {
           result.push(failures ? 'failure' : 'passed');
-        }).on('end', () => resolve());
+        }).on('end', () => resolve$$1());
       });
     }
   }
@@ -404,7 +406,7 @@ function rollupConfig({
       input: input.input,
       external: ['BX', 'react', 'react-dom'],
       treeshake: input.treeshake !== false,
-      plugins: [json(), postcss({
+      plugins: [resolve(), commonjs(), json(), postcss({
         extract: true,
         sourceMap: false,
         plugins: [autoprefixer({
