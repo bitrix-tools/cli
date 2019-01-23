@@ -28,8 +28,8 @@ describe('utils/generate-config-php', () => {
 
 	it('Should return config if passed valid config without rel', () => {
 		const config = {
-			input: '/modules/main/install/js/main/loader/loader.js',
-			output: '/modules/main/install/js/main/loader/loader.bundle.js',
+			input: 'loader.js',
+			output: 'loader.bundle.js',
 			context: '/modules/main/install/js/main/loader',
 			rel: []
 		};
@@ -44,8 +44,8 @@ describe('utils/generate-config-php', () => {
 
 	it('Should return config if passed valid config without rel (windows like paths)', () => {
 		const config = {
-			input: '\\modules\\main\\install\\js\\main\\loader\\loader.js',
-			output: '\\modules\\main\\install\\js\\main\\loader\\loader.bundle.js',
+			input: 'loader.js',
+			output: 'loader.bundle.js',
 			context: '\\modules\\main\\install\\js\\main\\loader',
 			rel: []
 		};
@@ -60,8 +60,8 @@ describe('utils/generate-config-php', () => {
 
 	it('Should return config if passed valid config with rel', () => {
 		const config = {
-			input: '/modules/main/install/js/main/loader/loader.js',
-			output: '/modules/main/install/js/main/loader/loader.bundle.js',
+			input: 'loader.js',
+			output: 'loader.bundle.js',
 			context: '/modules/main/install/js/main/loader',
 			rel: [
 				'main.loader',
@@ -73,6 +73,7 @@ describe('utils/generate-config-php', () => {
 		const resultConfig = fs.readFileSync(resultConfigPath, 'utf-8');
 
 		let result = generateConfigPhp(config);
+
 		assert.deepStrictEqual(result, resultConfig);
 	});
 

@@ -5,7 +5,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true)
 }
 
 return [
-	"css" => "/bitrix/js/ui/extension/dist/app.bundle.css",
-	"js" => "/bitrix/js/ui/extension/dist/app.bundle.js",
+	"css" => "dist/app.bundle.css",
+	"js" => "dist/app.bundle.js",
 	"rel" => []
 ];

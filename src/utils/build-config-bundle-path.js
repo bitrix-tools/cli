@@ -8,7 +8,6 @@ import buildTemplatePath from './build-template-path';
 
 function buildConfigBundlePath(filePath, ext) {
 	filePath = slash(filePath);
-	filePath = buildPath(filePath);
 
 	if (ext === 'js') {
 		return filePath.replace('.css', '.js');

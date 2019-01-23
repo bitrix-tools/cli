@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import mustache from 'mustache';
 import slash from 'slash';
+import { relative } from 'path';
 import buildConfigBundlePath from './build-config-bundle-path';
 import { appRoot } from '../constants';
 
@@ -14,9 +15,10 @@ function generateConfigPhp(config) {
 	const template = fs.readFileSync(templatePath, 'utf-8');
 	const outputPath = path.resolve(slash(config.context), slash(config.output));
 
+
 	const data = {
-		cssPath: buildConfigBundlePath(outputPath, 'css'),
-		jsPath: buildConfigBundlePath(outputPath, 'js'),
+		cssPath: slash(relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
+		jsPath: slash(relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
 		rel: renderRel(config.rel)
 	};
 

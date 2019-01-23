@@ -63,39 +63,8 @@ function buildRollupConfig(config) {
   });
 }
 
-function buildModulePath(filePath) {
-  filePath = slash(filePath);
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/js\/(.[a-z0-9_-]+)\/');
-  let res = filePath.match(exp);
-  return `/bitrix/js/${res[2]}/${filePath.split(res[0])[1]}`;
-}
-
-function isComponentPath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9]+)\/install\/components\/(.[a-z0-9]+)\/');
-  let res = slash(filePath).match(exp);
-  return !!res && !!res[1] && !!res[2];
-}
-
-function buildComponentPath(filePath) {
-  filePath = slash(filePath);
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/components\/(.[a-z0-9_-]+)\/');
-  let res = filePath.match(exp);
-  return `/bitrix/components/${res[2]}/${filePath.split(res[0])[1]}`;
-}
-
-function isTemplatePath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/templates\/(.[a-z0-9_-]+)\/');
-  let res = slash(filePath).match(exp);
-  return !!res && !!res[1] && !!res[2];
-}
-
-function buildTemplatePath(filePath) {
-  return `/bitrix/templates/${slash(filePath).split('install/templates/')[1]}`;
-}
-
 function buildConfigBundlePath(filePath, ext) {
   filePath = slash(filePath);
-  filePath = buildPath(filePath);
 
   if (ext === 'js') {
     return filePath.replace('.css', '.js');
@@ -108,22 +77,6 @@ function buildConfigBundlePath(filePath, ext) {
   return filePath;
 }
 
-function buildPath(path$$1) {
-  if (isModulePath(path$$1)) {
-    return buildModulePath(path$$1);
-  }
-
-  if (isComponentPath(path$$1)) {
-    return buildComponentPath(path$$1);
-  }
-
-  if (isTemplatePath(path$$1)) {
-    return buildTemplatePath(path$$1);
-  }
-
-  return path$$1;
-}
-
 function generateConfigPhp(config) {
   if (!!config && typeof config !== 'object') {
     throw new Error('Invalid config');
@@ -133,8 +86,8 @@ function generateConfigPhp(config) {
   const template = fs__default.readFileSync(templatePath, 'utf-8');
   const outputPath = path__default.resolve(slash(config.context), slash(config.output));
   const data = {
-    cssPath: buildConfigBundlePath(outputPath, 'css'),
-    jsPath: buildConfigBundlePath(outputPath, 'js'),
+    cssPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
+    jsPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
     rel: renderRel(config.rel)
   };
   return mustache.render(template, data);

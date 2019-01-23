@@ -11,32 +11,32 @@ describe('utils/build-config-bundle-path', () => {
 			{
 				source: '/modules/main/install/js/main/loader/loader.bundle.js',
 				result: {
-					css: '/bitrix/js/main/loader/loader.bundle.css',
-					js:  '/bitrix/js/main/loader/loader.bundle.js'
+					css: '/modules/main/install/js/main/loader/loader.bundle.css',
+					js:  '/modules/main/install/js/main/loader/loader.bundle.js'
 				}
 			},
 			{
 				source: '/modules/test/install/js/test/loader/loader.bundle.js',
 				result: {
-					css: '/bitrix/js/test/loader/loader.bundle.css',
-					js:  '/bitrix/js/test/loader/loader.bundle.js'
+					css: '/modules/test/install/js/test/loader/loader.bundle.css',
+					js:  '/modules/test/install/js/test/loader/loader.bundle.js'
 				}
 			},
 			{
 				source: '/modules/test/install/components/bitrix/main.ui.filter' +
 					'/templates/.default/component.bundle.js',
 				result: {
-					css: '/bitrix/components/bitrix' +
-						'/main.ui.filter/templates/.default/component.bundle.css',
-					js:  '/bitrix/components/bitrix' +
-						'/main.ui.filter/templates/.default/component.bundle.js'
+					css: '/modules/test/install/components/bitrix/main.ui.filter' +
+						'/templates/.default/component.bundle.css',
+					js:  '/modules/test/install/components/bitrix/main.ui.filter' +
+						'/templates/.default/component.bundle.js'
 				}
 			},
 			{
 				source: '/modules/main/install/templates/.default/template.bundle.js',
 				result: {
-					css: '/bitrix/templates/.default/template.bundle.css',
-					js:  '/bitrix/templates/.default/template.bundle.js'
+					css: '/modules/main/install/templates/.default/template.bundle.css',
+					js:  '/modules/main/install/templates/.default/template.bundle.js'
 				}
 			},
 			{
@@ -59,32 +59,32 @@ describe('utils/build-config-bundle-path', () => {
 			{
 				source: '\\modules\\main\\install\\js\\main\\loader\\loader.bundle.js',
 				result: {
-					css: '/bitrix/js/main/loader/loader.bundle.css',
-					js:  '/bitrix/js/main/loader/loader.bundle.js'
+					css: '/modules/main/install/js/main/loader/loader.bundle.css',
+					js:  '/modules/main/install/js/main/loader/loader.bundle.js'
 				}
 			},
 			{
 				source: '\\modules\\test\\install\\js\\test\\loader\\loader.bundle.js',
 				result: {
-					css: '/bitrix/js/test/loader/loader.bundle.css',
-					js:  '/bitrix/js/test/loader/loader.bundle.js'
+					css: '/modules/test/install/js/test/loader/loader.bundle.css',
+					js:  '/modules/test/install/js/test/loader/loader.bundle.js'
 				}
 			},
 			{
 				source: '\\modules\\test\\install\\components\\bitrix\\main.ui.filter' +
 					'\\templates\\.default\\component.bundle.js',
 				result: {
-					css: '/bitrix/components/bitrix' +
-						'/main.ui.filter/templates/.default/component.bundle.css',
-					js:  '/bitrix/components/bitrix' +
-						'/main.ui.filter/templates/.default/component.bundle.js'
+					css: '/modules/test/install/components/bitrix/main.ui.filter' +
+						'/templates/.default/component.bundle.css',
+					js:  '/modules/test/install/components/bitrix/main.ui.filter' +
+						'/templates/.default/component.bundle.js'
 				}
 			},
 			{
 				source: '\\modules\\main\\install\\templates\\.default\\template.bundle.js',
 				result: {
-					css: '/bitrix/templates/.default/template.bundle.css',
-					js:  '/bitrix/templates/.default/template.bundle.js'
+					css: '/modules/main/install/templates/.default/template.bundle.css',
+					js:  '/modules/main/install/templates/.default/template.bundle.js'
 				}
 			},
 			{
@@ -106,21 +106,21 @@ describe('utils/build-config-bundle-path', () => {
 		const samples = [
 			{
 				source: '/modules/main/install/js/main/loader/loader.bundle.js',
-				result: '/bitrix/js/main/loader/loader.bundle.js'
+				result: '/modules/main/install/js/main/loader/loader.bundle.js'
 			},
 			{
 				source: '/modules/test/install/js/test/loader/loader.bundle.js',
-				result: '/bitrix/js/test/loader/loader.bundle.js'
+				result: '/modules/test/install/js/test/loader/loader.bundle.js'
 			},
 			{
 				source: '/modules/test/install/components/bitrix/main.ui.filter' +
 					'/templates/.default/component.bundle.js',
-				result: '/bitrix/components/bitrix' +
-					'/main.ui.filter/templates/.default/component.bundle.js'
+				result: '/modules/test/install/components/bitrix/main.ui.filter' +
+					'/templates/.default/component.bundle.js'
 			},
 			{
 				source: '/modules/main/install/templates/.default/template.bundle.js',
-				result: '/bitrix/templates/.default/template.bundle.js'
+				result: '/modules/main/install/templates/.default/template.bundle.js'
 			},
 			{
 				source: '/custom/path/custom.bundle.js',
