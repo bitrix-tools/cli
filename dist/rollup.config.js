@@ -406,7 +406,7 @@ function rollupConfig({
       input: input.input,
       external: ['BX', 'react', 'react-dom'],
       treeshake: input.treeshake !== false,
-      plugins: [resolve(), commonjs(), json(), postcss({
+      plugins: [resolve(), json(), postcss({
         extract: true,
         sourceMap: false,
         plugins: [autoprefixer({
@@ -416,6 +416,8 @@ function rollupConfig({
         sourceMaps: true,
         presets: [resolvePackageModule('@babel/preset-env'), resolvePackageModule('@babel/preset-react')],
         plugins: [resolvePackageModule('@babel/plugin-external-helpers'), resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties'), resolvePackageModule('@babel/plugin-proposal-private-methods')]
+      }), commonjs({
+        sourceMap: false
       }), rollupMochaTestRunner(), namespaceTransformer({
         namespaceFunction: function () {
           if (output.namespaceFunction === null) {

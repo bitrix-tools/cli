@@ -23,7 +23,6 @@ export default function rollupConfig({ input, output }) {
 			treeshake: input.treeshake !== false,
 			plugins: [
 				resolve(),
-				commonjs(),
 				json(),
 				postcss({
 					extract: true,
@@ -49,6 +48,9 @@ export default function rollupConfig({ input, output }) {
 						resolvePackageModule('@babel/plugin-proposal-class-properties'),
 						resolvePackageModule('@babel/plugin-proposal-private-methods')
 					]
+				}),
+				commonjs({
+					sourceMap: false,
 				}),
 				mochaTestRunner(),
 				namespaceTransformer({
