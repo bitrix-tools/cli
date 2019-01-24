@@ -64,10 +64,17 @@ module.exports = {
             "tab",
             {
                 "SwitchCase": 1
-            }
+            },
         ],
+		"import/no-unresolved": "off",
+		"no-unused-expressions": [
+			"error",
+			{
+				"allowTaggedTemplates": true
+			},
+		],
 
         // Flow inspections
         "flowtype/no-types-missing-file-annotation": "off",
-    }
+    },
 };
