@@ -31,7 +31,7 @@ module.exports = {
                 "objects": "always-multiline",
                 "imports": "always-multiline",
                 "exports": "always-multiline",
-                "functions": "ignore",
+                "functions": "always-multiline",
             }
         ],
         "space-before-function-paren": [
