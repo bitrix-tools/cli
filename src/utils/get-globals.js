@@ -19,7 +19,7 @@ export default function getGlobals(imports: string[], { context }) {
 			const config = require(configPath);
 
 			if (config.namespace && config.namespace.length) {
-				moduleAlias = config.namespace.split('.')[0];
+				moduleAlias = config.namespace;
 			}
 		}
 
