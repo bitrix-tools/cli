@@ -61,6 +61,7 @@
     "ora": "^3.0.0",
     "rollup": "^0.67.3",
     "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-flow": "^1.1.1",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0",
@@ -70,8 +71,7 @@
     "shelljs": "^0.8.2",
     "sinon": "^7.1.1",
     "slash": "^2.0.0",
-    "update-notifier": "^2.5.0",
-    "rollup-plugin-commonjs": "^9.2.0"
+    "update-notifier": "^2.5.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.2.0",

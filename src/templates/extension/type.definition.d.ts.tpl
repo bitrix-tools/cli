@@ -1,4 +1,9 @@
 declare module '{{sourceName}}'
 {
-    function {{name}}(): void;
+    class {{name}}
+    {
+        constructor(options: {name: string});
+        getName(): string;
+        setName(name: string);
+    }
 }

@@ -1,11 +1,22 @@
 import { type } from 'main.core';
 
-export function {{name}}(data)
+export class {{name}}
 {
-	if (!type.isNil(data))
+	constructor(options = {name: {{name}}})
 	{
-		console.log(data);
+		this.name = options.name;
+	}
+
+	setName(name)
+	{
+		if (type.isString(name))
+		{
+			this.name = name;
+		}
+	}
+
+	getName()
+	{
+		return this.name;
 	}
 }
-
-{{name}}('{{name}} is works!');

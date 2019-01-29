@@ -33,14 +33,16 @@ export default function createExtension(directory, options = defaultOptions) {
 	render({
 		input: inputTemplatePath,
 		output: inputPath,
-		data: { name: camelcase(options.name) }
+		data: {
+			name: camelcase(options.name, {pascalCase: true})
+		}
 	});
 
 	render({
 		input: typeDefinitionTemplatePath,
 		output: typeDefinitionPath,
 		data: {
-			name: camelcase(options.name),
+			name: camelcase(options.name, {pascalCase: true}),
 			sourceName: extName
 		}
 	});
@@ -62,7 +64,7 @@ export default function createExtension(directory, options = defaultOptions) {
 			input: testTemplatePath,
 			output: testFilePath,
 			data: {
-				name: camelcase(options.name),
+				name: camelcase(options.name, {pascalCase: true}),
 				sourceName: options.name
 			}
 		});
@@ -74,6 +76,6 @@ export default function createExtension(directory, options = defaultOptions) {
 
 	return {
 		extName,
-		functionName: camelcase(options.name)
+		functionName: camelcase(options.name, {pascalCase: true})
 	};
 }
