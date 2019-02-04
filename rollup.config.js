@@ -54,6 +54,13 @@ export default [
 		}
 	},
 	{
+		input: './src/cli/bitrix.info.js',
+		output: {
+			format: 'cjs',
+			file: './dist/bitrix.info.js'
+		}
+	},
+	{
 		input: './src/test.bootstrap.js',
 		output: {
 			format: 'cjs',
@@ -91,13 +98,13 @@ export default [
 ].map(entry => {
 	return Object.assign({}, entry, {
 		plugins: [
+			json(),
 			babel({
 				plugins: [
 					"@babel/plugin-transform-flow-strip-types"
 				]
 			}),
 			commonJs(),
-			json()
 		],
 		external: Object.keys(pkg.dependencies).concat([], [
 			'os',
