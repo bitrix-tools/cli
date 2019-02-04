@@ -5,8 +5,17 @@ import bitrixAdjust from './bitrix.adjust';
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
+import logSymbols from 'log-symbols';
+import argv from '../process/argv';
 
 export default async function bitrixSettings() {
+	if (argv.intro) {
+		console.log(box(`
+			${logSymbols.success} @bitrix/cli installed 
+			Answer a few questions
+		`));
+	}
+
 	const answers = await ask([
 		{
 			name: 'Adjust Mercurial repository',

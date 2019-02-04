@@ -11,6 +11,7 @@ var path = require('path');
 var os = require('os');
 var os__default = _interopDefault(os);
 var fs = require('fs');
+var logSymbols = _interopDefault(require('log-symbols'));
 
 async function ask(questions = []) {
   const answers = {};
@@ -100,6 +101,13 @@ function bitrixAdjust(params = {
 }
 
 async function bitrixSettings() {
+  if (argv.intro) {
+    console.log(box(`
+			${logSymbols.success} @bitrix/cli installed 
+			Answer a few questions
+		`));
+  }
+
   const answers = await ask([{
     name: 'Adjust Mercurial repository',
     id: 'hg',
