@@ -42,7 +42,7 @@ export default function bitrixAdjust(params = { path: hgrcPath }) {
 
 	fs.writeFileSync(params.path, encodedHgrc);
 
-	if (!argv.silent) {
+	if (!argv.silent && params.silent !== true) {
 		console.log(`${params.path} updated`.green.bold);
 	}
 }

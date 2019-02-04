@@ -47,6 +47,13 @@ export default [
 		}
 	},
 	{
+		input: './src/cli/bitrix.settings.js',
+		output: {
+			format: 'cjs',
+			file: './dist/bitrix.settings.js'
+		}
+	},
+	{
 		input: './src/test.bootstrap.js',
 		output: {
 			format: 'cjs',
