@@ -147,7 +147,6 @@ function render({
 const templatePath = path.resolve(appRoot, 'src/templates/extension');
 const configTemplatePath = path.resolve(templatePath, 'bundle.config.js');
 const inputTemplatePath = path.resolve(templatePath, 'input.js');
-const typeDefinitionTemplatePath = path.resolve(templatePath, 'type.definition.d.ts.tpl');
 const defaultOptions = {
   test: true,
   flow: false
@@ -164,7 +163,6 @@ function createExtension(directory, options = defaultOptions) {
   const extensionPath = path.resolve(directory, options.name.toLowerCase());
   const inputPath = path.resolve(extensionPath, `src/${options.name}.js`);
   const outputPath = path.resolve(extensionPath, `dist/${options.name}.bundle.js`);
-  const typeDefinitionPath = path.resolve(extensionPath, `@types/${options.name}.d.ts`);
   const configPath = path.resolve(extensionPath, 'bundle.config.js');
   const extName = buildExtensionName(inputPath, extensionPath);
   render({
@@ -174,16 +172,6 @@ function createExtension(directory, options = defaultOptions) {
       name: camelcase(options.name, {
         pascalCase: true
       })
-    }
-  });
-  render({
-    input: typeDefinitionTemplatePath,
-    output: typeDefinitionPath,
-    data: {
-      name: camelcase(options.name, {
-        pascalCase: true
-      }),
-      sourceName: extName
     }
   });
   render({
