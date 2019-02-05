@@ -17,6 +17,10 @@ export default function bitrixInfo() {
 		Package: ${location.eslint}
 		Config: ${location.eslintrc}
 		
+		${'Mercurial'.bold}
+		hooks.preupdate: ${location.mercurial.preupdate}
+		hooks.update: ${location.mercurial.update}
+		
 		Update: npm update -g ${pkg.name}
 		Remove: npm uninstall -g ${pkg.name}
 	`);

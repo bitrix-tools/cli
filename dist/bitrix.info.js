@@ -15,7 +15,11 @@ function info() {
     root: appRoot,
     flow: path.resolve(appRoot, 'node_modules', 'flow-bin'),
     eslint: path.resolve(appRoot, 'node_modules', 'eslint'),
-    eslintrc: path.resolve(appRoot, '.eslintrc.js')
+    eslintrc: path.resolve(appRoot, '.eslintrc.js'),
+    mercurial: {
+      preupdate: path.resolve(appRoot, 'src', 'mercurial', 'hooks', 'preupdate.sh'),
+      update: path.resolve(appRoot, 'src', 'mercurial', 'hooks', 'update.sh')
+    }
   };
   return {
     location
@@ -48,6 +52,10 @@ function bitrixInfo() {
 		${'ESLint'.bold}
 		Package: ${location.eslint}
 		Config: ${location.eslintrc}
+		
+		${'Mercurial'.bold}
+		hooks.preupdate: ${location.mercurial.preupdate}
+		hooks.update: ${location.mercurial.update}
 		
 		Update: npm update -g ${pkg.name}
 		Remove: npm uninstall -g ${pkg.name}
