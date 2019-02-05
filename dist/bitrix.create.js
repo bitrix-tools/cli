@@ -289,8 +289,8 @@ async function bitrixCreate() {
 			${'Include extension in php'.bold}
 			\\Bitrix\\Main\\Extension::load('${extInfo.extName}');
 			
-			${'Or import in your js code'.bold}
-			import { ${extInfo.functionName} } from '${extInfo.extName}';
+			${'or import in your js code'.bold}
+			import {${extInfo.functionName}} from '${extInfo.extName}';
 		`);
     return console.log(info);
   }
