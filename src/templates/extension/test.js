@@ -1,7 +1,7 @@
-import {{{name}}} from '../../src/{{sourceName}}';
+{{=<% %>=}}import {<%name%>} from '../../src/<%sourceName%>';
 
-describe('{{name}}', () => {
+describe('<%name%>', () => {
 	it('Should be a function', () => {
-		assert(typeof {{name}} === 'function');
+		assert(typeof <%name%> === 'function');
 	});
 });
