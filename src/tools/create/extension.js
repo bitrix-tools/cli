@@ -6,6 +6,7 @@ import buildExtensionName from '../../utils/build-extension-name';
 import bitrixFlow from '../../cli/bitrix.flow';
 import render from '../render';
 import slash from 'slash';
+import buildNamespaceName from '../../utils/build-namespace-name';
 
 const templatePath = resolve(appRoot, 'src/templates/extension');
 const configTemplatePath = resolve(templatePath, 'bundle.config.js');
@@ -25,7 +26,8 @@ export default function createExtension(directory, options = defaultOptions) {
 	const inputPath = resolve(extensionPath, `src/${options.name}.js`);
 	const outputPath = resolve(extensionPath, `dist/${options.name}.bundle.js`);
 	const configPath = resolve(extensionPath, 'bundle.config.js');
-	const extName = buildExtensionName(inputPath, extensionPath);
+	const extensionName = buildExtensionName(inputPath, extensionPath);
+	const namespaceName = buildNamespaceName({root: 'BX', extensionName});
 
 	render({
 		input: inputTemplatePath,
@@ -40,7 +42,8 @@ export default function createExtension(directory, options = defaultOptions) {
 		output: configPath,
 		data: {
 			input: slash(relative(extensionPath, inputPath)),
-			output: slash(relative(extensionPath, outputPath))
+			output: slash(relative(extensionPath, outputPath)),
+			namespace: namespaceName
 		}
 	});
 
@@ -63,7 +66,7 @@ export default function createExtension(directory, options = defaultOptions) {
 	}
 
 	return {
-		extName,
+		extensionName,
 		functionName: camelcase(options.name, {pascalCase: true})
 	};
 }

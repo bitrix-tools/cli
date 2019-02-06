@@ -38,15 +38,15 @@ export default async function bitrixCreate() {
 		const extInfo = createExtension(params.path, answers);
 		const info = box(`
 			${'Success!'.bold}
-			Extension ${extInfo.extName} created
+			Extension ${extInfo.extensionName} created
 			
 			Run ${`bitrix build -p ./${answers.name}`.bold} for build extension
 			
 			${'Include extension in php'.bold}
-			\\Bitrix\\Main\\Extension::load('${extInfo.extName}');
+			\\Bitrix\\Main\\Extension::load('${extInfo.extensionName}');
 			
 			${'or import in your js code'.bold}
-			import {${extInfo.functionName}} from '${extInfo.extName}';
+			import {${extInfo.functionName}} from '${extInfo.extensionName}';
 		`);
 		return console.log(info);
 	}

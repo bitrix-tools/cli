@@ -144,6 +144,24 @@ function render({
   }
 }
 
+function buildNamespaceName({
+  root = '',
+  extensionName
+} = {}) {
+  if (typeof extensionName === 'string') {
+    const fragments = extensionName.split('.').filter((item, index, arr) => index + 1 < arr.length).map(item => `${item.charAt(0).toUpperCase()}${item.slice(1)}`);
+    const namespace = fragments.join('.');
+
+    if (typeof root === 'string' && root !== '') {
+      return `${root}.${namespace}`;
+    }
+
+    return namespace;
+  }
+
+  return root;
+}
+
 const templatePath = path.resolve(appRoot, 'src/templates/extension');
 const configTemplatePath = path.resolve(templatePath, 'bundle.config.js');
 const inputTemplatePath = path.resolve(templatePath, 'input.js');
@@ -164,7 +182,11 @@ function createExtension(directory, options = defaultOptions) {
   const inputPath = path.resolve(extensionPath, `src/${options.name}.js`);
   const outputPath = path.resolve(extensionPath, `dist/${options.name}.bundle.js`);
   const configPath = path.resolve(extensionPath, 'bundle.config.js');
-  const extName = buildExtensionName(inputPath, extensionPath);
+  const extensionName = buildExtensionName(inputPath, extensionPath);
+  const namespaceName = buildNamespaceName({
+    root: 'BX',
+    extensionName
+  });
   render({
     input: inputTemplatePath,
     output: inputPath,
@@ -179,7 +201,8 @@ function createExtension(directory, options = defaultOptions) {
     output: configPath,
     data: {
       input: slash(path.relative(extensionPath, inputPath)),
-      output: slash(path.relative(extensionPath, outputPath))
+      output: slash(path.relative(extensionPath, outputPath)),
+      namespace: namespaceName
     }
   });
 
@@ -207,7 +230,7 @@ function createExtension(directory, options = defaultOptions) {
   }
 
   return {
-    extName,
+    extensionName,
     functionName: camelcase(options.name, {
       pascalCase: true
     })
@@ -270,15 +293,15 @@ async function bitrixCreate() {
     const extInfo = createExtension(params.path, answers);
     const info = box(`
 			${'Success!'.bold}
-			Extension ${extInfo.extName} created
+			Extension ${extInfo.extensionName} created
 			
 			Run ${`bitrix build -p ./${answers.name}`.bold} for build extension
 			
 			${'Include extension in php'.bold}
-			\\Bitrix\\Main\\Extension::load('${extInfo.extName}');
+			\\Bitrix\\Main\\Extension::load('${extInfo.extensionName}');
 			
 			${'or import in your js code'.bold}
-			import {${extInfo.functionName}} from '${extInfo.extName}';
+			import {${extInfo.functionName}} from '${extInfo.extensionName}';
 		`);
     return console.log(info);
   }
