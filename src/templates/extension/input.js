@@ -1,8 +1,8 @@
-import { type } from 'main.core';
+import {type} from 'main.core';
 
 export class {{name}}
 {
-	constructor(options = {name: {{name}}})
+	constructor(options = {name: '{{name}}'})
 	{
 		this.name = options.name;
 	}

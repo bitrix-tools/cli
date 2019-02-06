@@ -1,4 +1,4 @@
-import { {{name}} } from '../../src/{{sourceName}}';
+import {{{name}}} from '../../src/{{sourceName}}';
 
 describe('{{name}}', () => {
 	it('Should be a function', () => {
