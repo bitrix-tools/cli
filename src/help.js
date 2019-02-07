@@ -14,10 +14,8 @@ helper
 	.option('-t, --test', 'Run tests after build')
 	.separator()
 
-	.header('Create entities')
-	.command('create <options>', 'Create entity')
-	.subheader('Options')
-	.option('--extension', 'Starts the new extension wizard')
+	.header('Create extension')
+	.command('create [extName]', 'Runs create extension wizard')
 	.separator()
 
 	.header('Testing')
@@ -26,6 +24,7 @@ helper
 	.option('-w, --watch', 'Run file change watcher for current directory')
 	.option('-m, --modules', 'Run command for specified modules')
 	.option('-p, --path', 'Run command for path')
+	.separator()
 
 	.header('Settings')
 	.command('settings', 'Runs settings wizard')

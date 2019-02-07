@@ -266,55 +266,43 @@ function box(content) {
 }
 
 async function bitrixCreate() {
-  if (argv.extension) {
-    const answers = await ask([{
-      name: 'Extension name',
-      id: 'name',
-      type: 'input',
-      default: typeof argv.extension === 'string' ? argv.extension : '',
-      validate: input => {
-        if (typeof input === 'string' && input.length) {
-          return true;
-        } else {
-          return 'Name should be not empty string';
-        }
+  const answers = await ask([{
+    name: 'Extension name',
+    id: 'name',
+    type: 'input',
+    default: typeof argv._[1] === 'string' ? argv._[1] : '',
+    validate: input => {
+      if (typeof input === 'string' && input.length) {
+        return true;
+      } else {
+        return 'Name should be not empty string';
       }
-    }, {
-      name: 'Enable tests',
-      id: 'tests',
-      type: 'confirm',
-      default: true
-    }, {
-      name: 'Enable Flow',
-      id: 'flow',
-      type: 'confirm',
-      default: false
-    }]);
-    const extInfo = createExtension(params.path, answers);
-    const info = box(`
-			${'Success!'.bold}
-			Extension ${extInfo.extensionName} created
-			
-			Run ${`bitrix build -p ./${answers.name}`.bold} for build extension
-			
-			${'Include extension in php'.bold}
-			\\Bitrix\\Main\\Extension::load('${extInfo.extensionName}');
-			
-			${'or import in your js code'.bold}
-			import {${extInfo.functionName}} from '${extInfo.extensionName}';
-		`);
-    return console.log(info);
-  }
-
-  if (argv.component) {
-    const info = box(`Creating components is not yet available`);
-    return console.log(info);
-  }
-
-  if (argv.module) {
-    const info = box(`Creating modules is not yet available`);
-    return console.log(info);
-  }
+    }
+  }, {
+    name: 'Enable tests',
+    id: 'tests',
+    type: 'confirm',
+    default: true
+  }, {
+    name: 'Enable Flow',
+    id: 'flow',
+    type: 'confirm',
+    default: false
+  }]);
+  const extInfo = createExtension(params.path, answers);
+  const info = box(`
+		${'Success!'.bold}
+		Extension ${extInfo.extensionName} created
+		
+		Run ${`bitrix build -p ./${answers.name}`.bold} for build extension
+		
+		${'Include extension in php'.bold}
+		\\Bitrix\\Main\\Extension::load('${extInfo.extensionName}');
+		
+		${'or import in your js code'.bold}
+		import {${extInfo.functionName}} from '${extInfo.extensionName}';
+	`);
+  return console.log(info);
 }
 
 module.exports = bitrixCreate;
