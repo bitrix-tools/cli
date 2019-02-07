@@ -18,24 +18,6 @@ helper
 	.command('create <options>', 'Create entity')
 	.subheader('Options')
 	.option('--extension', 'Starts the new extension wizard')
-	.option('--component', 'Starts the new component wizard')
-	.option('--module', 'Starts the new module wizard')
-	.separator()
-
-	.header('Technology usage')
-	.command('flow', 'Initializes Flow tech for current directory')
-	.command('typescript', '(soon) Initializes TypeScript tech for current directory')
-	.subheader('Options')
-	.option('-i, --init', 'Initialize technology for current directory')
-	.option('-p, --path', 'Initialize technology for specified directory')
-	.separator()
-
-	.header('Adjusts')
-	.command('adjust', 'Adds Mercurial events handlers for all repositories. ' +
-		'\nThe command modifies file ~/.hgrc. Before modification, ' +
-		'\na backup copy of the file with the name will be created .hgrc.backup')
-	.subheader('Options')
-	.option('--hg', 'Adjusts hg repositories')
 	.separator()
 
 	.header('Testing')
@@ -43,7 +25,19 @@ helper
 	.subheader('Options')
 	.option('-w, --watch', 'Run file change watcher for current directory')
 	.option('-m, --modules', 'Run command for specified modules')
-	.option('-p, --path', 'Run command for path');
+	.option('-p, --path', 'Run command for path')
+
+	.header('Settings')
+	.command('settings', 'Runs settings wizard')
+	.separator()
+
+	.header('Info')
+	.command('info', 'Prints information about tools')
+	.separator()
+
+	.header('Help')
+	.command('--help, -h', 'Prints help information')
+	.separator();
 
 export default function help() {
 	helper.print();
