@@ -1,4 +1,4 @@
-import {type} from 'main.core';
+import {Type} from 'main.core';
 
 export class {{name}}
 {
@@ -9,7 +9,7 @@ export class {{name}}
 
 	setName(name)
 	{
-		if (type.isString(name))
+		if (Type.isString(name))
 		{
 			this.name = name;
 		}
