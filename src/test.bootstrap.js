@@ -98,12 +98,7 @@ function moduleResolver(sourcePath, currentFile, opts) {
 		const moduleName = splitedName.shift();
 
 		const moduleJsPath = resolve(modulesPath, moduleName, 'install', 'js', moduleName);
-		let extPath = resolve(moduleJsPath, join.apply(null, splitedName));
-
-		// @todo refactoring
-		if (extPath.endsWith('main/core')) {
-			extPath = resolve(extPath, 'es6');
-		}
+		const extPath = resolve(moduleJsPath, join.apply(null, splitedName));
 
 		const configPath = resolve(extPath, 'bundle.config.js');
 
