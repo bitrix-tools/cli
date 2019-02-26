@@ -75,7 +75,6 @@ function getConfigs(directory) {
         name: currentConfig.namespace || '',
         treeshake: currentConfig.treeshake !== false,
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
-        namespaceFunction: currentConfig.namespaceFunction,
         rel: makeIterable(currentConfig.rel),
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))

@@ -7,17 +7,32 @@ var autoprefixer = _interopDefault(require('autoprefixer'));
 var json = _interopDefault(require('rollup-plugin-json'));
 var reporter = _interopDefault(require('rollup-plugin-reporter'));
 var babel = _interopDefault(require('rollup-plugin-simple-babel'));
+var resolve = _interopDefault(require('rollup-plugin-node-resolve'));
+var commonjs = _interopDefault(require('rollup-plugin-commonjs'));
+var minimist = _interopDefault(require('minimist'));
 require('colors');
 var logSymbols = _interopDefault(require('log-symbols'));
 var slash = _interopDefault(require('slash'));
-var minimist = _interopDefault(require('minimist'));
-var resolve = _interopDefault(require('rollup-plugin-node-resolve'));
-var commonjs = _interopDefault(require('rollup-plugin-commonjs'));
 var Mocha = _interopDefault(require('mocha'));
 var glob = _interopDefault(require('fast-glob'));
 var os = _interopDefault(require('os'));
 var path = require('path');
 var path__default = _interopDefault(path);
+
+var alias = {
+  'w': 'watch',
+  'p': 'path',
+  'm': 'modules',
+  't': 'test',
+  'h': 'help',
+  'v': 'version',
+  'c': 'create',
+  'n': 'name'
+};
+
+var argv = minimist(process.argv.slice(2), {
+  alias
+});
 
 function isModulePath(filePath) {
   let exp = new RegExp('\/(.[a-z0-9-_]+)\/install\/js\/(.[a-z0-9-_]+)\/');
@@ -86,7 +101,6 @@ function getConfigs(directory) {
         name: currentConfig.namespace || '',
         treeshake: currentConfig.treeshake !== false,
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
-        namespaceFunction: currentConfig.namespaceFunction,
         rel: makeIterable(currentConfig.rel),
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))
@@ -224,49 +238,6 @@ function bitrixReporter(bundle, argv = {}) {
   }
 
   console.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
-}
-
-var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
-};
-
-var argv = minimist(process.argv.slice(2), {
-  alias
-});
-
-function namespaceTransformer(options = {}) {
-  return {
-    name: 'rollup-plugin-namespace-transformer',
-
-    renderChunk(code) {
-      if (options.namespaceFunction) {
-        let lastLine = code.split(/\r?\n/).pop();
-        let parsedNamespace = lastLine.match(/this\.(.*)\s=/);
-        let namespace = null;
-
-        if (parsedNamespace && parsedNamespace[1]) {
-          namespace = parsedNamespace[1];
-        }
-
-        let modifiedLastLine = lastLine.replace(/\((.*?)\)/, `(${options.namespaceFunction}("${namespace}")`);
-        code = code.replace(lastLine, modifiedLastLine);
-        code = code.replace(/^this(.*) \|\| {};/gm, '').trim();
-      }
-
-      return {
-        code,
-        map: null
-      };
-    }
-
-  };
 }
 
 function invalidateModuleCache(module, recursive, store = []) {
@@ -418,19 +389,7 @@ function rollupConfig({
         plugins: [resolvePackageModule('@babel/plugin-external-helpers'), resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties'), resolvePackageModule('@babel/plugin-proposal-private-methods')]
       }), commonjs({
         sourceMap: false
-      }), rollupMochaTestRunner(), namespaceTransformer({
-        namespaceFunction: function () {
-          if (output.namespaceFunction === null) {
-            return output.namespaceFunction;
-          }
-
-          if (typeof output.namespaceFunction === 'string') {
-            return output.namespaceFunction;
-          }
-
-          return 'BX.namespace';
-        }()
-      }), reporter({
+      }), rollupMochaTestRunner(), reporter({
         exclude: ['style.js'],
         report: bundle => {
           if (argv.report !== false) {
@@ -448,10 +407,10 @@ function rollupConfig({
       extend: true,
       exports: 'named',
       globals: {
-        'BX': 'BX',
-        'react': 'React',
+        BX: 'BX',
+        react: 'React',
         'react-dom': 'ReactDOM',
-        'window': 'window',
+        window: 'window',
         ...output.globals
       }
     }

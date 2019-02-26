@@ -57,8 +57,7 @@ function buildRollupConfig(config) {
     },
     output: {
       file: path.resolve(config.context, config.output),
-      name: config.name,
-      namespaceFunction: config.namespaceFunction
+      name: config.name
     }
   });
 }
@@ -122,7 +121,6 @@ function getConfigs(directory) {
         name: currentConfig.namespace || '',
         treeshake: currentConfig.treeshake !== false,
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
-        namespaceFunction: currentConfig.namespaceFunction,
         rel: makeIterable(currentConfig.rel),
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))
