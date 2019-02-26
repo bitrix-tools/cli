@@ -7,7 +7,7 @@ import {appRoot} from '../constants';
 
 export function renderRel(rel) {
 	// @todo refactor this
-	return `${rel.map((item, i) => `${!i ? '\n' : ''}\t\t"${item}"`).join(',\n')
+	return `${rel.map((item, i) => `${!i ? '\n' : ''}\t\t'${item}'`).join(',\n')
 	}${rel.length ? '\n\t' : ''}`;
 }
 

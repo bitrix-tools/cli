@@ -54,12 +54,12 @@ async function buildDirectory(dir, recursive = true) {
 				if (Array.isArray(skipCoreResult) && skipCoreResult[1])
 				{
 					configContent = configContent
-						.replace(skipCoreExp, `"skip_core" => ${skipCoreValue}`);
+						.replace(skipCoreExp, `'skip_core' => ${skipCoreValue}`);
 				}
 				else
 				{
 					configContent = configContent
-						.replace(relExp, `"rel" => ${relativities},\n\t"skip_core" => ${skipCoreValue}`);
+						.replace(relExp, `'rel' => ${relativities},\n\t'skip_core' => ${skipCoreValue}`);
 				}
 
 				writeFileSync(configPhpPath, configContent);
