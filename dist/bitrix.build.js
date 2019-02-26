@@ -2,11 +2,11 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var rollup = require('rollup');
 var os = _interopDefault(require('os'));
 var mustache = _interopDefault(require('mustache'));
 var Concat = _interopDefault(require('concat-with-sourcemaps'));
 require('colors');
-var rollup = require('rollup');
 var minimist = _interopDefault(require('minimist'));
 var glob = _interopDefault(require('fast-glob'));
 var Ora = _interopDefault(require('ora'));
@@ -77,6 +77,11 @@ function buildConfigBundlePath(filePath, ext) {
   return filePath;
 }
 
+function renderRel(rel) {
+  // @todo refactor this
+  return `${rel.map((item, i) => `${!i ? '\n' : ''}\t\t"${item}"`).join(',\n')}${rel.length ? '\n\t' : ''}`;
+}
+
 function generateConfigPhp(config) {
   if (!!config && typeof config !== 'object') {
     throw new Error('Invalid config');
@@ -86,16 +91,11 @@ function generateConfigPhp(config) {
   const template = fs__default.readFileSync(templatePath, 'utf-8');
   const outputPath = path__default.resolve(slash(config.context), slash(config.output));
   const data = {
-    cssPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
-    jsPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
+    cssPath: slash(path__default.relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
+    jsPath: slash(path__default.relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
     rel: renderRel(config.rel)
   };
   return mustache.render(template, data);
-}
-
-function renderRel(rel) {
-  // @todo refactor this
-  return rel.map((item, i) => `${!i ? '\n' : ''}\t\t"${item}"`).join(',\n') + `${rel.length ? '\n\t' : ''}`;
 }
 
 function isEs6File(path$$1) {
@@ -291,27 +291,14 @@ function concat(input = [], output) {
   }
 }
 
-async function build(dir, recursive) {
-  if (Array.isArray(dir)) {
-    for (let item of dir) {
-      console.log(`Build module ${path.basename(item)}`.bold);
-      await buildDirectory(item, recursive);
-    }
-  } else if (typeof dir === 'string') {
-    await buildDirectory(dir, recursive);
-  } else {
-    throw new Error('dir not string or array');
-  }
-}
-
 async function buildDirectory(dir, recursive = true) {
   const directory = new Directory(dir);
-  let configs = directory.getConfigs(recursive); // @todo Remove global state change
+  const configs = directory.getConfigs(recursive); // @todo Remove global state change
 
   global.currentDirectory = path.resolve(dir);
 
   for (const config of configs) {
-    let {
+    const {
       input,
       output
     } = buildRollupConfig(config); // @todo Remove global state change
@@ -336,16 +323,40 @@ async function buildDirectory(dir, recursive = true) {
       } // Updates dependencies list
 
 
-      const exp = /['"]rel['"] => (\[.*?\])/s;
-      const configString = fs.readFileSync(configPhpPath, 'utf-8');
-      const result = configString.match(exp);
+      const relExp = /['"]rel['"] => (\[.*?\])/s;
+      let configContent = fs.readFileSync(configPhpPath, 'utf-8');
+      const result = configContent.match(relExp);
 
       if (Array.isArray(result) && result[1]) {
         const relativities = `[${renderRel(bundle.imports)}]`;
-        const configContent = configString.replace(result[1], relativities);
+        configContent = configContent.replace(result[1], relativities); // Adjust skip_core
+
+        const skipCoreExp = /['"]skip_core['"] => (true|false)/s;
+        const skipCoreResult = configContent.match(skipCoreExp);
+        const skipCoreValue = !bundle.imports.includes('main.core');
+
+        if (Array.isArray(skipCoreResult) && skipCoreResult[1]) {
+          configContent = configContent.replace(skipCoreExp, `"skip_core" => ${skipCoreValue}`);
+        } else {
+          configContent = configContent.replace(relExp, `"rel" => ${relativities},\n\t"skip_core" => ${skipCoreValue}`);
+        }
+
         fs.writeFileSync(configPhpPath, configContent);
       }
     }
+  }
+}
+
+async function build(dir, recursive) {
+  if (Array.isArray(dir)) {
+    for (const item of dir) {
+      console.log(`Build module ${path.basename(item)}`.bold);
+      await buildDirectory(item, recursive);
+    }
+  } else if (typeof dir === 'string') {
+    await buildDirectory(dir, recursive);
+  } else {
+    throw new Error('dir not string or array');
   }
 }
 

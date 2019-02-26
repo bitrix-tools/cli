@@ -2,9 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import mustache from 'mustache';
 import slash from 'slash';
-import { relative } from 'path';
 import buildConfigBundlePath from './build-config-bundle-path';
-import { appRoot } from '../constants';
+import {appRoot} from '../constants';
+
+export function renderRel(rel) {
+	// @todo refactor this
+	return `${rel.map((item, i) => `${!i ? '\n' : ''}\t\t"${item}"`).join(',\n')
+	}${rel.length ? '\n\t' : ''}`;
+}
 
 function generateConfigPhp(config) {
 	if (!!config && typeof config !== 'object') {
@@ -17,18 +22,12 @@ function generateConfigPhp(config) {
 
 
 	const data = {
-		cssPath: slash(relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
-		jsPath: slash(relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
-		rel: renderRel(config.rel)
+		cssPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'css'))),
+		jsPath: slash(path.relative(slash(config.context), buildConfigBundlePath(outputPath, 'js'))),
+		rel: renderRel(config.rel),
 	};
 
 	return mustache.render(template, data);
-}
-
-export function renderRel(rel) {
-	// @todo refactor this
-	return rel.map((item, i) => `${!i ? '\n' : ''}\t\t"${item}"`).join(',\n') +
-		`${rel.length ? '\n\t' : ''}`;
 }
 
 export default generateConfigPhp;

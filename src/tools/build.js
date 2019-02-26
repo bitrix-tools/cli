@@ -1,37 +1,23 @@
+import {existsSync, readFileSync, writeFileSync} from 'fs';
+import {resolve, basename} from 'path';
+import {rollup} from 'rollup';
 import isModulePath from '../utils/is-module-path';
 import buildRollupConfig from '../utils/build-rollup-config';
-import generateConfigPhp, { renderRel } from '../utils/generate-config-php';
-import Directory from '../../src/entities/directory';
+import generateConfigPhp, {renderRel} from '../utils/generate-config-php';
+import Directory from '../entities/directory';
 import getGlobals from '../utils/get-globals';
 import concat from './concat';
 import 'colors';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { resolve, basename } from 'path';
-import { rollup } from 'rollup';
-
-async function build(dir, recursive) {
-	if (Array.isArray(dir)) {
-		for (let item of dir) {
-			console.log(`Build module ${basename(item)}`.bold);
-
-			await buildDirectory(item, recursive);
-		}
-	} else if (typeof dir === 'string') {
-		await buildDirectory(dir, recursive);
-	} else {
-		throw new Error('dir not string or array');
-	}
-}
 
 async function buildDirectory(dir, recursive = true) {
 	const directory = new Directory(dir);
-	let configs = directory.getConfigs(recursive);
+	const configs = directory.getConfigs(recursive);
 
 	// @todo Remove global state change
 	global.currentDirectory = resolve(dir);
 
 	for (const config of configs) {
-		let { input, output } = buildRollupConfig(config);
+		const {input, output} = buildRollupConfig(config);
 
 		// @todo Remove global state change
 		global.outputOptions = output;
@@ -52,16 +38,47 @@ async function buildDirectory(dir, recursive = true) {
 			}
 
 			// Updates dependencies list
-			const exp = /['"]rel['"] => (\[.*?\])/s;
-			const configString = readFileSync(configPhpPath, 'utf-8');
-			const result = configString.match(exp);
+			const relExp = /['"]rel['"] => (\[.*?\])/s;
+			let configContent = readFileSync(configPhpPath, 'utf-8');
+			const result = configContent.match(relExp);
 
 			if (Array.isArray(result) && result[1]) {
 				const relativities = `[${renderRel(bundle.imports)}]`;
-				const configContent = configString.replace(result[1], relativities);
+				configContent = configContent.replace(result[1], relativities);
+
+				// Adjust skip_core
+				const skipCoreExp = /['"]skip_core['"] => (true|false)/s;
+				const skipCoreResult = configContent.match(skipCoreExp);
+				const skipCoreValue = !bundle.imports.includes('main.core');
+
+				if (Array.isArray(skipCoreResult) && skipCoreResult[1])
+				{
+					configContent = configContent
+						.replace(skipCoreExp, `"skip_core" => ${skipCoreValue}`);
+				}
+				else
+				{
+					configContent = configContent
+						.replace(relExp, `"rel" => ${relativities},\n\t"skip_core" => ${skipCoreValue}`);
+				}
+
 				writeFileSync(configPhpPath, configContent);
 			}
 		}
+	}
+}
+
+async function build(dir, recursive) {
+	if (Array.isArray(dir)) {
+		for (const item of dir) {
+			console.log(`Build module ${basename(item)}`.bold);
+
+			await buildDirectory(item, recursive);
+		}
+	} else if (typeof dir === 'string') {
+		await buildDirectory(dir, recursive);
+	} else {
+		throw new Error('dir not string or array');
 	}
 }
 

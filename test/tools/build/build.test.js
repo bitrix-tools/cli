@@ -10,7 +10,8 @@ const extensions = [
 	path.resolve(modules, 'main/install/js/main/extension/child1'),
 	path.resolve(modules, 'main/install/js/main/extension/child2'),
 	path.resolve(modules, 'main/install/components/bitrix/test/templates/.default'),
-	path.resolve(modules, 'ui/install/js/ui/extension')
+	path.resolve(modules, 'ui/install/js/ui/extension'),
+	path.resolve(modules, 'main/install/js/main/withcore')
 ];
 
 const moduleWithoutExtensions = path.resolve(modules, 'iblock');
