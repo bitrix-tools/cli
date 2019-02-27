@@ -328,7 +328,8 @@ async function buildDirectory(dir, recursive = true) {
         fs.writeFileSync(configPhpPath, generateConfigPhp(config));
       }
 
-      let imports = [...bundle.imports];
+      const extNameExp = /^(\w).(.[\w.])/;
+      let imports = [...bundle.imports].filter(item => extNameExp.test(item));
 
       if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
         imports = ['main.polyfill.core', ...imports];
