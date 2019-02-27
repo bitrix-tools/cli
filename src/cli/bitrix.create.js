@@ -15,23 +15,22 @@ export default async function bitrixCreate() {
 			validate: (input) => {
 				if (typeof input === 'string' && input.length) {
 					return true;
-				} else {
-					return 'Name should be not empty string';
 				}
-			}
+				return 'Name should be not empty string';
+			},
 		},
 		{
 			name: 'Enable tests',
 			id: 'tests',
 			type: 'confirm',
-			default: true
+			default: true,
 		},
 		{
 			name: 'Enable Flow',
 			id: 'flow',
 			type: 'confirm',
-			default: false
-		}
+			default: false,
+		},
 	]);
 
 	const extInfo = createExtension(params.path, answers);
@@ -48,5 +47,6 @@ export default async function bitrixCreate() {
 		import {${extInfo.functionName}} from '${extInfo.extensionName}';
 	`);
 
+	// eslint-disable-next-line
 	return console.log(info);
 }

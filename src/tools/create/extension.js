@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import camelcase from 'camelcase';
-import { resolve, relative } from 'path';
-import { appRoot } from '../../constants';
+import {resolve, relative} from 'path';
+import slash from 'slash';
+import {appRoot} from '../../constants';
 import buildExtensionName from '../../utils/build-extension-name';
 import bitrixFlow from '../../cli/bitrix.flow';
 import render from '../render';
-import slash from 'slash';
 import buildNamespaceName from '../../utils/build-namespace-name';
 
 const templatePath = resolve(appRoot, 'src/templates/extension');
@@ -33,8 +33,8 @@ export default function createExtension(directory, options = defaultOptions) {
 		input: inputTemplatePath,
 		output: inputPath,
 		data: {
-			name: camelcase(options.name, {pascalCase: true})
-		}
+			name: camelcase(options.name, {pascalCase: true}),
+		},
 	});
 
 	render({
@@ -43,8 +43,8 @@ export default function createExtension(directory, options = defaultOptions) {
 		data: {
 			input: slash(relative(extensionPath, inputPath)),
 			output: slash(relative(extensionPath, outputPath)),
-			namespace: namespaceName
-		}
+			namespace: namespaceName,
+		},
 	});
 
 	if (options.tests) {
@@ -56,8 +56,8 @@ export default function createExtension(directory, options = defaultOptions) {
 			output: testFilePath,
 			data: {
 				name: camelcase(options.name, {pascalCase: true}),
-				sourceName: options.name
-			}
+				sourceName: options.name,
+			},
 		});
 	}
 
@@ -67,6 +67,6 @@ export default function createExtension(directory, options = defaultOptions) {
 
 	return {
 		extensionName,
-		functionName: camelcase(options.name, {pascalCase: true})
+		functionName: camelcase(options.name, {pascalCase: true}),
 	};
 }

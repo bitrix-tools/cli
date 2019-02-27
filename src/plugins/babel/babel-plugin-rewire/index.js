@@ -9,8 +9,8 @@ module.exports = function() {
 			Program: {
 				enter(path) {
 					path.pushContainer('body', babel.parse(src).program.body);
-				}
-			}
-		}
+				},
+			},
+		},
 	};
 };

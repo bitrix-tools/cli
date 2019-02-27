@@ -5,14 +5,14 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var minimist = _interopDefault(require('minimist'));
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {

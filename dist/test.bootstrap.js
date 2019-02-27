@@ -2,14 +2,14 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var os = _interopDefault(require('os'));
 var jsdom = require('jsdom');
 var mocha = _interopDefault(require('mocha'));
 var assert = _interopDefault(require('assert'));
 var sinon = require('sinon');
+var fs = require('fs');
+var os = _interopDefault(require('os'));
 var path = require('path');
 var path__default = _interopDefault(path);
-var fs = require('fs');
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
@@ -34,7 +34,7 @@ global.suiteTeardown = mocha.suiteTeardown;
 global.teardown = mocha.teardown;
 global.test = mocha.test;
 global.run = mocha.run;
-const DOM = new jsdom.JSDOM(``, {
+const DOM = new jsdom.JSDOM('', {
   url: 'https://example.org/',
   referrer: 'https://example.com/',
   contentType: 'text/html',
@@ -63,8 +63,31 @@ require.extensions['.png'] = () => null;
 
 require.extensions['.jpg'] = () => null;
 
+function moduleResolver(sourcePath, currentFile) {
+  const exp = /(^\w+)\.(.*)/;
+  const root = currentFile.split('modules')[0];
+
+  if (exp.test(sourcePath)) {
+    const modulesPath = path.resolve(root, 'modules');
+    const splitedName = sourcePath.split('.');
+    const moduleName = splitedName.shift();
+    const moduleJsPath = path.resolve(modulesPath, moduleName, 'install', 'js', moduleName);
+    const extPath = path.resolve(moduleJsPath, path.join(...splitedName));
+    const configPath = path.resolve(extPath, 'bundle.config.js');
+
+    if (fs.existsSync(configPath)) {
+      // eslint-disable-next-line
+      const config = require(configPath);
+
+      return path.resolve(extPath, config.input);
+    }
+  }
+
+  return '';
+}
+
 require('@babel/register')({
-  cwd: function () {
+  cwd: (() => {
     const cwd = process.cwd();
 
     if (cwd.includes('/modules')) {
@@ -76,30 +99,10 @@ require('@babel/register')({
     }
 
     return path.resolve(cwd, '../../../../../');
-  }(),
+  })(),
   presets: [resolvePackageModule('@babel/preset-env'), resolvePackageModule('@babel/preset-react')],
   plugins: [[resolvePackageModule('babel-plugin-module-resolver'), {
     resolvePath: moduleResolver
   }], resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties')],
   exclude: ['**/node_modules**/', '**/babel-external-helpers.js', '**/base-polyfill.js', '**/bundle.core-init.js', '**/bundle.core.js', '**/core/core.js']
 });
-
-function moduleResolver(sourcePath, currentFile, opts) {
-  const exp = /(^\w+)\.(.*)/;
-  const root = currentFile.split('modules')[0];
-
-  if (exp.test(sourcePath)) {
-    const modulesPath = path.resolve(root, 'modules');
-    const splitedName = sourcePath.split('.');
-    const moduleName = splitedName.shift();
-    const moduleJsPath = path.resolve(modulesPath, moduleName, 'install', 'js', moduleName);
-    const extPath = path.resolve(moduleJsPath, path.join.apply(null, splitedName));
-    const configPath = path.resolve(extPath, 'bundle.config.js');
-
-    if (fs.existsSync(configPath)) {
-      const config = require(configPath);
-
-      return path.resolve(extPath, config.input);
-    }
-  }
-}

@@ -20,14 +20,14 @@ var path = require('path');
 var path__default = _interopDefault(path);
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -35,45 +35,45 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 function isModulePath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9-_]+)\/install\/js\/(.[a-z0-9-_]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9-_]+)/install/js/(.[a-z0-9-_]+)/');
+  const res = `${slash(filePath)}`.match(exp);
   return !!res && !!res[1] && !!res[2];
 }
 
 function buildExtensionName(filePath, context) {
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/js\/(.[a-z0-9_-]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9_-]+)/install/js/(.[a-z0-9_-]+)/');
+  const res = `${slash(filePath)}`.match(exp);
 
   if (!Array.isArray(res)) {
     return path.basename(context);
   }
 
-  let fragments = slash(context).split(`${res[1]}/install/js/${res[2]}/`);
+  const fragments = `${slash(context)}`.split(`${res[1]}/install/js/${res[2]}/`);
   return `${res[2]}.${fragments[fragments.length - 1].replace(/\/$/, '').split('/').join('.')}`;
 }
 
 function isComponentPath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9]+)\/install\/components\/(.[a-z0-9]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9]+)/install/components/(.[a-z0-9]+)/');
+  const res = `${slash(filePath)}`.match(exp);
   return !!res && !!res[1] && !!res[2];
 }
 
 function buildComponentName(filePath) {
-  filePath = slash(filePath);
-  let regExp = new RegExp('\/(.[a-z0-9]+)\/install\/components\/(.[a-z0-9]+)\/');
-  let res = filePath.match(regExp);
-  return `${res[2]}:${filePath.split(res[0])[1].split('/')[0]}`;
+  const normalizedPath = `${slash(filePath)}`;
+  const regExp = new RegExp('/(.[a-z0-9]+)/install/components/(.[a-z0-9]+)/');
+  const res = normalizedPath.match(regExp);
+  return `${res[2]}:${normalizedPath.split(res[0])[1].split('/')[0]}`;
 }
 
 function isTemplatePath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/templates\/(.[a-z0-9_-]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9_-]+)/install/templates/(.[a-z0-9_-]+)/');
+  const res = `${slash(filePath)}`.match(exp);
   return !!res && !!res[1] && !!res[2];
 }
 
 function buildTemplateName(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9_-]+)\/install\/templates\/(.[a-z0-9_-]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9_-]+)/install/templates/(.[a-z0-9_-]+)/');
+  const res = `${slash(filePath)}`.match(exp);
   return res && res[2];
 }
 
@@ -87,41 +87,15 @@ const options = {
   unique: false
 };
 
-function getConfigs(directory) {
-  directory = slash(directory);
-  const pattern = [path.resolve(directory, '**/bundle.config.js'), path.resolve(directory, '**/script.es6.js')];
-  return glob.sync(pattern, options).reduce((acc, file) => {
-    let context = path.dirname(file);
-    let config = getConfigByFile(file);
-    let configs = makeIterable(config);
-    configs.forEach(currentConfig => {
-      acc.push({
-        input: path.resolve(context, currentConfig.input),
-        output: path.resolve(context, currentConfig.output),
-        name: currentConfig.namespace || '',
-        treeshake: currentConfig.treeshake !== false,
-        adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
-        rel: makeIterable(currentConfig.rel),
-        context: path.resolve(context),
-        concat: prepareConcat(currentConfig.concat, path.resolve(context))
-      });
-    });
-    return acc;
-  }, []);
-}
-
 function prepareConcat(files, context) {
   if (typeof files !== 'object') {
     return {};
   }
 
-  files = { ...files
-  };
+  const result = {};
   Object.keys(files).forEach(key => {
     if (Array.isArray(files[key])) {
-      files[key] = files[key].map(filePath => {
-        return path.resolve(context, filePath);
-      });
+      result[key] = files[key].map(filePath => path.resolve(context, filePath));
     }
   });
   return files;
@@ -134,7 +108,8 @@ function getConfigByFile(configPath) {
       input: path.resolve(context, 'script.es6.js'),
       output: path.resolve(context, 'script.js')
     };
-  }
+  } // eslint-disable-next-line
+
 
   return require(configPath);
 }
@@ -151,6 +126,29 @@ function makeIterable(value) {
   return [];
 }
 
+function getConfigs(directory) {
+  const normalizedDirectory = `${slash(directory)}`;
+  const pattern = [path.resolve(normalizedDirectory, '**/bundle.config.js'), path.resolve(normalizedDirectory, '**/script.es6.js')];
+  return glob.sync(pattern, options).reduce((acc, file) => {
+    const context = path.dirname(file);
+    const config = getConfigByFile(file);
+    const configs = makeIterable(config);
+    configs.forEach(currentConfig => {
+      acc.push({
+        input: path.resolve(context, currentConfig.input),
+        output: path.resolve(context, currentConfig.output),
+        name: currentConfig.namespace || '',
+        treeshake: currentConfig.treeshake !== false,
+        adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
+        rel: makeIterable(currentConfig.rel),
+        context: path.resolve(context),
+        concat: prepareConcat(currentConfig.concat, path.resolve(context))
+      });
+    });
+    return acc;
+  }, []);
+}
+
 class Directory {
   constructor(dir) {
     this.location = dir;
@@ -161,13 +159,13 @@ class Directory {
       Directory.configs.set(this.location, getConfigs(this.location));
     }
 
-    let configs = Directory.configs.get(this.location);
+    const configs = Directory.configs.get(this.location);
 
     if (recursive) {
       return configs;
     }
 
-    let parentConfig = configs.reduce((prevConfig, config) => {
+    const parentConfig = configs.reduce((prevConfig, config) => {
       if (prevConfig) {
         const prevContext = prevConfig.context;
         const currContext = config.context;
@@ -181,9 +179,7 @@ class Directory {
     }, null);
 
     if (parentConfig) {
-      return configs.filter(config => {
-        return config.context === parentConfig.context;
-      });
+      return configs.filter(config => config.context === parentConfig.context);
     }
 
     return configs;
@@ -196,10 +192,8 @@ Directory.configs = new Map();
 function bitrixReporter(bundle, argv = {}) {
   const directory = new Directory(global.currentDirectory || argv.path || argv.p || process.cwd());
   const configs = directory.getConfigs();
-  let input = path.resolve(process.cwd(), bundle.bundle);
-  let config = configs.find(currentConfig => {
-    return path.resolve(currentConfig.context, currentConfig.output).endsWith(bundle.bundle);
-  });
+  const input = path.resolve(process.cwd(), bundle.bundle);
+  const config = configs.find(currentConfig => path.resolve(currentConfig.context, currentConfig.output).endsWith(bundle.bundle));
   let testsStatus = '';
   let testResult = '';
 
@@ -220,40 +214,44 @@ function bitrixReporter(bundle, argv = {}) {
   }
 
   if (isModulePath(input)) {
-    let name = buildExtensionName(input, config.context);
+    const name = buildExtensionName(input, config.context); // eslint-disable-next-line
+
     console.log(` ${logSymbols.success} Build extension ${name} ${testResult}`);
     return;
   }
 
   if (isComponentPath(input)) {
-    let name = buildComponentName(input);
+    const name = buildComponentName(input); // eslint-disable-next-line
+
     console.log(` ${logSymbols.success} Build component ${name} ${testResult}`);
     return;
   }
 
   if (isTemplatePath(input)) {
-    let name = buildTemplateName(input);
+    const name = buildTemplateName(input); // eslint-disable-next-line
+
     console.log(` ${logSymbols.success} Build template ${name} ${testResult}`);
     return;
-  }
+  } // eslint-disable-next-line
+
 
   console.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
 }
 
 function invalidateModuleCache(module, recursive, store = []) {
   if (typeof module === 'string') {
-    module = require.resolve(module);
+    const resolvedModule = require.resolve(module);
 
-    if (require.cache[module] && !store.includes(module)) {
-      store.push(module);
+    if (require.cache[resolvedModule] && !store.includes(resolvedModule)) {
+      store.push(resolvedModule);
 
-      if (Array.isArray(require.cache[module].children) && recursive) {
-        require.cache[module].children.forEach(module => {
-          invalidateModuleCache(module.id, recursive, store);
+      if (Array.isArray(require.cache[resolvedModule].children) && recursive) {
+        require.cache[resolvedModule].children.forEach(currentModule => {
+          invalidateModuleCache(currentModule.id, recursive, store);
         });
       }
 
-      delete require.cache[module];
+      delete require.cache[resolvedModule];
     }
   }
 }
@@ -261,33 +259,21 @@ function invalidateModuleCache(module, recursive, store = []) {
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
 
-async function test(dir, report = true) {
-  if (Array.isArray(dir)) {
-    for (let item of dir) {
-      const testStatus = await testDirectory(item, report);
-      let testResult = '';
+/*
+	eslint
+ 	"no-restricted-syntax": "off",
+ 	"no-await-in-loop": "off"
+*/
 
-      if (testStatus === 'passed') {
-        testResult = 'passed'.green;
-      }
-
-      if (testStatus === 'failure') {
-        testResult = 'failed'.red;
-      }
-
-      if (testStatus === 'notests') {
-        testResult = 'no tests'.grey;
-      }
-
-      console.log(`Test module ${item}`.bold, `${testResult}`);
-    }
-  } else if (typeof dir === 'string') {
-    return await testDirectory(dir, report);
-  } else {
-    throw new Error('dir not string or array');
-  }
-}
 function reporterStub() {}
+
+function appendBootstrap() {
+  const bootstrapPath = path__default.resolve(appRoot, 'dist/test.bootstrap.js');
+  invalidateModuleCache(bootstrapPath); // eslint-disable-next-line
+
+  require(bootstrapPath);
+}
+
 async function testDirectory(dir, report = true) {
   const directory = new Directory(dir);
   const configs = directory.getConfigs();
@@ -311,10 +297,10 @@ async function testDirectory(dir, report = true) {
     });
 
     if (tests.length) {
-      tests.forEach(test => {
+      tests.forEach(testFile => {
         const recursive = true;
-        invalidateModuleCache(test, recursive);
-        mocha.addFile(test);
+        invalidateModuleCache(testFile, recursive);
+        mocha.addFile(testFile);
       });
       appendBootstrap();
       await new Promise(resolve$$1 => {
@@ -335,15 +321,36 @@ async function testDirectory(dir, report = true) {
 
   return 'failure';
 }
+async function test(dir, report = true) {
+  if (Array.isArray(dir)) {
+    for (const item of dir) {
+      const testStatus = await testDirectory(item, report);
+      let testResult = '';
 
-function appendBootstrap() {
-  invalidateModuleCache(path__default.resolve(appRoot, 'dist/test.bootstrap.js'));
+      if (testStatus === 'passed') {
+        testResult = 'passed'.green;
+      }
 
-  require(path__default.resolve(appRoot, 'dist/test.bootstrap.js'));
+      if (testStatus === 'failure') {
+        testResult = 'failed'.red;
+      }
+
+      if (testStatus === 'notests') {
+        testResult = 'no tests'.grey;
+      } // eslint-disable-next-line
+
+
+      console.log(`Test module ${item}`.bold, `${testResult}`);
+    }
+  } else if (typeof dir === 'string') {
+    await testDirectory(dir, report);
+  } else {
+    throw new Error('dir not string or array');
+  }
 }
 
 global.testsStatus = global.testsStatus || {};
-function rollupMochaTestRunner(options = {}) {
+function rollupMochaTestRunner() {
   return {
     name: 'test',
 
@@ -351,12 +358,10 @@ function rollupMochaTestRunner(options = {}) {
       if (argv.test || argv.t) {
         const directory = new Directory(global.currentDirectory);
         const configs = directory.getConfigs();
-        let config = configs.find(({
+        const config = configs.find(({
           context,
           output
-        }) => {
-          return path__default.resolve(context, output).endsWith(bundle.file);
-        });
+        }) => path__default.resolve(context, output).endsWith(bundle.file));
         global.testsStatus[config.context] = await test(config.context);
       }
     }

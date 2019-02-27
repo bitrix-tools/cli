@@ -5,7 +5,7 @@ const options = {
 	margin: 1,
 	align: 'left',
 	borderColor: 'yellow',
-	borderStyle: 'round'
+	borderStyle: 'round',
 };
 
 export default function box(content) {

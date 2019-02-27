@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as mustache from 'mustache';
 import fse from 'fs-extra';
 
-export default function render({ input, output, data = {}}) {
+export default function render({input, output, data = {}}) {
 	if (fs.existsSync(input)) {
 		if (fs.existsSync(output)) {
 			fs.unlinkSync(output);

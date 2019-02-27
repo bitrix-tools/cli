@@ -1,15 +1,16 @@
-import ask from '../tools/ask';
-import box from '../tools/box';
 import 'colors';
-import bitrixAdjust from './bitrix.adjust';
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import logSymbols from 'log-symbols';
+import bitrixAdjust from './bitrix.adjust';
+import box from '../tools/box';
+import ask from '../tools/ask';
 import argv from '../process/argv';
 
 export default async function bitrixSettings() {
 	if (argv.intro) {
+		// eslint-disable-next-line
 		console.log(box(`
 			${logSymbols.success} @bitrix/cli installed 
 			Answer a few questions
@@ -21,8 +22,8 @@ export default async function bitrixSettings() {
 			name: 'Adjust Mercurial repository',
 			id: 'hg',
 			type: 'confirm',
-			default: false
-		}
+			default: false,
+		},
 	]);
 
 	if (answers.hg) {
@@ -35,23 +36,24 @@ export default async function bitrixSettings() {
 					{
 						name: 'All repositories',
 						value: 'all',
-						default: true
+						default: true,
 					},
 					{
 						name: 'Specified repository',
-						value: 'specified'
-					}
-				]
-			}
+						value: 'specified',
+					},
+				],
+			},
 		]);
 
 		if (adjustAnswers.adjustType === 'all') {
 			const hgrcPath = path.resolve(os.homedir(), '.hgrc');
 			bitrixAdjust({
 				silent: true,
-				path: hgrcPath
+				path: hgrcPath,
 			});
 
+			// eslint-disable-next-line
 			console.log(box(`${hgrcPath} updated`));
 		}
 
@@ -74,12 +76,12 @@ export default async function bitrixSettings() {
 
 						if (!fs.existsSync(hgPath))
 						{
-							return `Specified path is not valid Mercurial repository`;
+							return 'Specified path is not valid Mercurial repository';
 						}
 
 						return true;
-					}
-				}
+					},
+				},
 			]);
 
 			const normalizedPath = repositoryAnswers.path.replace('~', os.homedir());
@@ -88,9 +90,10 @@ export default async function bitrixSettings() {
 
 			bitrixAdjust({
 				silent: true,
-				path: hgrcPath
+				path: hgrcPath,
 			});
 
+			// eslint-disable-next-line
 			console.log(box(`${hgrcPath} updated`));
 		}
 	}

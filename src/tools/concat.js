@@ -1,6 +1,6 @@
 import Concat from 'concat-with-sourcemaps';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import {existsSync, readFileSync, writeFileSync} from 'fs';
+import {resolve, dirname} from 'path';
 import adjustSourceMap from '../utils/adjust-sourcemap';
 
 const separator = '\n\n';
@@ -13,17 +13,17 @@ export default function concat(input: string[] = [], output: string) {
 
 		input
 			.filter(existsSync)
-			.forEach(filePath => {
-				let fileContent = readFileSync(filePath, encoding);
-				let sourceMapContent = undefined;
-				let sourceMapPath = `${filePath}.map`;
+			.forEach((filePath) => {
+				const fileContent = readFileSync(filePath, encoding);
+				const sourceMapPath = `${filePath}.map`;
+				let sourceMapContent;
 
 				if (existsSync(sourceMapPath)) {
-					let mapContent = JSON.parse(readFileSync(sourceMapPath, encoding));
+					const mapContent = JSON.parse(readFileSync(sourceMapPath, encoding));
 
-					mapContent.sources = mapContent.sources.map(sourcePath => {
-						return resolve(dirname(sourceMapPath), sourcePath);
-					});
+					mapContent.sources = mapContent.sources.map(sourcePath => (
+						resolve(dirname(sourceMapPath), sourcePath)
+					));
 
 					sourceMapContent = JSON.stringify(mapContent);
 				}
@@ -31,7 +31,7 @@ export default function concat(input: string[] = [], output: string) {
 				concatenator.add(filePath, fileContent, sourceMapContent);
 			});
 
-		let { content, sourceMap } = concatenator;
+		const {content, sourceMap} = concatenator;
 
 		writeFileSync(output, content);
 		writeFileSync(`${output}.map`, sourceMap);

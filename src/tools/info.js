@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { appRoot } from '../constants';
+import {appRoot} from '../constants';
 
 export default function info() {
 	const location = {
@@ -10,7 +10,7 @@ export default function info() {
 		mercurial: {
 			preupdate: path.resolve(appRoot, 'src', 'mercurial', 'hooks', 'preupdate.sh'),
 			update: path.resolve(appRoot, 'src', 'mercurial', 'hooks', 'update.sh'),
-		}
+		},
 	};
 
 	return {

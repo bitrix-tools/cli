@@ -2,57 +2,29 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var inquirer = _interopDefault(require('inquirer'));
-var boxen = _interopDefault(require('boxen'));
+var logSymbols = _interopDefault(require('log-symbols'));
+var fs = require('fs');
 var ini = _interopDefault(require('ini'));
-var minimist = _interopDefault(require('minimist'));
-require('colors');
-var path = require('path');
 var os = require('os');
 var os__default = _interopDefault(os);
-var fs = require('fs');
-var logSymbols = _interopDefault(require('log-symbols'));
-
-async function ask(questions = []) {
-  const answers = {};
-
-  if (!Array.isArray(questions) || !questions.length) {
-    return answers;
-  }
-
-  const rawAnswers = await inquirer.prompt(questions);
-  return Object.keys(rawAnswers).reduce((acc, item) => {
-    const question = questions.find(currentQuestion => {
-      return currentQuestion.name === item;
-    });
-    answers[question.id || item] = rawAnswers[item];
-    return answers;
-  }, answers);
-}
-
-const options = {
-  padding: 1,
-  margin: 1,
-  align: 'left',
-  borderColor: 'yellow',
-  borderStyle: 'round'
-};
-function box(content) {
-  return boxen(content.replace(/^\s+|\s+$|\t/g, ''), options);
-}
+var path = require('path');
+var minimist = _interopDefault(require('minimist'));
+require('colors');
+var boxen = _interopDefault(require('boxen'));
+var inquirer = _interopDefault(require('inquirer'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os__default.homedir(), '.bitrix.lock');
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -84,7 +56,7 @@ function bitrixAdjust(params = {
     fs.copyFileSync(params.path, `${params.path}.backup`);
   }
 
-  let hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
+  const hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
 
   if (!('hooks' in hgrc)) {
     hgrc.hooks = {};
@@ -92,16 +64,46 @@ function bitrixAdjust(params = {
 
   hgrc.hooks['preupdate.bitrix.build.watcher'] = preUpdateHandler;
   hgrc.hooks['update.bitrix.build.watcher'] = updateHandler;
-  let encodedHgrc = ini.encode(hgrc);
+  const encodedHgrc = ini.encode(hgrc);
   fs.writeFileSync(params.path, encodedHgrc);
 
   if (!argv.silent && params.silent !== true) {
+    // eslint-disable-next-line
     console.log(`${params.path} updated`.green.bold);
   }
 }
 
+const options = {
+  padding: 1,
+  margin: 1,
+  align: 'left',
+  borderColor: 'yellow',
+  borderStyle: 'round'
+};
+function box(content) {
+  return boxen(content.replace(/^\s+|\s+$|\t/g, ''), options);
+}
+
+async function ask(questions = []) {
+  const answers = {};
+
+  if (!Array.isArray(questions) || !questions.length) {
+    return answers;
+  }
+
+  const rawAnswers = await inquirer.prompt(questions);
+  return Object.keys(rawAnswers).reduce((acc, item) => {
+    const question = questions.find(currentQuestion => {
+      return currentQuestion.name === item;
+    });
+    answers[question.id || item] = rawAnswers[item];
+    return answers;
+  }, answers);
+}
+
 async function bitrixSettings() {
   if (argv.intro) {
+    // eslint-disable-next-line
     console.log(box(`
 			${logSymbols.success} @bitrix/cli installed 
 			Answer a few questions
@@ -135,7 +137,8 @@ async function bitrixSettings() {
       bitrixAdjust({
         silent: true,
         path: hgrcPath
-      });
+      }); // eslint-disable-next-line
+
       console.log(box(`${hgrcPath} updated`));
     }
 
@@ -155,7 +158,7 @@ async function bitrixSettings() {
           const hgPath = path.resolve(repositoryPath, '.hg');
 
           if (!fs.existsSync(hgPath)) {
-            return `Specified path is not valid Mercurial repository`;
+            return 'Specified path is not valid Mercurial repository';
           }
 
           return true;
@@ -167,7 +170,8 @@ async function bitrixSettings() {
       bitrixAdjust({
         silent: true,
         path: hgrcPath
-      });
+      }); // eslint-disable-next-line
+
       console.log(box(`${hgrcPath} updated`));
     }
   }

@@ -2,22 +2,27 @@ export default function namespaceTransformer(options = {}) {
 	return {
 		name: 'rollup-plugin-namespace-transformer',
 		renderChunk(code) {
+			let normalizedCode = code;
+
 			if (options.namespaceFunction) {
-				let lastLine = code.split(/\r?\n/).pop();
-				let parsedNamespace = lastLine.match(/this\.(.*)\s=/);
+				const lastLine = code.split(/\r?\n/).pop();
+				const parsedNamespace = lastLine.match(/this\.(.*)\s=/);
 				let namespace = null;
 
 				if (parsedNamespace && parsedNamespace[1]) {
-					namespace = parsedNamespace[1];
+					[namespace] = parsedNamespace;
 				}
 
-				let modifiedLastLine = lastLine.replace(/\((.*?)\)/, `(${options.namespaceFunction}("${namespace}")`);
+				const modifiedLastLine = lastLine
+					.replace(/\((.*?)\)/, `(${options.namespaceFunction}("${namespace}")`);
 
-				code = code.replace(lastLine, modifiedLastLine);
-				code = code.replace(/^this(.*) \|\| {};/gm, '').trim();
+				normalizedCode = code
+					.replace(lastLine, modifiedLastLine)
+					.replace(/^this(.*) \|\| {};/gm, '')
+					.trim();
 			}
 
-			return {code, map: null}
-		}
-	}
+			return {code: normalizedCode, map: null};
+		},
+	};
 }

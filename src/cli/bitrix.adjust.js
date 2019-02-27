@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import ini from 'ini';
 import * as os from 'os';
-import { appRoot } from '../constants';
+import {appRoot} from '../constants';
 import argv from '../process/argv';
 import 'colors';
 
@@ -12,7 +12,7 @@ const updateHandler = path.resolve(appRoot, 'src/mercurial/hooks/update.sh');
 const defaultPath = path.resolve(os.homedir(), '.hgrc');
 const hgrcPath = argv.path || defaultPath;
 
-export default function bitrixAdjust(params = { path: hgrcPath }) {
+export default function bitrixAdjust(params = {path: hgrcPath}) {
 	if (!params.path) {
 		throw new Error('params.path is not string');
 	}
@@ -29,7 +29,7 @@ export default function bitrixAdjust(params = { path: hgrcPath }) {
 		fs.copyFileSync(params.path, `${params.path}.backup`);
 	}
 
-	let hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
+	const hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
 
 	if (!('hooks' in hgrc)) {
 		hgrc.hooks = {};
@@ -38,11 +38,12 @@ export default function bitrixAdjust(params = { path: hgrcPath }) {
 	hgrc.hooks['preupdate.bitrix.build.watcher'] = preUpdateHandler;
 	hgrc.hooks['update.bitrix.build.watcher'] = updateHandler;
 
-	let encodedHgrc = ini.encode(hgrc);
+	const encodedHgrc = ini.encode(hgrc);
 
 	fs.writeFileSync(params.path, encodedHgrc);
 
 	if (!argv.silent && params.silent !== true) {
+		// eslint-disable-next-line
 		console.log(`${params.path} updated`.green.bold);
 	}
 }

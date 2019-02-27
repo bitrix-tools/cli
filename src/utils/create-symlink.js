@@ -5,27 +5,27 @@ import * as glob from 'fast-glob';
 const type = process.platform.includes('win') ? 'junction' : null;
 
 export default function createSymlink(src, dest) {
-	src = path.resolve(src);
-	dest = path.resolve(dest);
+	const resolvedSrc = path.resolve(src);
+	const resolvedDest = path.resolve(dest);
 
-	if (fs.existsSync(src)) {
-		if (fs.lstatSync(src).isDirectory()) {
-			const destDirPath = path.resolve(dest, `../${path.basename(src)}`);
+	if (fs.existsSync(resolvedSrc)) {
+		if (fs.lstatSync(resolvedSrc).isDirectory()) {
+			const destDirPath = path.resolve(resolvedDest, `../${path.basename(resolvedSrc)}`);
 
 			if (!fs.existsSync(destDirPath)) {
 				fs.mkdirSync(destDirPath);
 			}
 
-			const children = glob.sync(path.join(src, '**'));
+			const children = glob.sync(path.join(resolvedSrc, '**'));
 
-			children.forEach(child => {
+			children.forEach((child) => {
 				if (typeof child === 'string') {
-					const destPath = path.resolve(dest, path.basename(child));
+					const destPath = path.resolve(resolvedDest, path.basename(child));
 					createSymlink(child, destPath);
 				}
 			});
 		} else {
-			fs.symlinkSync(src, dest, type);
+			fs.symlinkSync(resolvedSrc, resolvedDest, type);
 		}
 	}
 }

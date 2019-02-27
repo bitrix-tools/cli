@@ -59,7 +59,8 @@ function bitrixInfo() {
 		
 		Update: npm update -g ${pkg.name}
 		Remove: npm uninstall -g ${pkg.name}
-	`);
+	`); // eslint-disable-next-line
+
   console.log(result);
 }
 

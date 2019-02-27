@@ -2,6 +2,7 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var Ora = _interopDefault(require('ora'));
 var rollup = require('rollup');
 var os = _interopDefault(require('os'));
 var mustache = _interopDefault(require('mustache'));
@@ -9,7 +10,6 @@ var Concat = _interopDefault(require('concat-with-sourcemaps'));
 require('colors');
 var minimist = _interopDefault(require('minimist'));
 var glob = _interopDefault(require('fast-glob'));
-var Ora = _interopDefault(require('ora'));
 var EventEmitter = _interopDefault(require('events'));
 var chokidar = _interopDefault(require('chokidar'));
 var fs = require('fs');
@@ -19,25 +19,25 @@ var path = require('path');
 var path__default = _interopDefault(path);
 
 function isModulePath(filePath) {
-  let exp = new RegExp('\/(.[a-z0-9-_]+)\/install\/js\/(.[a-z0-9-_]+)\/');
-  let res = slash(filePath).match(exp);
+  const exp = new RegExp('/(.[a-z0-9-_]+)/install/js/(.[a-z0-9-_]+)/');
+  const res = `${slash(filePath)}`.match(exp);
   return !!res && !!res[1] && !!res[2];
 }
 
 function invalidateModuleCache(module, recursive, store = []) {
   if (typeof module === 'string') {
-    module = require.resolve(module);
+    const resolvedModule = require.resolve(module);
 
-    if (require.cache[module] && !store.includes(module)) {
-      store.push(module);
+    if (require.cache[resolvedModule] && !store.includes(resolvedModule)) {
+      store.push(resolvedModule);
 
-      if (Array.isArray(require.cache[module].children) && recursive) {
-        require.cache[module].children.forEach(module => {
-          invalidateModuleCache(module.id, recursive, store);
+      if (Array.isArray(require.cache[resolvedModule].children) && recursive) {
+        require.cache[resolvedModule].children.forEach(currentModule => {
+          invalidateModuleCache(currentModule.id, recursive, store);
         });
       }
 
-      delete require.cache[module];
+      delete require.cache[resolvedModule];
     }
   }
 }
@@ -46,7 +46,7 @@ const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
 
 function buildRollupConfig(config) {
-  invalidateModuleCache(path.resolve(appRoot, 'dist/rollup.config.js'));
+  invalidateModuleCache(path.resolve(appRoot, 'dist/rollup.config.js')); // eslint-disable-next-line
 
   const rollupConfig = require(path.resolve(appRoot, 'dist/rollup.config.js'));
 
@@ -63,17 +63,17 @@ function buildRollupConfig(config) {
 }
 
 function buildConfigBundlePath(filePath, ext) {
-  filePath = slash(filePath);
+  const normalizedPath = `${slash(filePath)}`;
 
   if (ext === 'js') {
-    return filePath.replace('.css', '.js');
+    return normalizedPath.replace('.css', '.js');
   }
 
   if (ext === 'css') {
-    return filePath.replace('.js', '.css');
+    return normalizedPath.replace('.js', '.css');
   }
 
-  return filePath;
+  return normalizedPath;
 }
 
 function renderRel(rel) {
@@ -107,41 +107,15 @@ const options = {
   unique: false
 };
 
-function getConfigs(directory) {
-  directory = slash(directory);
-  const pattern = [path.resolve(directory, '**/bundle.config.js'), path.resolve(directory, '**/script.es6.js')];
-  return glob.sync(pattern, options).reduce((acc, file) => {
-    let context = path.dirname(file);
-    let config = getConfigByFile(file);
-    let configs = makeIterable(config);
-    configs.forEach(currentConfig => {
-      acc.push({
-        input: path.resolve(context, currentConfig.input),
-        output: path.resolve(context, currentConfig.output),
-        name: currentConfig.namespace || '',
-        treeshake: currentConfig.treeshake !== false,
-        adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
-        rel: makeIterable(currentConfig.rel),
-        context: path.resolve(context),
-        concat: prepareConcat(currentConfig.concat, path.resolve(context))
-      });
-    });
-    return acc;
-  }, []);
-}
-
 function prepareConcat(files, context) {
   if (typeof files !== 'object') {
     return {};
   }
 
-  files = { ...files
-  };
+  const result = {};
   Object.keys(files).forEach(key => {
     if (Array.isArray(files[key])) {
-      files[key] = files[key].map(filePath => {
-        return path.resolve(context, filePath);
-      });
+      result[key] = files[key].map(filePath => path.resolve(context, filePath));
     }
   });
   return files;
@@ -154,7 +128,8 @@ function getConfigByFile(configPath) {
       input: path.resolve(context, 'script.es6.js'),
       output: path.resolve(context, 'script.js')
     };
-  }
+  } // eslint-disable-next-line
+
 
   return require(configPath);
 }
@@ -171,6 +146,29 @@ function makeIterable(value) {
   return [];
 }
 
+function getConfigs(directory) {
+  const normalizedDirectory = `${slash(directory)}`;
+  const pattern = [path.resolve(normalizedDirectory, '**/bundle.config.js'), path.resolve(normalizedDirectory, '**/script.es6.js')];
+  return glob.sync(pattern, options).reduce((acc, file) => {
+    const context = path.dirname(file);
+    const config = getConfigByFile(file);
+    const configs = makeIterable(config);
+    configs.forEach(currentConfig => {
+      acc.push({
+        input: path.resolve(context, currentConfig.input),
+        output: path.resolve(context, currentConfig.output),
+        name: currentConfig.namespace || '',
+        treeshake: currentConfig.treeshake !== false,
+        adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
+        rel: makeIterable(currentConfig.rel),
+        context: path.resolve(context),
+        concat: prepareConcat(currentConfig.concat, path.resolve(context))
+      });
+    });
+    return acc;
+  }, []);
+}
+
 class Directory {
   constructor(dir) {
     this.location = dir;
@@ -181,13 +179,13 @@ class Directory {
       Directory.configs.set(this.location, getConfigs(this.location));
     }
 
-    let configs = Directory.configs.get(this.location);
+    const configs = Directory.configs.get(this.location);
 
     if (recursive) {
       return configs;
     }
 
-    let parentConfig = configs.reduce((prevConfig, config) => {
+    const parentConfig = configs.reduce((prevConfig, config) => {
       if (prevConfig) {
         const prevContext = prevConfig.context;
         const currContext = config.context;
@@ -201,9 +199,7 @@ class Directory {
     }, null);
 
     if (parentConfig) {
-      return configs.filter(config => {
-        return config.context === parentConfig.context;
-      });
+      return configs.filter(config => config.context === parentConfig.context);
     }
 
     return configs;
@@ -221,12 +217,12 @@ function getGlobals(imports, {
     const moduleName = parsedExtensionName.shift();
     const moduleRoot = path.join(context.split('modules')[0], 'modules', moduleName);
     const moduleJsRoot = path.join(moduleRoot, 'install', 'js', moduleName);
-    const extensionPath = path.join(moduleJsRoot, path.join.apply(null, parsedExtensionName));
+    const extensionPath = path.join(moduleJsRoot, path.join(...parsedExtensionName));
     const configPath = path.join(extensionPath, 'bundle.config.js');
     let moduleAlias = 'BX';
 
     if (fs.existsSync(configPath)) {
-      moduleAlias = 'window';
+      moduleAlias = 'window'; // eslint-disable-next-line
 
       const config = require(configPath);
 
@@ -265,21 +261,19 @@ function concat(input = [], output) {
   if (Array.isArray(input) && input.length) {
     const concatenator = new Concat(generateSourceMap, output, separator);
     input.filter(fs.existsSync).forEach(filePath => {
-      let fileContent = fs.readFileSync(filePath, encoding);
-      let sourceMapContent = undefined;
-      let sourceMapPath = `${filePath}.map`;
+      const fileContent = fs.readFileSync(filePath, encoding);
+      const sourceMapPath = `${filePath}.map`;
+      let sourceMapContent;
 
       if (fs.existsSync(sourceMapPath)) {
-        let mapContent = JSON.parse(fs.readFileSync(sourceMapPath, encoding));
-        mapContent.sources = mapContent.sources.map(sourcePath => {
-          return path.resolve(path.dirname(sourceMapPath), sourcePath);
-        });
+        const mapContent = JSON.parse(fs.readFileSync(sourceMapPath, encoding));
+        mapContent.sources = mapContent.sources.map(sourcePath => path.resolve(path.dirname(sourceMapPath), sourcePath));
         sourceMapContent = JSON.stringify(mapContent);
       }
 
       concatenator.add(filePath, fileContent, sourceMapContent);
     });
-    let {
+    const {
       content,
       sourceMap
     } = concatenator;
@@ -288,6 +282,12 @@ function concat(input = [], output) {
     adjustSourceMap(`${output}.map`);
   }
 }
+
+/*
+	eslint
+ 	"no-restricted-syntax": "off",
+ 	"no-await-in-loop": "off"
+*/
 
 async function buildDirectory(dir, recursive = true) {
   const directory = new Directory(dir);
@@ -354,6 +354,7 @@ async function buildDirectory(dir, recursive = true) {
 async function build(dir, recursive) {
   if (Array.isArray(dir)) {
     for (const item of dir) {
+      // eslint-disable-next-line
       console.log(`Build module ${path.basename(item)}`.bold);
       await buildDirectory(item, recursive);
     }
@@ -365,14 +366,14 @@ async function build(dir, recursive) {
 }
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -389,7 +390,7 @@ function getDirectories(dir) {
 }
 
 function isRepositoryRoot(dirPath) {
-  let dirs = getDirectories(dirPath);
+  const dirs = getDirectories(dirPath);
   return dirs.includes('main') && dirs.includes('fileman') && dirs.includes('iblock') && dirs.includes('ui') && dirs.includes('translate');
 }
 
@@ -399,7 +400,7 @@ var params = {
   },
 
   get modules() {
-    let modules = (argv.modules || '').split(',').map(module => module.trim()).filter(module => !!module).map(module => path.resolve(this.path, module));
+    const modules = (argv.modules || '').split(',').map(module => module.trim()).filter(module => !!module).map(module => path.resolve(this.path, module));
 
     if (isRepositoryRoot(this.path) && modules.length === 0) {
       return getDirectories(this.path);
@@ -436,13 +437,13 @@ function isAllowed(fileName) {
     return false;
   }
 
-  fileName = slash(fileName);
+  const normalizedFileName = slash(fileName);
 
-  if (new RegExp('\/components\/(.*)\/style.js').test(fileName) || new RegExp('\/components\/(.*)\/style.css').test(fileName)) {
+  if (new RegExp('/components/(.*)/style.js').test(normalizedFileName) || new RegExp('/components/(.*)/style.css').test(normalizedFileName)) {
     return false;
   }
 
-  let ext = path__default.extname(fileName);
+  const ext = path__default.extname(normalizedFileName);
 
   switch (ext) {
     case '.js':
@@ -462,23 +463,37 @@ function isInput(dir, fileName) {
   });
 }
 
+function isAllowedChanges(directories, file) {
+  return directories.every(dir => isAllowed(file) && isInput(dir, file));
+}
+
+function createPattern(directories) {
+  return directories.reduce((acc, dir) => {
+    const directory = new Directory(dir);
+    const directoryConfigs = directory.getConfigs();
+    directoryConfigs.forEach(currentConfig => {
+      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.js')));
+      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.css')));
+      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.scss')));
+    });
+    return acc;
+  }, []);
+}
+
 function watch(directories) {
-  directories = Array.isArray(directories) ? directories : [directories];
-  const pattern = createPattern(directories);
+  const preparedDirectories = Array.isArray(directories) ? directories : [directories];
+  const pattern = createPattern(preparedDirectories);
   const emitter = new EventEmitter();
-  process.nextTick(() => {
-    emitter.emit('start', watcher);
-  });
   const watcher = chokidar.watch(pattern).on('ready', () => emitter.emit('ready', watcher)).on('change', file => {
     if (repository.isLocked(file)) {
       return;
     }
 
-    if (!isAllowedChanges(directories, file)) {
+    if (!isAllowedChanges(preparedDirectories, file)) {
       return;
     }
 
-    let changedConfig = directories.reduce((acc, dir) => acc.concat(new Directory(dir).getConfigs()), []).filter(config => path__default.resolve(file).includes(config.context)).reduce((prevConfig, config) => {
+    const changedConfig = preparedDirectories.reduce((acc, dir) => acc.concat(new Directory(dir).getConfigs()), []).filter(config => path__default.resolve(file).includes(config.context)).reduce((prevConfig, config) => {
       if (prevConfig && prevConfig.context.length > config.context.length) {
         return prevConfig;
       }
@@ -490,25 +505,17 @@ function watch(directories) {
       emitter.emit('change', changedConfig);
     }
   });
+  process.nextTick(() => {
+    emitter.emit('start', watcher);
+  });
   return emitter;
 }
 
-function isAllowedChanges(directories, file) {
-  return directories.every(dir => isAllowed(file) && isInput(dir, file));
-}
-
-function createPattern(directories) {
-  return directories.reduce((acc, dir) => {
-    let directory = new Directory(dir);
-    let directoryConfigs = directory.getConfigs();
-    directoryConfigs.forEach(currentConfig => {
-      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.js')));
-      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.css')));
-      acc.push(slash(path__default.resolve(currentConfig.context, '**/*.scss')));
-    });
-    return acc;
-  }, []);
-}
+/*
+	eslint
+ 	"no-restricted-syntax": "off",
+ 	"no-await-in-loop": "off"
+*/
 
 async function bitrixBuild({
   path: path$$1,
@@ -517,7 +524,7 @@ async function bitrixBuild({
   await build(modules.length ? modules : path$$1);
 
   if (argv.watch) {
-    return await new Promise(resolve => {
+    return new Promise(resolve => {
       const progressbar = new Ora();
       const directories = modules.length ? modules : [path$$1];
       const emitter = watch(directories).on('start', watcher => {
@@ -527,12 +534,14 @@ async function bitrixBuild({
           emitter
         });
       }).on('ready', () => {
-        progressbar.succeed(`Watcher is ready`.green.bold);
+        progressbar.succeed('Watcher is ready'.green.bold);
       }).on('change', config => {
         void build(config.context, false);
       });
     });
   }
+
+  return Promise.resolve();
 }
 
 module.exports = bitrixBuild;

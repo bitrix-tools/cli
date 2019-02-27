@@ -14,14 +14,14 @@ const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os__default.homedir(), '.bitrix.lock');
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -53,7 +53,7 @@ function bitrixAdjust(params = {
     fs.copyFileSync(params.path, `${params.path}.backup`);
   }
 
-  let hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
+  const hgrc = ini.parse(fs.readFileSync(params.path, 'utf-8'));
 
   if (!('hooks' in hgrc)) {
     hgrc.hooks = {};
@@ -61,10 +61,11 @@ function bitrixAdjust(params = {
 
   hgrc.hooks['preupdate.bitrix.build.watcher'] = preUpdateHandler;
   hgrc.hooks['update.bitrix.build.watcher'] = updateHandler;
-  let encodedHgrc = ini.encode(hgrc);
+  const encodedHgrc = ini.encode(hgrc);
   fs.writeFileSync(params.path, encodedHgrc);
 
   if (!argv.silent && params.silent !== true) {
+    // eslint-disable-next-line
     console.log(`${params.path} updated`.green.bold);
   }
 }

@@ -1,10 +1,10 @@
-import resolvePackageModule from './utils/resolve-package-module';
-import { JSDOM } from 'jsdom';
+import {JSDOM} from 'jsdom';
 import mocha from 'mocha';
 import assert from 'assert';
 import * as sinon from 'sinon';
-import { resolve, join } from 'path';
-import { existsSync } from 'fs';
+import {resolve, join} from 'path';
+import {existsSync} from 'fs';
+import resolvePackageModule from './utils/resolve-package-module';
 
 global.sinon = sinon;
 global.assert = assert;
@@ -23,12 +23,12 @@ global.teardown = mocha.teardown;
 global.test = mocha.test;
 global.run = mocha.run;
 
-const DOM = new JSDOM(``, {
+const DOM = new JSDOM('', {
 	url: 'https://example.org/',
 	referrer: 'https://example.com/',
 	contentType: 'text/html',
 	includeNodeLocations: true,
-	storageQuota: 10000000
+	storageQuota: 10000000,
 });
 
 global.window = DOM.window;
@@ -44,7 +44,7 @@ Object.keys(DOM.window).forEach((property) => {
 });
 
 global.navigator = {
-	userAgent: 'node.js'
+	userAgent: 'node.js',
 };
 
 require('../public/babel-regenerator-runtime');
@@ -53,8 +53,32 @@ require.extensions['.css'] = () => null;
 require.extensions['.png'] = () => null;
 require.extensions['.jpg'] = () => null;
 
+function moduleResolver(sourcePath, currentFile) {
+	const exp = /(^\w+)\.(.*)/;
+	const root = currentFile.split('modules')[0];
+
+	if (exp.test(sourcePath)) {
+		const modulesPath = resolve(root, 'modules');
+		const splitedName = sourcePath.split('.');
+		const moduleName = splitedName.shift();
+
+		const moduleJsPath = resolve(modulesPath, moduleName, 'install', 'js', moduleName);
+		const extPath = resolve(moduleJsPath, join(...splitedName));
+
+		const configPath = resolve(extPath, 'bundle.config.js');
+
+		if (existsSync(configPath)) {
+			// eslint-disable-next-line
+			const config = require(configPath);
+			return resolve(extPath, config.input);
+		}
+	}
+
+	return '';
+}
+
 require('@babel/register')({
-	cwd: (function() {
+	cwd: (() => {
 		const cwd = process.cwd();
 
 		if (cwd.includes('/modules')) {
@@ -69,14 +93,14 @@ require('@babel/register')({
 	})(),
 	presets: [
 		resolvePackageModule('@babel/preset-env'),
-		resolvePackageModule('@babel/preset-react')
+		resolvePackageModule('@babel/preset-react'),
 	],
 	plugins: [
 		[resolvePackageModule('babel-plugin-module-resolver'), {
-			resolvePath: moduleResolver
+			resolvePath: moduleResolver,
 		}],
 		resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
-		resolvePackageModule('@babel/plugin-proposal-class-properties')
+		resolvePackageModule('@babel/plugin-proposal-class-properties'),
 	],
 	exclude: [
 		'**/node_modules**/',
@@ -84,27 +108,6 @@ require('@babel/register')({
 		'**/base-polyfill.js',
 		'**/bundle.core-init.js',
 		'**/bundle.core.js',
-		'**/core/core.js'
-	]
+		'**/core/core.js',
+	],
 });
-
-function moduleResolver(sourcePath, currentFile, opts) {
-	const exp = /(^\w+)\.(.*)/;
-	const root = currentFile.split('modules')[0];
-
-	if (exp.test(sourcePath)) {
-		const modulesPath = resolve(root, 'modules');
-		const splitedName = sourcePath.split('.');
-		const moduleName = splitedName.shift();
-
-		const moduleJsPath = resolve(modulesPath, moduleName, 'install', 'js', moduleName);
-		const extPath = resolve(moduleJsPath, join.apply(null, splitedName));
-
-		const configPath = resolve(extPath, 'bundle.config.js');
-
-		if (existsSync(configPath)) {
-			const config = require(configPath);
-			return resolve(extPath, config.input);
-		}
-	}
-}

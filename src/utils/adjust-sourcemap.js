@@ -8,7 +8,7 @@ export default function adjustSourceMap(mapPath) {
 			const file = fs.readFileSync(mapPath, 'utf-8');
 			const map = JSON.parse(file);
 
-			map.sources = map.sources.map(sourcePath => {
+			map.sources = map.sources.map((sourcePath) => {
 				return slash(path.relative(slash(path.dirname(mapPath)), slash(sourcePath)));
 			});
 

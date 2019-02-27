@@ -10,7 +10,7 @@ export default async function ask(questions = []) {
 	const rawAnswers = await inquirer.prompt(questions);
 
 	return Object.keys(rawAnswers).reduce((acc, item) => {
-		const question = questions.find(currentQuestion => {
+		const question = questions.find((currentQuestion) => {
 			return currentQuestion.name === item;
 		});
 

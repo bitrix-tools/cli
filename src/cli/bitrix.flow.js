@@ -1,5 +1,5 @@
-import { resolve } from 'path';
-import { appRoot } from '../constants';
+import {resolve} from 'path';
+import {appRoot} from '../constants';
 import createSymlink from '../utils/create-symlink';
 import params from '../process/params';
 import argv from '../process/argv';
@@ -7,7 +7,7 @@ import argv from '../process/argv';
 const srcConfigPath = resolve(appRoot, 'src/templates/.flowconfig');
 const srcFlowTypedPath = resolve(appRoot, 'src/templates/flow-typed');
 
-export default function bitrixFlow({ path } = params, { init } = argv) {
+export default function bitrixFlow({path} = params, {init} = argv) {
 	if (init) {
 		const currentDir = path;
 

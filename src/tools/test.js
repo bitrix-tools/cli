@@ -3,37 +3,23 @@ import glob from 'fast-glob';
 import path from 'path';
 import argv from '../process/argv';
 import invalidateModuleCache from '../utils/invalidate-module-cache';
-import { appRoot } from '../constants';
+import {appRoot} from '../constants';
 import Directory from '../entities/directory';
 
-export default async function test(dir, report = true) {
-	if (Array.isArray(dir)) {
-		for (let item of dir) {
-			const testStatus = await testDirectory(item, report);
-			let testResult = '';
-
-			if (testStatus === 'passed') {
-				testResult = 'passed'.green;
-			}
-
-			if (testStatus === 'failure') {
-				testResult = 'failed'.red;
-			}
-
-			if (testStatus === 'notests') {
-				testResult = 'no tests'.grey;
-			}
-
-			console.log(`Test module ${item}`.bold, `${testResult}`);
-		}
-	} else if (typeof dir === 'string') {
-		return await testDirectory(dir, report);
-	} else {
-		throw new Error('dir not string or array');
-	}
-}
+/*
+	eslint
+ 	"no-restricted-syntax": "off",
+ 	"no-await-in-loop": "off"
+*/
 
 export function reporterStub() {}
+
+function appendBootstrap() {
+	const bootstrapPath = path.resolve(appRoot, 'dist/test.bootstrap.js');
+	invalidateModuleCache(bootstrapPath);
+	// eslint-disable-next-line
+	require(bootstrapPath);
+}
 
 export async function testDirectory(dir, report = true) {
 	const directory = new Directory(dir);
@@ -54,21 +40,21 @@ export async function testDirectory(dir, report = true) {
 		const mocha = new Mocha({
 			globals: Object.keys(global),
 			allowUncaught: true,
-			reporter: argv.test || argv.t || !report ? reporterStub : 'spec'
+			reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
 		});
 
 		if (tests.length) {
-			tests.forEach(test => {
+			tests.forEach((testFile) => {
 				const recursive = true;
-				invalidateModuleCache(test, recursive);
-				mocha.addFile(test);
+				invalidateModuleCache(testFile, recursive);
+				mocha.addFile(testFile);
 			});
 
 			appendBootstrap();
 
-			await new Promise(resolve => {
+			await new Promise((resolve) => {
 				mocha
-					.run(failures => {
+					.run((failures) => {
 						result.push(failures ? 'failure' : 'passed');
 					})
 					.on('end', () => resolve());
@@ -80,15 +66,38 @@ export async function testDirectory(dir, report = true) {
 		return 'notests';
 	}
 
-	if (result.some(res => res === 'passed') &&
-		result.every(res => res !== 'failure')) {
+	if (result.some(res => res === 'passed')
+		&& result.every(res => res !== 'failure')) {
 		return 'passed';
 	}
 
 	return 'failure';
 }
 
-function appendBootstrap() {
-	invalidateModuleCache(path.resolve(appRoot, 'dist/test.bootstrap.js'));
-	require(path.resolve(appRoot, 'dist/test.bootstrap.js'));
+export default async function test(dir, report = true) {
+	if (Array.isArray(dir)) {
+		for (const item of dir) {
+			const testStatus = await testDirectory(item, report);
+			let testResult = '';
+
+			if (testStatus === 'passed') {
+				testResult = 'passed'.green;
+			}
+
+			if (testStatus === 'failure') {
+				testResult = 'failed'.red;
+			}
+
+			if (testStatus === 'notests') {
+				testResult = 'no tests'.grey;
+			}
+
+			// eslint-disable-next-line
+			console.log(`Test module ${item}`.bold, `${testResult}`);
+		}
+	} else if (typeof dir === 'string') {
+		await testDirectory(dir, report);
+	} else {
+		throw new Error('dir not string or array');
+	}
 }

@@ -1,20 +1,36 @@
-import Directory from '../entities/directory';
 import slash from 'slash';
 import path from 'path';
 import EventEmitter from 'events';
 import chokidar from 'chokidar';
+import Directory from '../entities/directory';
 import repository from '../process/repository';
 import isAllowed from '../utils/is-allowed';
 import isInput from '../utils/is-input';
 
-export default function watch(directories) {
-	directories = Array.isArray(directories) ? directories : [directories];
-	const pattern = createPattern(directories);
-	const emitter = new EventEmitter();
+function isAllowedChanges(directories, file) {
+	return directories
+		.every(dir => isAllowed(file) && isInput(dir, file));
+}
 
-	process.nextTick(() => {
-		emitter.emit('start', watcher);
-	});
+function createPattern(directories) {
+	return directories.reduce((acc, dir) => {
+		const directory = new Directory(dir);
+		const directoryConfigs = directory.getConfigs();
+
+		directoryConfigs.forEach((currentConfig) => {
+			acc.push(slash(path.resolve(currentConfig.context, '**/*.js')));
+			acc.push(slash(path.resolve(currentConfig.context, '**/*.css')));
+			acc.push(slash(path.resolve(currentConfig.context, '**/*.scss')));
+		});
+
+		return acc;
+	}, []);
+}
+
+export default function watch(directories) {
+	const preparedDirectories = Array.isArray(directories) ? directories : [directories];
+	const pattern = createPattern(preparedDirectories);
+	const emitter = new EventEmitter();
 
 	const watcher = chokidar.watch(pattern)
 		.on('ready', () => emitter.emit('ready', watcher))
@@ -23,11 +39,11 @@ export default function watch(directories) {
 				return;
 			}
 
-			if (!isAllowedChanges(directories, file)) {
+			if (!isAllowedChanges(preparedDirectories, file)) {
 				return;
 			}
 
-			let changedConfig = directories
+			const changedConfig = preparedDirectories
 				.reduce((acc, dir) => acc.concat((new Directory(dir)).getConfigs()), [])
 				.filter(config => path.resolve(file).includes(config.context))
 				.reduce((prevConfig, config) => {
@@ -42,25 +58,9 @@ export default function watch(directories) {
 			}
 		});
 
+	process.nextTick(() => {
+		emitter.emit('start', watcher);
+	});
+
 	return emitter;
-}
-
-function isAllowedChanges(directories, file) {
-	return directories
-		.every(dir => isAllowed(file) && isInput(dir, file));
-}
-
-function createPattern(directories) {
-	return directories.reduce((acc, dir) => {
-		let directory = new Directory(dir);
-		let directoryConfigs = directory.getConfigs();
-
-		directoryConfigs.forEach(currentConfig => {
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.js')));
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.css')));
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.scss')));
-		});
-
-		return acc;
-	}, []);
 }

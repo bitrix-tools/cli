@@ -6,19 +6,23 @@ var minimist = _interopDefault(require('minimist'));
 var colors = _interopDefault(require('colors'));
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
   alias
 });
+
+function space(count) {
+  return ' '.repeat(count);
+}
 
 class Help {
   constructor() {
@@ -42,19 +46,19 @@ class Help {
   }
 
   command(command, description) {
-    if (description.includes('\n')) {
-      description = description.split('\n').reduce((acc, item, index) => {
+    let preparedDescription = description;
+
+    if (preparedDescription.includes('\n')) {
+      preparedDescription = description.split('\n').reduce((acc, item, index) => {
         if (index) {
-          acc += `\n${space(20 + this.offset + 2)}${item}`;
-        } else {
-          acc += item;
+          return `${acc}\n${space(20 + this.offset + 2)}${item}`;
         }
 
-        return acc;
+        return `${acc}${item}`;
       }, '');
     }
 
-    this.data.push(`${space(this.offset + 2)}${command}${space(20 - command.length)}${description}`);
+    this.data.push(`${space(this.offset + 2)}${command}${space(20 - command.length)}${preparedDescription}`);
     return this;
   }
 
@@ -70,14 +74,11 @@ class Help {
 
   print() {
     ['\n', ...this.data, '\n'].forEach(item => {
+      // eslint-disable-next-line
       console.log(`${item}`);
     });
   }
 
-}
-
-function space(count) {
-  return ' '.repeat(count);
 }
 
 const helper = new Help();
@@ -88,14 +89,19 @@ function help() {
 
 function bitrixUnhandledCommand(params = argv) {
   if (params.help) {
-    return help();
+    help();
+    return;
   }
 
   if (params.version) {
-    const pkg = require('../package.json');
+    // eslint-disable-next-line
+    const pkg = require('../package.json'); // eslint-disable-next-line
 
-    return console.log(pkg.name, pkg.version);
-  }
+
+    console.log(pkg.name, pkg.version);
+    return;
+  } // eslint-disable-next-line
+
 
   console.log('Unknown command. Try run "bitrix --help" for more information');
 }

@@ -1,13 +1,13 @@
 import * as path from 'path';
 import fs from 'fs';
 
-const root = path.parse(process.cwd()).root;
+const {root} = path.parse(process.cwd());
 
 export default function getCoreJsPath(corePath) {
-	let baseCorePath = 'main/install/js/main/core';
-	let alternativePath = 'bitrix/js/main/core';
-	let newPath = path.resolve(corePath, baseCorePath);
-	let newAlternativePath = path.resolve(corePath, alternativePath);
+	const baseCorePath = 'main/install/js/main/core';
+	const alternativePath = 'bitrix/js/main/core';
+	const newPath = path.resolve(corePath, baseCorePath);
+	const newAlternativePath = path.resolve(corePath, alternativePath);
 
 	if (fs.existsSync(newPath)) {
 		return newPath;

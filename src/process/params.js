@@ -1,15 +1,15 @@
-import argv from './argv';
 import * as nodePath from 'path';
+import argv from './argv';
 import isRepositoryRoot from '../utils/is-repository-root';
 import getDirectories from '../utils/get-directories';
 
 export default {
 	get path() {
-		return nodePath.resolve(argv.path || process.cwd())
+		return nodePath.resolve(argv.path || process.cwd());
 	},
 
 	get modules() {
-		let modules = (argv.modules || '')
+		const modules = (argv.modules || '')
 			.split(',')
 			.map(module => module.trim())
 			.filter(module => !!module)
@@ -24,6 +24,5 @@ export default {
 
 	get name() {
 		return argv.name || argv._[1];
-	}
+	},
 };
-

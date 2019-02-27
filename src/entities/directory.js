@@ -10,13 +10,13 @@ class Directory {
 			Directory.configs.set(this.location, getConfigs(this.location));
 		}
 
-		let configs = Directory.configs.get(this.location);
+		const configs = Directory.configs.get(this.location);
 
 		if (recursive) {
 			return configs;
 		}
 
-		let parentConfig = configs
+		const parentConfig = configs
 			.reduce((prevConfig, config) => {
 				if (prevConfig) {
 					const prevContext = prevConfig.context;
@@ -31,9 +31,7 @@ class Directory {
 			}, null);
 
 		if (parentConfig) {
-			return configs.filter(config => {
-				return config.context === parentConfig.context
-			});
+			return configs.filter(config => config.context === parentConfig.context);
 		}
 
 		return configs;

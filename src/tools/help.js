@@ -1,5 +1,9 @@
 import colors from 'colors';
 
+function space(count) {
+	return ' '.repeat(count);
+}
+
 export default class Help {
 	constructor() {
 		this.data = [];
@@ -22,19 +26,21 @@ export default class Help {
 	}
 
 	command(command, description) {
-		if (description.includes('\n')) {
-			description = description.split('\n').reduce((acc, item, index) => {
-				if (index) {
-					acc += `\n${space(20 + this.offset + 2)}${item}`;
-				} else {
-					acc += item;
-				}
+		let preparedDescription = description;
 
-				return acc;
-			}, '');
+		if (preparedDescription.includes('\n')) {
+			preparedDescription = description
+				.split('\n')
+				.reduce((acc, item, index) => {
+					if (index) {
+						return `${acc}\n${space(20 + this.offset + 2)}${item}`;
+					}
+
+					return `${acc}${item}`;
+				}, '');
 		}
 
-		this.data.push(`${space(this.offset + 2)}${command}${space(20 - command.length)}${description}`);
+		this.data.push(`${space(this.offset + 2)}${command}${space(20 - command.length)}${preparedDescription}`);
 		return this;
 	}
 
@@ -49,16 +55,9 @@ export default class Help {
 	}
 
 	print() {
-		['\n', ...this.data, '\n'].forEach(item => {
+		['\n', ...this.data, '\n'].forEach((item) => {
+			// eslint-disable-next-line
 			console.log(`${item}`);
 		});
 	}
-}
-
-function space(count) {
-	return ' '.repeat(count);
-}
-
-function dot(count) {
-	return '.'.repeat(count).gray;
 }

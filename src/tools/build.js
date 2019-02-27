@@ -9,6 +9,12 @@ import getGlobals from '../utils/get-globals';
 import concat from './concat';
 import 'colors';
 
+/*
+	eslint
+ 	"no-restricted-syntax": "off",
+ 	"no-await-in-loop": "off"
+*/
+
 async function buildDirectory(dir, recursive = true) {
 	const directory = new Directory(dir);
 	const configs = directory.getConfigs(recursive);
@@ -77,6 +83,7 @@ async function buildDirectory(dir, recursive = true) {
 async function build(dir, recursive) {
 	if (Array.isArray(dir)) {
 		for (const item of dir) {
+			// eslint-disable-next-line
 			console.log(`Build module ${basename(item)}`.bold);
 
 			await buildDirectory(item, recursive);

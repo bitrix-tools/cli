@@ -1,8 +1,8 @@
-export default function getSourcemaps({ output }) {
-	let mapPath = output.replace('.js', '');
+export default function getSourcemaps({output}) {
+	const mapPath = output.replace('.js', '');
 
 	return {
 		js: `${mapPath}.js.map`,
-		css: `${mapPath}.css.map`
+		css: `${mapPath}.css.map`,
 	};
 }

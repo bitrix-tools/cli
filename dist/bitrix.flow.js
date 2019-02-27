@@ -16,39 +16,39 @@ const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
 
 const type = process.platform.includes('win') ? 'junction' : null;
 function createSymlink(src, dest) {
-  src = path.resolve(src);
-  dest = path.resolve(dest);
+  const resolvedSrc = path.resolve(src);
+  const resolvedDest = path.resolve(dest);
 
-  if (fs.existsSync(src)) {
-    if (fs.lstatSync(src).isDirectory()) {
-      const destDirPath = path.resolve(dest, `../${path.basename(src)}`);
+  if (fs.existsSync(resolvedSrc)) {
+    if (fs.lstatSync(resolvedSrc).isDirectory()) {
+      const destDirPath = path.resolve(resolvedDest, `../${path.basename(resolvedSrc)}`);
 
       if (!fs.existsSync(destDirPath)) {
         fs.mkdirSync(destDirPath);
       }
 
-      const children = glob.sync(path.join(src, '**'));
+      const children = glob.sync(path.join(resolvedSrc, '**'));
       children.forEach(child => {
         if (typeof child === 'string') {
-          const destPath = path.resolve(dest, path.basename(child));
+          const destPath = path.resolve(resolvedDest, path.basename(child));
           createSymlink(child, destPath);
         }
       });
     } else {
-      fs.symlinkSync(src, dest, type);
+      fs.symlinkSync(resolvedSrc, resolvedDest, type);
     }
   }
 }
 
 var alias = {
-  'w': 'watch',
-  'p': 'path',
-  'm': 'modules',
-  't': 'test',
-  'h': 'help',
-  'v': 'version',
-  'c': 'create',
-  'n': 'name'
+  w: 'watch',
+  p: 'path',
+  m: 'modules',
+  t: 'test',
+  h: 'help',
+  v: 'version',
+  c: 'create',
+  n: 'name'
 };
 
 var argv = minimist(process.argv.slice(2), {
@@ -65,7 +65,7 @@ function getDirectories(dir) {
 }
 
 function isRepositoryRoot(dirPath) {
-  let dirs = getDirectories(dirPath);
+  const dirs = getDirectories(dirPath);
   return dirs.includes('main') && dirs.includes('fileman') && dirs.includes('iblock') && dirs.includes('ui') && dirs.includes('translate');
 }
 
@@ -75,7 +75,7 @@ var params = {
   },
 
   get modules() {
-    let modules = (argv.modules || '').split(',').map(module => module.trim()).filter(module => !!module).map(module => path.resolve(this.path, module));
+    const modules = (argv.modules || '').split(',').map(module => module.trim()).filter(module => !!module).map(module => path.resolve(this.path, module));
 
     if (isRepositoryRoot(this.path) && modules.length === 0) {
       return getDirectories(this.path);

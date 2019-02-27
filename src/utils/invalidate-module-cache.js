@@ -1,18 +1,18 @@
 
 export default function invalidateModuleCache(module, recursive, store = []) {
 	if (typeof module === 'string') {
-		module = require.resolve(module);
+		const resolvedModule = require.resolve(module);
 
-		if (require.cache[module] && !store.includes(module)) {
-			store.push(module);
+		if (require.cache[resolvedModule] && !store.includes(resolvedModule)) {
+			store.push(resolvedModule);
 
-			if (Array.isArray(require.cache[module].children) && recursive) {
-				require.cache[module].children.forEach(module => {
-					invalidateModuleCache(module.id, recursive, store);
+			if (Array.isArray(require.cache[resolvedModule].children) && recursive) {
+				require.cache[resolvedModule].children.forEach((currentModule) => {
+					invalidateModuleCache(currentModule.id, recursive, store);
 				});
 			}
 
-			delete require.cache[module];
+			delete require.cache[resolvedModule];
 		}
 	}
 }

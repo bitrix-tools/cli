@@ -1,8 +1,7 @@
-
 export default function buildNamespaceName({root = '', extensionName} = {}) {
 	if (typeof extensionName === 'string') {
 		const fragments = extensionName.split('.')
-			.filter((item, index, arr) => index+1 < arr.length)
+			.filter((item, index, arr) => index + 1 < arr.length)
 			.map(item => `${item.charAt(0).toUpperCase()}${item.slice(1)}`);
 		const namespace = fragments.join('.');
 

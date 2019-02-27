@@ -6,14 +6,16 @@ export default function isAllowed(fileName) {
 		return false;
 	}
 
-	fileName = slash(fileName);
+	const normalizedFileName = slash(fileName);
 
-	if ((new RegExp('\/components\/(.*)\/style.js')).test(fileName) ||
-		(new RegExp('\/components\/(.*)\/style.css')).test(fileName)) {
+	if (
+		(new RegExp('/components/(.*)/style.js')).test(normalizedFileName)
+		|| (new RegExp('/components/(.*)/style.css')).test(normalizedFileName)
+	) {
 		return false;
 	}
 
-	let ext = path.extname(fileName);
+	const ext = path.extname(normalizedFileName);
 
 	switch (ext) {
 		case '.js':
@@ -24,4 +26,4 @@ export default function isAllowed(fileName) {
 		default:
 			return false;
 	}
-};
+}

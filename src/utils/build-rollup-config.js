@@ -4,6 +4,7 @@ import {appRoot} from '../constants';
 
 export default function buildRollupConfig(config) {
 	invalidateModuleCache(resolve(appRoot, 'dist/rollup.config.js'));
+	// eslint-disable-next-line
 	const rollupConfig = require(resolve(appRoot, 'dist/rollup.config.js'));
 
 	return rollupConfig({

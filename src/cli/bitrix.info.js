@@ -5,7 +5,7 @@ import 'colors';
 const pkg = require('../package.json');
 
 export default function bitrixInfo() {
-	const { location } = info();
+	const {location} = info();
 
 	const result = box(`
 		Info ${pkg.name}, v${pkg.version}
@@ -25,5 +25,6 @@ export default function bitrixInfo() {
 		Remove: npm uninstall -g ${pkg.name}
 	`);
 
+	// eslint-disable-next-line
 	console.log(result);
 }
