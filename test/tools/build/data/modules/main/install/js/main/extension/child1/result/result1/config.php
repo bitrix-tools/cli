@@ -8,5 +8,5 @@ return [
 	'css' => 'dist/app.bundle.css',
 	'js' => 'dist/app.bundle.js',
 	'rel' => [],
-	'skip_core' => true
+	'skip_core' => true,
 ];

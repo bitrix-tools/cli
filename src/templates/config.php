@@ -7,5 +7,5 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
 return [
 	'css' => '{{{cssPath}}}',
 	'js' => '{{{jsPath}}}',
-	'rel' => [{{{rel}}}]
+	'rel' => [{{{rel}}}],
 ];

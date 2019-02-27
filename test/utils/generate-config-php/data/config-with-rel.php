@@ -9,6 +9,6 @@ return [
 	'js' => 'loader.bundle.js',
 	'rel' => [
 		'main.loader',
-		'ui.buttons'
-	]
+		'ui.buttons',
+	],
 ];

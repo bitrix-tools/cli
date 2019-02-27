@@ -38,7 +38,7 @@ async function buildDirectory(dir, recursive = true) {
 			}
 
 			// Updates dependencies list
-			const relExp = /['"]rel['"] => (\[.*?\])/s;
+			const relExp = /['"]rel['"] => (\[.*?\])(,?)/s;
 			let configContent = readFileSync(configPhpPath, 'utf-8');
 			const result = configContent.match(relExp);
 
@@ -47,19 +47,19 @@ async function buildDirectory(dir, recursive = true) {
 				configContent = configContent.replace(result[1], relativities);
 
 				// Adjust skip_core
-				const skipCoreExp = /['"]skip_core['"] => (true|false)/s;
+				const skipCoreExp = /['"]skip_core['"] => (true|false)(,?)/;
 				const skipCoreResult = configContent.match(skipCoreExp);
 				const skipCoreValue = !bundle.imports.includes('main.core');
 
 				if (Array.isArray(skipCoreResult) && skipCoreResult[1])
 				{
 					configContent = configContent
-						.replace(skipCoreExp, `'skip_core' => ${skipCoreValue}`);
+						.replace(skipCoreExp, `'skip_core' => ${skipCoreValue},`);
 				}
 				else
 				{
 					configContent = configContent
-						.replace(relExp, `'rel' => ${relativities},\n\t'skip_core' => ${skipCoreValue}`);
+						.replace(relExp, `'rel' => ${relativities},\n\t'skip_core' => ${skipCoreValue},`);
 				}
 
 				writeFileSync(configPhpPath, configContent);

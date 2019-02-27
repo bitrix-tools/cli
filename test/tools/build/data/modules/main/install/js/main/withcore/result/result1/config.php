@@ -8,7 +8,7 @@ return [
 	'css' => 'dist/app.bundle.css',
 	'js' => 'dist/app.bundle.js',
 	'rel' => [
-		'main.core'
+		'main.core',
 	],
-	'skip_core' => false
+	'skip_core' => false,
 ];
