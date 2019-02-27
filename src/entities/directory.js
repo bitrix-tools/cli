@@ -7,7 +7,16 @@ class Directory {
 
 	getConfigs(recursive = true) {
 		if (!Directory.configs.has(this.location)) {
-			Directory.configs.set(this.location, getConfigs(this.location));
+			const configs = getConfigs(this.location)
+				.filter((config) => {
+					if (config.protected)
+					{
+						return config.context === this.location;
+					}
+
+					return config;
+				});
+			Directory.configs.set(this.location, configs);
 		}
 
 		const configs = Directory.configs.get(this.location);

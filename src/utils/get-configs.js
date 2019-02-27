@@ -73,6 +73,7 @@ export default function getConfigs(directory) {
 					name: currentConfig.namespace || '',
 					treeshake: currentConfig.treeshake !== false,
 					adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
+					protected: currentConfig.protected === true,
 					rel: makeIterable(currentConfig.rel),
 					context: path.resolve(context),
 					concat: prepareConcat(currentConfig.concat, path.resolve(context)),

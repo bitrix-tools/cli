@@ -160,6 +160,7 @@ function getConfigs(directory) {
         name: currentConfig.namespace || '',
         treeshake: currentConfig.treeshake !== false,
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
+        protected: currentConfig.protected === true,
         rel: makeIterable(currentConfig.rel),
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))
@@ -176,7 +177,14 @@ class Directory {
 
   getConfigs(recursive = true) {
     if (!Directory.configs.has(this.location)) {
-      Directory.configs.set(this.location, getConfigs(this.location));
+      const configs = getConfigs(this.location).filter(config => {
+        if (config.protected) {
+          return config.context === this.location;
+        }
+
+        return config;
+      });
+      Directory.configs.set(this.location, configs);
     }
 
     const configs = Directory.configs.get(this.location);

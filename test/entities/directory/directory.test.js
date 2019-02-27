@@ -40,6 +40,15 @@ describe('entities/directory', () => {
 			assert(result.length === 1);
 		});
 
+		it('Should return protected config if context equal config context', () => {
+			const context = path.resolve(__dirname, 'data', 'protected');
+			const directory = new Directory(context);
+			const result = directory.getConfigs();
+
+			assert(result.length === 1);
+			assert(result[0].protected);
+		});
+
 		it('Should return all configs from cache', () => {
 			const context = path.resolve(__dirname, 'data');
 			const directory = new Directory(context);
