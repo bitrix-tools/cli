@@ -1,2 +1,3 @@
+*.js
 *.d.ts
-*.test.js
+!src/**/*.js
