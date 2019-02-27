@@ -37,19 +37,25 @@ async function buildDirectory(dir, recursive = true) {
 				writeFileSync(configPhpPath, generateConfigPhp(config));
 			}
 
+			let imports = [...bundle.imports];
+
+			if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
+				imports = ['main.polyfill.core', ...imports];
+			}
+
 			// Updates dependencies list
 			const relExp = /['"]rel['"] => (\[.*?\])(,?)/s;
 			let configContent = readFileSync(configPhpPath, 'utf-8');
 			const result = configContent.match(relExp);
 
 			if (Array.isArray(result) && result[1]) {
-				const relativities = `[${renderRel(bundle.imports)}]`;
+				const relativities = `[${renderRel(imports)}]`;
 				configContent = configContent.replace(result[1], relativities);
 
 				// Adjust skip_core
 				const skipCoreExp = /['"]skip_core['"] => (true|false)(,?)/;
 				const skipCoreResult = configContent.match(skipCoreExp);
-				const skipCoreValue = !bundle.imports.includes('main.core');
+				const skipCoreValue = !imports.includes('main.core');
 
 				if (Array.isArray(skipCoreResult) && skipCoreResult[1])
 				{

@@ -31,7 +31,9 @@ describe('utils/generate-config-php', () => {
 			input: 'loader.js',
 			output: 'loader.bundle.js',
 			context: '/modules/main/install/js/main/loader',
-			rel: []
+			rel: [
+				'main.polyfill.core',
+			]
 		};
 
 		const resultConfigPath = path.resolve(__dirname, './data/config-without-rel.php');
@@ -47,7 +49,9 @@ describe('utils/generate-config-php', () => {
 			input: 'loader.js',
 			output: 'loader.bundle.js',
 			context: '\\modules\\main\\install\\js\\main\\loader',
-			rel: []
+			rel: [
+				'main.polyfill.core',
+			]
 		};
 
 		const resultConfigPath = path.resolve(__dirname, './data/config-without-rel.php');
@@ -64,6 +68,7 @@ describe('utils/generate-config-php', () => {
 			output: 'loader.bundle.js',
 			context: '/modules/main/install/js/main/loader',
 			rel: [
+				'main.polyfill.core',
 				'main.loader',
 				'ui.buttons'
 			]

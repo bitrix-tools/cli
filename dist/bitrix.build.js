@@ -318,6 +318,12 @@ async function buildDirectory(dir, recursive = true) {
     if (config.adjustConfigPhp && (isModulePath(input.input) || fs.existsSync(bundleConfigPath))) {
       if (!fs.existsSync(configPhpPath)) {
         fs.writeFileSync(configPhpPath, generateConfigPhp(config));
+      }
+
+      let imports = [...bundle.imports];
+
+      if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
+        imports = ['main.polyfill.core', ...imports];
       } // Updates dependencies list
 
 
@@ -326,12 +332,12 @@ async function buildDirectory(dir, recursive = true) {
       const result = configContent.match(relExp);
 
       if (Array.isArray(result) && result[1]) {
-        const relativities = `[${renderRel(bundle.imports)}]`;
+        const relativities = `[${renderRel(imports)}]`;
         configContent = configContent.replace(result[1], relativities); // Adjust skip_core
 
         const skipCoreExp = /['"]skip_core['"] => (true|false)(,?)/;
         const skipCoreResult = configContent.match(skipCoreExp);
-        const skipCoreValue = !bundle.imports.includes('main.core');
+        const skipCoreValue = !imports.includes('main.core');
 
         if (Array.isArray(skipCoreResult) && skipCoreResult[1]) {
           configContent = configContent.replace(skipCoreExp, `'skip_core' => ${skipCoreValue},`);

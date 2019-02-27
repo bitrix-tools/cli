@@ -7,5 +7,7 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
 return [
 	'css' => 'loader.bundle.css',
 	'js' => 'loader.bundle.js',
-	'rel' => [],
+	'rel' => [
+		'main.polyfill.core',
+	],
 ];

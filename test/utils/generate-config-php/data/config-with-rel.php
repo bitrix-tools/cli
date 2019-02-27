@@ -8,6 +8,7 @@ return [
 	'css' => 'loader.bundle.css',
 	'js' => 'loader.bundle.js',
 	'rel' => [
+		'main.polyfill.core',
 		'main.loader',
 		'ui.buttons',
 	],
