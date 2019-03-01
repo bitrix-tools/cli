@@ -199,6 +199,7 @@ class Directory {
 Directory.configs = new Map();
 
 function bitrixReporter(bundle, argv = {}) {
+  console.log(Logger.level, process.env.LOGGER_LEVEL);
   const directory = new Directory(global.currentDirectory || argv.path || argv.p || process.cwd());
   const configs = directory.getConfigs();
   const input = path.resolve(process.cwd(), bundle.bundle);
