@@ -5,6 +5,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var Mocha = _interopDefault(require('mocha'));
 var minimist = _interopDefault(require('minimist'));
 var os = _interopDefault(require('os'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 var glob = _interopDefault(require('fast-glob'));
 var Ora = _interopDefault(require('ora'));
 var EventEmitter = _interopDefault(require('events'));
@@ -252,7 +253,7 @@ async function test(dir, report = true) {
       } // eslint-disable-next-line
 
 
-      console.log(`Test module ${item}`.bold, `${testResult}`);
+      Logger.log(`Test module ${item}`.bold, `${testResult}`);
     }
   } else if (typeof dir === 'string') {
     await testDirectory(dir, report);

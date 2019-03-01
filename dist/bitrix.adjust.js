@@ -9,6 +9,7 @@ var os__default = _interopDefault(os);
 var path = require('path');
 var minimist = _interopDefault(require('minimist'));
 require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os__default.homedir(), '.bitrix.lock');
@@ -66,7 +67,7 @@ function bitrixAdjust(params = {
 
   if (!argv.silent && params.silent !== true) {
     // eslint-disable-next-line
-    console.log(`${params.path} updated`.green.bold);
+    Logger.log(`${params.path} updated`.green.bold);
   }
 }
 

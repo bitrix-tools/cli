@@ -1,6 +1,7 @@
 import 'colors';
 import logSymbols from 'log-symbols';
 import {resolve} from 'path';
+import Logger from '@bitrix/logger';
 import isModulePath from '../utils/is-module-path';
 import buildExtensionName from '../utils/build-extension-name';
 import isComponentPath from '../utils/is-component-path';
@@ -40,7 +41,7 @@ export default function bitrixReporter(bundle, argv = {}) {
 		const name = buildExtensionName(input, config.context);
 
 		// eslint-disable-next-line
-		console.log(` ${logSymbols.success} Build extension ${name} ${testResult}`);
+		Logger.log(` ${logSymbols.success} Build extension ${name} ${testResult}`);
 		return;
 	}
 
@@ -48,7 +49,7 @@ export default function bitrixReporter(bundle, argv = {}) {
 		const name = buildComponentName(input);
 
 		// eslint-disable-next-line
-		console.log(` ${logSymbols.success} Build component ${name} ${testResult}`);
+		Logger.log(` ${logSymbols.success} Build component ${name} ${testResult}`);
 		return;
 	}
 
@@ -56,10 +57,10 @@ export default function bitrixReporter(bundle, argv = {}) {
 		const name = buildTemplateName(input);
 
 		// eslint-disable-next-line
-		console.log(` ${logSymbols.success} Build template ${name} ${testResult}`);
+		Logger.log(` ${logSymbols.success} Build template ${name} ${testResult}`);
 		return;
 	}
 
 	// eslint-disable-next-line
-	console.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
+	Logger.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
 }

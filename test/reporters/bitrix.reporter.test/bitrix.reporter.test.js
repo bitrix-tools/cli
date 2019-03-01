@@ -6,12 +6,7 @@ import logSymbols from 'log-symbols';
 import bitrixReporter from '../../../src/reporters/bitrix.reporter';
 
 describe('reporters/bitrix.reporter', () => {
-	beforeEach(function() {
-		sinon.spy(console, 'log');
-	});
-
 	afterEach(function() {
-		console.log.restore();
 		delete global.currentDirectory;
 		delete global.testsStatus;
 	});
@@ -63,10 +58,13 @@ describe('reporters/bitrix.reporter', () => {
 			}
 		];
 
+		const logSpy = sinon.spy();
+		bitrixReporter.__Rewire__('Logger', {log: logSpy});
+
 		samples.forEach(entry => {
 			global.currentDirectory = entry.source.context;
 			bitrixReporter(entry.source.bundle);
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 		});
 	});
 
@@ -107,17 +105,20 @@ describe('reporters/bitrix.reporter', () => {
 			}
 		];
 
+		const logSpy = sinon.spy();
+		bitrixReporter.__Rewire__('Logger', {log: logSpy});
+
 		samples.forEach(entry => {
 			global.currentDirectory = entry.source.context;
 			global.testsStatus = global.testsStatus || {};
 			global.testsStatus[entry.source.context] = entry.source.status;
 			bitrixReporter(entry.source.bundle, {test: true});
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 
 			global.currentDirectory = entry.source.context;
 			delete global.testsStatus;
 			bitrixReporter(entry.source.bundle, {test: true});
-			assert(console.log.lastCall.args[0].includes(entry.result) === false);
+			assert(logSpy.lastCall.args[0].includes(entry.result) === false);
 		});
 	});
 
@@ -164,15 +165,18 @@ describe('reporters/bitrix.reporter', () => {
 			}
 		];
 
+		const logSpy = sinon.spy();
+		bitrixReporter.__Rewire__('Logger', {log: logSpy});
+
 		samples.forEach(entry => {
 			bitrixReporter(entry.source.bundle, {path: entry.source.context});
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 		});
 
 		// test with alias
 		samples.forEach(entry => {
 			bitrixReporter(entry.source.bundle, {p: entry.source.context});
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 		});
 	});
 
@@ -219,9 +223,12 @@ describe('reporters/bitrix.reporter', () => {
 			}
 		];
 
+		const logSpy = sinon.spy();
+		bitrixReporter.__Rewire__('Logger', {log: logSpy});
+
 		samples.forEach(entry => {
 			bitrixReporter(entry.source.bundle, {p: entry.source.context});
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 		});
 	});
 
@@ -268,9 +275,12 @@ describe('reporters/bitrix.reporter', () => {
 			}
 		];
 
+		const logSpy = sinon.spy();
+		bitrixReporter.__Rewire__('Logger', {log: logSpy});
+
 		samples.forEach(entry => {
 			bitrixReporter(entry.source.bundle);
-			assert(console.log.lastCall.args[0].includes(entry.result));
+			assert(logSpy.lastCall.args[0].includes(entry.result));
 		});
 	});
 });

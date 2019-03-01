@@ -4,6 +4,7 @@ import argv from '../process/argv';
 import ask from '../tools/ask';
 import box from '../tools/box';
 import 'colors';
+import Logger from '@bitrix/logger';
 
 export default async function bitrixCreate() {
 	const answers = await ask([
@@ -48,5 +49,5 @@ export default async function bitrixCreate() {
 	`);
 
 	// eslint-disable-next-line
-	return console.log(info);
+	return Logger.log(info);
 }

@@ -16,6 +16,7 @@ var fse = _interopDefault(require('fs-extra'));
 var inquirer = _interopDefault(require('inquirer'));
 var boxen = _interopDefault(require('boxen'));
 require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
@@ -303,7 +304,7 @@ async function bitrixCreate() {
 		import {${extInfo.functionName}} from '${extInfo.extensionName}';
 	`); // eslint-disable-next-line
 
-  return console.log(info);
+  return Logger.log(info);
 }
 
 module.exports = bitrixCreate;

@@ -1,4 +1,5 @@
 import colors from 'colors';
+import Logger from '@bitrix/logger';
 
 function space(count) {
 	return ' '.repeat(count);
@@ -57,7 +58,7 @@ export default class Help {
 	print() {
 		['\n', ...this.data, '\n'].forEach((item) => {
 			// eslint-disable-next-line
-			console.log(`${item}`);
+			Logger.log(`${item}`);
 		});
 	}
 }

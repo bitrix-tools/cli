@@ -5,6 +5,7 @@ import * as os from 'os';
 import {appRoot} from '../constants';
 import argv from '../process/argv';
 import 'colors';
+import Logger from '@bitrix/logger';
 
 const preUpdateHandler = path.resolve(appRoot, 'src/mercurial/hooks/preupdate.sh');
 const updateHandler = path.resolve(appRoot, 'src/mercurial/hooks/update.sh');
@@ -44,6 +45,6 @@ export default function bitrixAdjust(params = {path: hgrcPath}) {
 
 	if (!argv.silent && params.silent !== true) {
 		// eslint-disable-next-line
-		console.log(`${params.path} updated`.green.bold);
+		Logger.log(`${params.path} updated`.green.bold);
 	}
 }

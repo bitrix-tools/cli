@@ -12,6 +12,7 @@ var minimist = _interopDefault(require('minimist'));
 require('colors');
 var boxen = _interopDefault(require('boxen'));
 var inquirer = _interopDefault(require('inquirer'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os__default.homedir(), '.bitrix.lock');
@@ -69,7 +70,7 @@ function bitrixAdjust(params = {
 
   if (!argv.silent && params.silent !== true) {
     // eslint-disable-next-line
-    console.log(`${params.path} updated`.green.bold);
+    Logger.log(`${params.path} updated`.green.bold);
   }
 }
 
@@ -104,7 +105,7 @@ async function ask(questions = []) {
 async function bitrixSettings() {
   if (argv.intro) {
     // eslint-disable-next-line
-    console.log(box(`
+    Logger.log(box(`
 			${logSymbols.success} @bitrix/cli installed 
 			Answer a few questions
 		`));
@@ -139,7 +140,7 @@ async function bitrixSettings() {
         path: hgrcPath
       }); // eslint-disable-next-line
 
-      console.log(box(`${hgrcPath} updated`));
+      Logger.log(box(`${hgrcPath} updated`));
     }
 
     if (adjustAnswers.adjustType === 'specified') {
@@ -172,7 +173,7 @@ async function bitrixSettings() {
         path: hgrcPath
       }); // eslint-disable-next-line
 
-      console.log(box(`${hgrcPath} updated`));
+      Logger.log(box(`${hgrcPath} updated`));
     }
   }
 }

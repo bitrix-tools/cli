@@ -16,6 +16,7 @@ var slash = _interopDefault(require('slash'));
 var Mocha = _interopDefault(require('mocha'));
 var glob = _interopDefault(require('fast-glob'));
 var os = _interopDefault(require('os'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 var path = require('path');
 var path__default = _interopDefault(path);
 
@@ -224,26 +225,26 @@ function bitrixReporter(bundle, argv = {}) {
   if (isModulePath(input)) {
     const name = buildExtensionName(input, config.context); // eslint-disable-next-line
 
-    console.log(` ${logSymbols.success} Build extension ${name} ${testResult}`);
+    Logger.log(` ${logSymbols.success} Build extension ${name} ${testResult}`);
     return;
   }
 
   if (isComponentPath(input)) {
     const name = buildComponentName(input); // eslint-disable-next-line
 
-    console.log(` ${logSymbols.success} Build component ${name} ${testResult}`);
+    Logger.log(` ${logSymbols.success} Build component ${name} ${testResult}`);
     return;
   }
 
   if (isTemplatePath(input)) {
     const name = buildTemplateName(input); // eslint-disable-next-line
 
-    console.log(` ${logSymbols.success} Build template ${name} ${testResult}`);
+    Logger.log(` ${logSymbols.success} Build template ${name} ${testResult}`);
     return;
   } // eslint-disable-next-line
 
 
-  console.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
+  Logger.log(` ${logSymbols.success} Build bundle ${bundle.bundle} ${testResult}`);
 }
 
 function invalidateModuleCache(module, recursive, store = []) {
@@ -348,7 +349,7 @@ async function test(dir, report = true) {
       } // eslint-disable-next-line
 
 
-      console.log(`Test module ${item}`.bold, `${testResult}`);
+      Logger.log(`Test module ${item}`.bold, `${testResult}`);
     }
   } else if (typeof dir === 'string') {
     await testDirectory(dir, report);

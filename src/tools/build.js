@@ -8,6 +8,7 @@ import Directory from '../entities/directory';
 import getGlobals from '../utils/get-globals';
 import concat from './concat';
 import 'colors';
+import Logger from '@bitrix/logger';
 
 /*
 	eslint
@@ -85,7 +86,7 @@ async function build(dir, recursive) {
 	if (Array.isArray(dir)) {
 		for (const item of dir) {
 			// eslint-disable-next-line
-			console.log(`Build module ${basename(item)}`.bold);
+			Logger.log(`Build module ${basename(item)}`.bold);
 
 			await buildDirectory(item, recursive);
 		}

@@ -4,6 +4,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var minimist = _interopDefault(require('minimist'));
 var colors = _interopDefault(require('colors'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 
 var alias = {
   w: 'watch',
@@ -75,7 +76,7 @@ class Help {
   print() {
     ['\n', ...this.data, '\n'].forEach(item => {
       // eslint-disable-next-line
-      console.log(`${item}`);
+      Logger.log(`${item}`);
     });
   }
 
@@ -98,12 +99,12 @@ function bitrixUnhandledCommand(params = argv) {
     const pkg = require('../package.json'); // eslint-disable-next-line
 
 
-    console.log(pkg.name, pkg.version);
+    Logger.log(pkg.name, pkg.version);
     return;
   } // eslint-disable-next-line
 
 
-  console.log('Unknown command. Try run "bitrix --help" for more information');
+  Logger.log('Unknown command. Try run "bitrix --help" for more information');
 }
 
 module.exports = bitrixUnhandledCommand;

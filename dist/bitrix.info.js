@@ -6,6 +6,7 @@ var os = _interopDefault(require('os'));
 var path = require('path');
 var boxen = _interopDefault(require('boxen'));
 require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
@@ -61,7 +62,7 @@ function bitrixInfo() {
 		Remove: npm uninstall -g ${pkg.name}
 	`); // eslint-disable-next-line
 
-  console.log(result);
+  Logger.log(result);
 }
 
 module.exports = bitrixInfo;

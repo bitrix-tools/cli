@@ -1,6 +1,7 @@
 import info from '../tools/info';
 import box from '../tools/box';
 import 'colors';
+import Logger from '@bitrix/logger';
 
 const pkg = require('../package.json');
 
@@ -26,5 +27,5 @@ export default function bitrixInfo() {
 	`);
 
 	// eslint-disable-next-line
-	console.log(result);
+	Logger.log(result);
 }

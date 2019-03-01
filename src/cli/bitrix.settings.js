@@ -7,11 +7,12 @@ import bitrixAdjust from './bitrix.adjust';
 import box from '../tools/box';
 import ask from '../tools/ask';
 import argv from '../process/argv';
+import Logger from '@bitrix/logger';
 
 export default async function bitrixSettings() {
 	if (argv.intro) {
 		// eslint-disable-next-line
-		console.log(box(`
+		Logger.log(box(`
 			${logSymbols.success} @bitrix/cli installed 
 			Answer a few questions
 		`));
@@ -54,7 +55,7 @@ export default async function bitrixSettings() {
 			});
 
 			// eslint-disable-next-line
-			console.log(box(`${hgrcPath} updated`));
+			Logger.log(box(`${hgrcPath} updated`));
 		}
 
 		if (adjustAnswers.adjustType === 'specified') {
@@ -94,7 +95,7 @@ export default async function bitrixSettings() {
 			});
 
 			// eslint-disable-next-line
-			console.log(box(`${hgrcPath} updated`));
+			Logger.log(box(`${hgrcPath} updated`));
 		}
 	}
 }

@@ -8,6 +8,7 @@ var os = _interopDefault(require('os'));
 var mustache = _interopDefault(require('mustache'));
 var Concat = _interopDefault(require('concat-with-sourcemaps'));
 require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 var minimist = _interopDefault(require('minimist'));
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
@@ -364,7 +365,7 @@ async function build(dir, recursive) {
   if (Array.isArray(dir)) {
     for (const item of dir) {
       // eslint-disable-next-line
-      console.log(`Build module ${path.basename(item)}`.bold);
+      Logger.log(`Build module ${path.basename(item)}`.bold);
       await buildDirectory(item, recursive);
     }
   } else if (typeof dir === 'string') {

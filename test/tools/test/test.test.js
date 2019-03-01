@@ -5,14 +5,6 @@ import * as path from 'path';
 import test, { testDirectory, reporterStub, __RewireAPI__ as testDirectoryRewire } from '../../../src/tools/test';
 
 describe('tools/test', () => {
-	beforeEach(() => {
-		sinon.spy(console, 'log');
-	});
-
-	afterEach(() => {
-		console.log.restore();
-	});
-
 	it('Should be exported as function', () => {
 		assert(typeof test === 'function');
 	});
@@ -60,37 +52,43 @@ describe('tools/test', () => {
 	it('Should print test result with status passed', async () => {
 		const extension = [path.resolve(__dirname, 'data/extension')];
 		const testDirectoryFake = sinon.fake.returns('passed');
+		const logSpy = sinon.spy();
 
 		test.__Rewire__('testDirectory', testDirectoryFake);
 		test.__Rewire__('appendBootstrap', sinon.spy());
+		test.__Rewire__('Logger', {log: logSpy});
 
 		await test(extension);
 
-		assert(console.log.lastCall.args[1].includes('passed'));
+		assert(logSpy.lastCall.args[1].includes('passed'));
 	});
 
 	it('Should print test result with status "failure"', async () => {
 		const extension = [path.resolve(__dirname, 'data/extension')];
 		const testDirectoryFake = sinon.fake.returns('failure');
+		const logSpy = sinon.spy();
 
 		test.__Rewire__('testDirectory', testDirectoryFake);
 		test.__Rewire__('appendBootstrap', sinon.spy());
+		test.__Rewire__('Logger', {log: logSpy});
 
 		await test(extension);
 
-		assert(console.log.lastCall.args[1].includes('failed'));
+		assert(logSpy.lastCall.args[1].includes('failed'));
 	});
 
 	it('Should print test result with status "notests"', async () => {
 		const extension = [path.resolve(__dirname, 'data/extension')];
 		const testDirectoryFake = sinon.fake.returns('notests');
+		const logSpy = sinon.spy();
 
 		test.__Rewire__('testDirectory', testDirectoryFake);
 		test.__Rewire__('appendBootstrap', sinon.spy());
+		test.__Rewire__('Logger', {log: logSpy});
 
 		await test(extension);
 
-		assert(console.log.lastCall.args[1].includes('no tests'));
+		assert(logSpy.lastCall.args[1].includes('no tests'));
 	});
 
 	describe('testDirectory', () => {

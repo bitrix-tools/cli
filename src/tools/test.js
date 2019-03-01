@@ -5,6 +5,7 @@ import argv from '../process/argv';
 import invalidateModuleCache from '../utils/invalidate-module-cache';
 import {appRoot} from '../constants';
 import Directory from '../entities/directory';
+import Logger from '@bitrix/logger';
 
 /*
 	eslint
@@ -93,7 +94,7 @@ export default async function test(dir, report = true) {
 			}
 
 			// eslint-disable-next-line
-			console.log(`Test module ${item}`.bold, `${testResult}`);
+			Logger.log(`Test module ${item}`.bold, `${testResult}`);
 		}
 	} else if (typeof dir === 'string') {
 		await testDirectory(dir, report);
