@@ -4,11 +4,12 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var Ora = _interopDefault(require('ora'));
 var rollup = require('rollup');
+var logSymbols = _interopDefault(require('log-symbols'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 var os = _interopDefault(require('os'));
 var mustache = _interopDefault(require('mustache'));
 var Concat = _interopDefault(require('concat-with-sourcemaps'));
 require('colors');
-var Logger = _interopDefault(require('@bitrix/logger'));
 var minimist = _interopDefault(require('minimist'));
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
@@ -312,51 +313,65 @@ async function buildDirectory(dir, recursive = true) {
 
     global.outputOptions = output; // Build
 
-    const bundle = await rollup.rollup(input);
-    await bundle.write({ ...output,
-      ...{
-        globals: getGlobals(bundle.imports, config)
-      }
-    });
-    await concat(config.concat.js, config.output);
-    await concat(config.concat.css, config.output); // Generate config.php if needed
+    try {
+      const bundle = await rollup.rollup(input);
+      await bundle.write({ ...output,
+        ...{
+          globals: getGlobals(bundle.imports, config)
+        }
+      });
+      await concat(config.concat.js, config.output);
+      await concat(config.concat.css, config.output); // Generate config.php if needed
 
-    const bundleConfigPath = path.resolve(config.context, 'bundle.config.js');
-    const configPhpPath = path.resolve(config.context, 'config.php');
+      const bundleConfigPath = path.resolve(config.context, 'bundle.config.js');
+      const configPhpPath = path.resolve(config.context, 'config.php');
 
-    if (config.adjustConfigPhp && (isModulePath(input.input) || fs.existsSync(bundleConfigPath))) {
-      if (!fs.existsSync(configPhpPath)) {
-        fs.writeFileSync(configPhpPath, generateConfigPhp(config));
-      }
-
-      const extNameExp = /^(\w).(.[\w.])/;
-      let imports = [...bundle.imports].filter(item => extNameExp.test(item));
-
-      if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
-        imports = ['main.polyfill.core', ...imports];
-      } // Updates dependencies list
-
-
-      const relExp = /['"]rel['"] => (\[.*?\])(,?)/s;
-      let configContent = fs.readFileSync(configPhpPath, 'utf-8');
-      const result = configContent.match(relExp);
-
-      if (Array.isArray(result) && result[1]) {
-        const relativities = `[${renderRel(imports)}]`;
-        configContent = configContent.replace(result[1], relativities); // Adjust skip_core
-
-        const skipCoreExp = /['"]skip_core['"] => (true|false)(,?)/;
-        const skipCoreResult = configContent.match(skipCoreExp);
-        const skipCoreValue = !imports.includes('main.core');
-
-        if (Array.isArray(skipCoreResult) && skipCoreResult[1]) {
-          configContent = configContent.replace(skipCoreExp, `'skip_core' => ${skipCoreValue},`);
-        } else {
-          configContent = configContent.replace(relExp, `'rel' => ${relativities},\n\t'skip_core' => ${skipCoreValue},`);
+      if (config.adjustConfigPhp && (isModulePath(input.input) || fs.existsSync(bundleConfigPath))) {
+        if (!fs.existsSync(configPhpPath)) {
+          fs.writeFileSync(configPhpPath, generateConfigPhp(config));
         }
 
-        fs.writeFileSync(configPhpPath, configContent);
+        const extNameExp = /^(\w).(.[\w.])/;
+        let imports = [...bundle.imports].filter(item => extNameExp.test(item));
+
+        if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
+          imports = ['main.polyfill.core', ...imports];
+        } // Updates dependencies list
+
+
+        const relExp = /['"]rel['"] => (\[.*?\])(,?)/s;
+        let configContent = fs.readFileSync(configPhpPath, 'utf-8');
+        const result = configContent.match(relExp);
+
+        if (Array.isArray(result) && result[1]) {
+          const relativities = `[${renderRel(imports)}]`;
+          configContent = configContent.replace(result[1], relativities); // Adjust skip_core
+
+          const skipCoreExp = /['"]skip_core['"] => (true|false)(,?)/;
+          const skipCoreResult = configContent.match(skipCoreExp);
+          const skipCoreValue = !imports.includes('main.core');
+
+          if (Array.isArray(skipCoreResult) && skipCoreResult[1]) {
+            configContent = configContent.replace(skipCoreExp, `'skip_core' => ${skipCoreValue},`);
+          } else {
+            configContent = configContent.replace(relExp, `'rel' => ${relativities},\n\t'skip_core' => ${skipCoreValue},`);
+          }
+
+          fs.writeFileSync(configPhpPath, configContent);
+        }
       }
+    } catch (error) {
+      if (error.code === 'UNRESOLVED_IMPORT') {
+        Logger.log(`   ${logSymbols.error} Error: ${error.message}`);
+        return;
+      }
+
+      if (error.code === 'PLUGIN_ERROR') {
+        Logger.log(`   ${logSymbols.error} ${error.message.replace('undefined:', 'Error:')}`);
+        return;
+      }
+
+      throw new Error(error);
     }
   }
 }
