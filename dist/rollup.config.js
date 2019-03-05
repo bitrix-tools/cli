@@ -99,7 +99,7 @@ function prepareConcat(files, context) {
       result[key] = files[key].map(filePath => path.resolve(context, filePath));
     }
   });
-  return files;
+  return result;
 }
 
 function getConfigByFile(configPath) {
@@ -135,6 +135,14 @@ function getConfigs(directory) {
     const config = getConfigByFile(file);
     const configs = makeIterable(config);
     configs.forEach(currentConfig => {
+      let {
+        plugins
+      } = currentConfig;
+
+      if (typeof plugins !== 'object') {
+        plugins = {};
+      }
+
       acc.push({
         input: path.resolve(context, currentConfig.input),
         output: path.resolve(context, currentConfig.output),
@@ -143,6 +151,7 @@ function getConfigs(directory) {
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
         protected: currentConfig.protected === true,
         rel: makeIterable(currentConfig.rel),
+        plugins,
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))
       });
@@ -384,7 +393,8 @@ function resolvePackageModule(moduleName) {
 
 function rollupConfig({
   input,
-  output
+  output,
+  plugins = {}
 }) {
   return {
     input: {
@@ -397,11 +407,11 @@ function rollupConfig({
         plugins: [autoprefixer({
           browsers: ['ie >= 11', 'last 4 version']
         })]
-      }), babel({
+      }), plugins.babel !== false ? babel(plugins.babel || {
         sourceMaps: true,
-        presets: [resolvePackageModule('@babel/preset-env'), resolvePackageModule('@babel/preset-react')],
+        presets: [resolvePackageModule('@babel/preset-env')],
         plugins: [resolvePackageModule('@babel/plugin-external-helpers'), resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties'), resolvePackageModule('@babel/plugin-proposal-private-methods')]
-      }), commonjs({
+      }) : {}, commonjs({
         sourceMap: false
       }), rollupMochaTestRunner(), reporter({
         exclude: ['style.js'],

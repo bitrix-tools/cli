@@ -16,5 +16,6 @@ export default function buildRollupConfig(config) {
 			file: resolve(config.context, config.output),
 			name: config.name,
 		},
+		plugins: config.plugins,
 	});
 }

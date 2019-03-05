@@ -10,7 +10,7 @@ import bitrixReporter from './reporters/bitrix.reporter';
 import mochaTestRunner from './plugins/rollup/rollup-plugin-mocha-test-runner/index';
 import resolvePackageModule from './utils/resolve-package-module';
 
-export default function rollupConfig({input, output}) {
+export default function rollupConfig({input, output, plugins = {}}) {
 	return {
 		input: {
 			input: input.input,
@@ -35,11 +35,10 @@ export default function rollupConfig({input, output}) {
 						}),
 					],
 				}),
-				babel({
+				plugins.babel !== false ? babel(plugins.babel || {
 					sourceMaps: true,
 					presets: [
 						resolvePackageModule('@babel/preset-env'),
-						resolvePackageModule('@babel/preset-react'),
 					],
 					plugins: [
 						resolvePackageModule('@babel/plugin-external-helpers'),
@@ -47,7 +46,7 @@ export default function rollupConfig({input, output}) {
 						resolvePackageModule('@babel/plugin-proposal-class-properties'),
 						resolvePackageModule('@babel/plugin-proposal-private-methods'),
 					],
-				}),
+				}) : {},
 				commonjs({
 					sourceMap: false,
 				}),

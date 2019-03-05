@@ -73,7 +73,7 @@ function prepareConcat(files, context) {
       result[key] = files[key].map(filePath => path.resolve(context, filePath));
     }
   });
-  return files;
+  return result;
 }
 
 function getConfigByFile(configPath) {
@@ -109,6 +109,14 @@ function getConfigs(directory) {
     const config = getConfigByFile(file);
     const configs = makeIterable(config);
     configs.forEach(currentConfig => {
+      let {
+        plugins
+      } = currentConfig;
+
+      if (typeof plugins !== 'object') {
+        plugins = {};
+      }
+
       acc.push({
         input: path.resolve(context, currentConfig.input),
         output: path.resolve(context, currentConfig.output),
@@ -117,6 +125,7 @@ function getConfigs(directory) {
         adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
         protected: currentConfig.protected === true,
         rel: makeIterable(currentConfig.rel),
+        plugins,
         context: path.resolve(context),
         concat: prepareConcat(currentConfig.concat, path.resolve(context))
       });

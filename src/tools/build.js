@@ -33,9 +33,7 @@ async function buildDirectory(dir, recursive = true) {
 		// Build
 		try {
 			const bundle = await rollup(input);
-
 			await bundle.write({...output, ...{globals: getGlobals(bundle.imports, config)}});
-
 			await concat(config.concat.js, config.output);
 			await concat(config.concat.css, config.output);
 
