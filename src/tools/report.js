@@ -26,7 +26,7 @@ function printError(error) {
 		}
 
 		if (error.code === 'PLUGIN_ERROR') {
-			Logger.log(`    ${error.message.replace('undefined:', 'Error:')}`.red);
+			Logger.log(`    Error: ${error.message.replace('undefined:', '')}`.red);
 			return;
 		}
 

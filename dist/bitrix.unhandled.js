@@ -88,6 +88,9 @@ function help() {
   helper.print();
 }
 
+var name = "@bitrix/cli";
+var version = "2.1.2";
+
 function bitrixUnhandledCommand(params = argv) {
   if (params.help) {
     help();
@@ -95,14 +98,9 @@ function bitrixUnhandledCommand(params = argv) {
   }
 
   if (params.version) {
-    // eslint-disable-next-line
-    const pkg = require('../package.json'); // eslint-disable-next-line
-
-
-    Logger.log(pkg.name, pkg.version);
+    Logger.log(name, version);
     return;
-  } // eslint-disable-next-line
-
+  }
 
   Logger.log('Unknown command. Try run "bitrix --help" for more information');
 }

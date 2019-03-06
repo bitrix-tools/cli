@@ -2,11 +2,11 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 var os = _interopDefault(require('os'));
 var path = require('path');
 var boxen = _interopDefault(require('boxen'));
-require('colors');
-var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
@@ -38,14 +38,15 @@ function box(content) {
   return boxen(content.replace(/^\s+|\s+$|\t/g, ''), options);
 }
 
-const pkg = require('../package.json');
+var name = "@bitrix/cli";
+var version = "2.1.2";
 
 function bitrixInfo() {
   const {
     location
   } = info();
   const result = box(`
-		Info ${pkg.name}, v${pkg.version}
+		Info ${name}, v${version}
 		
 		${'Flow'.bold}
 		Package: ${location.flow}
@@ -58,8 +59,8 @@ function bitrixInfo() {
 		hooks.preupdate: ${location.mercurial.preupdate}
 		hooks.update: ${location.mercurial.update}
 		
-		Update: npm update -g ${pkg.name}
-		Remove: npm uninstall -g ${pkg.name}
+		Update: npm update -g ${name}
+		Remove: npm uninstall -g ${name}
 	`); // eslint-disable-next-line
 
   Logger.log(result);

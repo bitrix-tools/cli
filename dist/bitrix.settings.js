@@ -10,9 +10,9 @@ var os__default = _interopDefault(os);
 var path = require('path');
 var minimist = _interopDefault(require('minimist'));
 require('colors');
+var Logger = _interopDefault(require('@bitrix/logger'));
 var boxen = _interopDefault(require('boxen'));
 var inquirer = _interopDefault(require('inquirer'));
-var Logger = _interopDefault(require('@bitrix/logger'));
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os__default.homedir(), '.bitrix.lock');

@@ -3,11 +3,11 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import logSymbols from 'log-symbols';
+import Logger from '@bitrix/logger';
 import bitrixAdjust from './bitrix.adjust';
 import box from '../tools/box';
 import ask from '../tools/ask';
 import argv from '../process/argv';
-import Logger from '@bitrix/logger';
 
 export default async function bitrixSettings() {
 	if (argv.intro) {

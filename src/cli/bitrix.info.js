@@ -1,9 +1,8 @@
-import info from '../tools/info';
-import box from '../tools/box';
 import 'colors';
 import Logger from '@bitrix/logger';
-
-const pkg = require('../package.json');
+import info from '../tools/info';
+import box from '../tools/box';
+import * as pkg from '../../package.json';
 
 export default function bitrixInfo() {
 	const {location} = info();
