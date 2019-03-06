@@ -3,9 +3,9 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var Mocha = _interopDefault(require('mocha'));
+var Logger = _interopDefault(require('@bitrix/logger'));
 var minimist = _interopDefault(require('minimist'));
 var os = _interopDefault(require('os'));
-var Logger = _interopDefault(require('@bitrix/logger'));
 var glob = _interopDefault(require('fast-glob'));
 var Ora = _interopDefault(require('ora'));
 var EventEmitter = _interopDefault(require('events'));
@@ -56,12 +56,6 @@ function isEs6File(path$$1) {
   return typeof path$$1 === 'string' && path$$1.endsWith('script.es6.js');
 }
 
-const options = {
-  dot: true,
-  cache: true,
-  unique: false
-};
-
 function prepareConcat(files, context) {
   if (typeof files !== 'object') {
     return {};
@@ -104,6 +98,11 @@ function makeIterable(value) {
 function getConfigs(directory) {
   const normalizedDirectory = `${slash(directory)}`;
   const pattern = [path.resolve(normalizedDirectory, '**/bundle.config.js'), path.resolve(normalizedDirectory, '**/script.es6.js')];
+  const options = {
+    dot: true,
+    cache: true,
+    unique: false
+  };
   return glob.sync(pattern, options).reduce((acc, file) => {
     const context = path.dirname(file);
     const config = getConfigByFile(file);
@@ -114,7 +113,9 @@ function getConfigs(directory) {
       } = currentConfig;
 
       if (typeof plugins !== 'object') {
-        plugins = {};
+        plugins = {
+          resolve: false
+        };
       }
 
       acc.push({
@@ -265,10 +266,12 @@ async function test(dir, report = true) {
       Logger.log(`Test module ${item}`.bold, `${testResult}`);
     }
   } else if (typeof dir === 'string') {
-    await testDirectory(dir, report);
+    return testDirectory(dir, report);
   } else {
     throw new Error('dir not string or array');
   }
+
+  return '';
 }
 
 function getDirectories(dir) {

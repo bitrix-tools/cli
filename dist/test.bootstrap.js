@@ -100,9 +100,8 @@ require('@babel/register')({
 
     return path.resolve(cwd, '../../../../../');
   })(),
-  presets: [resolvePackageModule('@babel/preset-env'), resolvePackageModule('@babel/preset-react')],
+  presets: [resolvePackageModule('@babel/preset-env')],
   plugins: [[resolvePackageModule('babel-plugin-module-resolver'), {
     resolvePath: moduleResolver
-  }], resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties')],
-  exclude: ['**/node_modules**/', '**/babel-external-helpers.js', '**/base-polyfill.js', '**/bundle.core-init.js', '**/bundle.core.js', '**/core/core.js']
+  }], resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties')]
 });

@@ -249,7 +249,7 @@ function checkBuild(extPath, assertion = false) {
 	}
 
 	if (distConfigPhp !== resConfigPhp) {
-		assertion && assert(false, `invalid ${path.basename(distConfigPhp)}`);
+		assertion && assert(false, `invalid ${path.basename(distConfigPhpPath)}`);
 		return false;
 	}
 

@@ -1,20 +1,11 @@
 {
   "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react"
+    "@babel/preset-env"
   ],
   "plugins": [
     "@babel/plugin-transform-flow-strip-types",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-transform-runtime",
     "babel-plugin-rewire"
-  ],
-  "exclude": [
-    "**/node_modules**/",
-    "**/babel-external-helpers.js",
-    "**/base-polyfill.js",
-    "**/bundle.core-init.js",
-    "**/bundle.core.js",
-    "**/core/core.js"
   ]
 }

@@ -1,1 +1,0 @@
-{"version":3,"file":"app.bundle.js","sources":["../src/component.js","../src/app.js"],"sourcesContent":["export default class Component {\n\tname = 'Component';\n\tcircular = this;\n}","import Component from './component';\nimport './main.css';\n\nvoid new Component();"],"names":["Component"],"mappings":";;;KAAqBA;;6CACb;iDACI;;;CCCZ,KAAK,IAAIA,SAAJ,EAAL;;;;"}

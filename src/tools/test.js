@@ -1,11 +1,11 @@
 import Mocha from 'mocha';
 import glob from 'fast-glob';
 import path from 'path';
+import Logger from '@bitrix/logger';
 import argv from '../process/argv';
 import invalidateModuleCache from '../utils/invalidate-module-cache';
 import {appRoot} from '../constants';
 import Directory from '../entities/directory';
-import Logger from '@bitrix/logger';
 
 /*
 	eslint
@@ -97,8 +97,10 @@ export default async function test(dir, report = true) {
 			Logger.log(`Test module ${item}`.bold, `${testResult}`);
 		}
 	} else if (typeof dir === 'string') {
-		await testDirectory(dir, report);
+		return testDirectory(dir, report);
 	} else {
 		throw new Error('dir not string or array');
 	}
+
+	return '';
 }

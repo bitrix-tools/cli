@@ -93,7 +93,6 @@ require('@babel/register')({
 	})(),
 	presets: [
 		resolvePackageModule('@babel/preset-env'),
-		resolvePackageModule('@babel/preset-react'),
 	],
 	plugins: [
 		[resolvePackageModule('babel-plugin-module-resolver'), {
@@ -101,13 +100,5 @@ require('@babel/register')({
 		}],
 		resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
 		resolvePackageModule('@babel/plugin-proposal-class-properties'),
-	],
-	exclude: [
-		'**/node_modules**/',
-		'**/babel-external-helpers.js',
-		'**/base-polyfill.js',
-		'**/bundle.core-init.js',
-		'**/bundle.core.js',
-		'**/core/core.js',
 	],
 });

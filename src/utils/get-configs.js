@@ -3,12 +3,6 @@ import * as path from 'path';
 import slash from 'slash';
 import isEs6File from './is-es6-file';
 
-const options = {
-	dot: true,
-	cache: true,
-	unique: false,
-};
-
 function prepareConcat(files, context) {
 	if (typeof files !== 'object') {
 		return {};
@@ -18,7 +12,9 @@ function prepareConcat(files, context) {
 
 	Object.keys(files).forEach((key) => {
 		if (Array.isArray(files[key])) {
-			result[key] = files[key].map(filePath => path.resolve(context, filePath));
+			result[key] = files[key].map(filePath => (
+				path.resolve(context, filePath)
+			));
 		}
 	});
 
@@ -59,6 +55,12 @@ export default function getConfigs(directory) {
 		path.resolve(normalizedDirectory, '**/script.es6.js'),
 	];
 
+	const options = {
+		dot: true,
+		cache: true,
+		unique: false,
+	};
+
 	return glob
 		.sync(pattern, options)
 		.reduce((acc, file) => {
@@ -71,7 +73,9 @@ export default function getConfigs(directory) {
 
 				if (typeof plugins !== 'object')
 				{
-					plugins = {};
+					plugins = {
+						resolve: false,
+					};
 				}
 
 				acc.push({
