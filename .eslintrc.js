@@ -24,6 +24,7 @@ module.exports = {
         "implicit-arrow-linebreak": "off",
         "import/prefer-default-export": "off",
         "eol-last": "off",
+        "no-param-reassign": ["error", {"props": false}],
         "comma-dangle": [
             "error",
             {

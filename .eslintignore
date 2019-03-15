@@ -1,3 +1,4 @@
 *.js
+!**/src/**/*.js
+**/src/old/**/*.js
 *.d.ts
-!src/**/*.js
