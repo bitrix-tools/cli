@@ -14,7 +14,7 @@ export default function concat(input: string[] = [], output: string) {
 		input
 			.filter(existsSync)
 			.forEach((filePath) => {
-				const fileContent = readFileSync(filePath, encoding);
+				const fileContent = readFileSync(filePath);
 				const sourceMapPath = `${filePath}.map`;
 				let sourceMapContent;
 

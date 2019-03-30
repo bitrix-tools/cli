@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import detectCharacterEncoding from 'detect-character-encoding';
+import * as iconv from 'iconv-lite';
 
 export function getEncoding(buffer)
 {
@@ -10,13 +11,17 @@ export function getEncoding(buffer)
 		return 'utf-8';
 	}
 
-	return 'ascii';
+	return 'windows-1251';
 }
 
 export default function adjustEncoding(config) {
 	const input = fs.readFileSync(config.input);
 	const inputFileEncoding = getEncoding(input);
 	const output = fs.readFileSync(config.output);
+	const outputFileEncoding = getEncoding(output);
 
-	fs.writeFileSync(config.output, output.toString(inputFileEncoding));
+	const sourceContent = iconv.decode(output, outputFileEncoding);
+	const content = iconv.encode(sourceContent, inputFileEncoding);
+
+	fs.writeFileSync(config.output, content);
 }

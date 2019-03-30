@@ -14,6 +14,7 @@ require('colors');
 var rollup = require('rollup');
 var mustache = _interopDefault(require('mustache'));
 var detectCharacterEncoding = _interopDefault(require('detect-character-encoding'));
+var iconv = require('iconv-lite');
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
 var chokidar = _interopDefault(require('chokidar'));
@@ -178,7 +179,7 @@ function concat(input = [], output) {
   if (Array.isArray(input) && input.length) {
     const concatenator = new Concat(generateSourceMap, output, separator);
     input.filter(fs.existsSync).forEach(filePath => {
-      const fileContent = fs.readFileSync(filePath, encoding);
+      const fileContent = fs.readFileSync(filePath);
       const sourceMapPath = `${filePath}.map`;
       let sourceMapContent;
 
@@ -626,13 +627,16 @@ function getEncoding(buffer) {
     return 'utf-8';
   }
 
-  return 'ascii';
+  return 'windows-1251';
 }
 function adjustEncoding(config) {
   const input = fs.readFileSync(config.input);
   const inputFileEncoding = getEncoding(input);
   const output = fs.readFileSync(config.output);
-  fs.writeFileSync(config.output, output.toString(inputFileEncoding));
+  const outputFileEncoding = getEncoding(output);
+  const sourceContent = iconv.decode(output, outputFileEncoding);
+  const content = iconv.encode(sourceContent, inputFileEncoding);
+  fs.writeFileSync(config.output, content);
 }
 
 /*
