@@ -13,6 +13,7 @@ var os = _interopDefault(require('os'));
 require('colors');
 var rollup = require('rollup');
 var mustache = _interopDefault(require('mustache'));
+var detectCharacterEncoding = _interopDefault(require('detect-character-encoding'));
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
 var chokidar = _interopDefault(require('chokidar'));
@@ -618,6 +619,22 @@ async function adjustExtension(bundle, config) {
   }
 }
 
+function getEncoding(buffer) {
+  const result = detectCharacterEncoding(buffer);
+
+  if (!result || result.encoding === 'UTF-8') {
+    return 'utf-8';
+  }
+
+  return 'ascii';
+}
+function adjustEncoding(config) {
+  const input = fs.readFileSync(config.input);
+  const inputFileEncoding = getEncoding(input);
+  const output = fs.readFileSync(config.output);
+  fs.writeFileSync(config.output, output.toString(inputFileEncoding));
+}
+
 /*
 	eslint
  	"no-restricted-syntax": "off",
@@ -638,6 +655,7 @@ async function buildDirectory(dir, recursive = true) {
       await concat(config.concat.js, config.output);
       await concat(config.concat.css, config.output);
       await adjustExtension(bundle, config);
+      await adjustEncoding(config);
 
       if (argv.test || argv.t) {
         testResult = await test(config.context);
