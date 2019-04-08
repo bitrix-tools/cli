@@ -1,6 +1,6 @@
 {
   "name": "@bitrix/cli",
-  "version": "2.1.7-beta.0",
+  "version": "2.1.7",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/plugin-proposal-private-methods": "^7.2.3",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
-    "@babel/preset-env": "^7.2.0",
+    "@babel/preset-env": "^7.4.3",
     "@babel/register": "^7.4.0",
     "@babel/runtime": "^7.4.3",
     "@bitrix/logger": "^1.0.5",
