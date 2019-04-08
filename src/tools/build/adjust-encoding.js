@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import detectCharacterEncoding from 'detect-character-encoding';
+import jscharder from 'jschardet';
 import * as iconv from 'iconv-lite';
 
 export function getEncoding(buffer)
 {
-	const result = detectCharacterEncoding(buffer);
+	const result = jscharder.detect(buffer);
 
 	if (!result || result.encoding === 'UTF-8')
 	{

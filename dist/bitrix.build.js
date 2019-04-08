@@ -13,7 +13,7 @@ var os = _interopDefault(require('os'));
 require('colors');
 var rollup = require('rollup');
 var mustache = _interopDefault(require('mustache'));
-var detectCharacterEncoding = _interopDefault(require('detect-character-encoding'));
+var jscharder = _interopDefault(require('jschardet'));
 var iconv = require('iconv-lite');
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
@@ -636,7 +636,7 @@ async function adjustExtension(bundle, config) {
 }
 
 function getEncoding(buffer) {
-  const result = detectCharacterEncoding(buffer);
+  const result = jscharder.detect(buffer);
 
   if (!result || result.encoding === 'UTF-8') {
     return 'utf-8';
