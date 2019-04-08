@@ -42,7 +42,11 @@ function rollupConfig({
   if (plugins.babel !== false) {
     enabledPlugins.push(babel(plugins.babel || {
       sourceMaps: true,
-      presets: [resolvePackageModule('@babel/preset-env')],
+      presets: [[resolvePackageModule('@babel/preset-env'), {
+        targets: {
+          ie: '11'
+        }
+      }]],
       plugins: [resolvePackageModule('@babel/plugin-external-helpers'), resolvePackageModule('@babel/plugin-transform-flow-strip-types'), resolvePackageModule('@babel/plugin-proposal-class-properties'), resolvePackageModule('@babel/plugin-proposal-private-methods')]
     }));
   }

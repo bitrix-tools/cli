@@ -33,7 +33,14 @@ export default function rollupConfig({input, output, plugins = {}}) {
 		enabledPlugins.push(babel(plugins.babel || {
 			sourceMaps: true,
 			presets: [
-				resolvePackageModule('@babel/preset-env'),
+				[
+					resolvePackageModule('@babel/preset-env'),
+					{
+						targets: {
+							ie: '11',
+						},
+					},
+				],
 			],
 			plugins: [
 				resolvePackageModule('@babel/plugin-external-helpers'),
