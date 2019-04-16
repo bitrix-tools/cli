@@ -4,13 +4,13 @@ import {resolve, relative} from 'path';
 import slash from 'slash';
 import {appRoot} from '../../constants';
 import buildExtensionName from '../../utils/build-extension-name';
-import bitrixFlow from '../../cli/bitrix.flow';
 import render from '../render';
 import buildNamespaceName from '../../utils/build-namespace-name';
 
 const templatePath = resolve(appRoot, 'src/templates/extension');
 const configTemplatePath = resolve(templatePath, 'bundle.config.js');
 const inputTemplatePath = resolve(templatePath, 'input.js');
+const inputFlowTemplatePath = resolve(templatePath, 'input.flow.js');
 const defaultOptions = {test: true, flow: false};
 
 export default function createExtension(directory, options = defaultOptions) {
@@ -30,10 +30,12 @@ export default function createExtension(directory, options = defaultOptions) {
 	const namespaceName = buildNamespaceName({root: 'BX', extensionName});
 
 	render({
-		input: inputTemplatePath,
+		input: options.flow ? inputFlowTemplatePath : inputTemplatePath,
 		output: inputPath,
 		data: {
 			name: camelcase(options.name, {pascalCase: true}),
+			nameLower: `${options.name}`.toLowerCase(),
+			flow: options.flow,
 		},
 	});
 
@@ -59,10 +61,6 @@ export default function createExtension(directory, options = defaultOptions) {
 				sourceName: options.name,
 			},
 		});
-	}
-
-	if (options.flow) {
-		bitrixFlow({path: extensionPath}, {init: true});
 	}
 
 	return {
