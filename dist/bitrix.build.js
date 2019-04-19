@@ -4,6 +4,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var Ora = _interopDefault(require('ora'));
 var Concat = _interopDefault(require('concat-with-sourcemaps'));
+var jscharder = _interopDefault(require('jschardet'));
+var iconv = require('iconv-lite');
 var logSymbols = _interopDefault(require('log-symbols'));
 var filesize = _interopDefault(require('filesize'));
 var Mocha = _interopDefault(require('mocha'));
@@ -13,8 +15,6 @@ var os = _interopDefault(require('os'));
 require('colors');
 var rollup = require('rollup');
 var mustache = _interopDefault(require('mustache'));
-var jscharder = _interopDefault(require('jschardet'));
-var iconv = require('iconv-lite');
 var glob = _interopDefault(require('fast-glob'));
 var EventEmitter = _interopDefault(require('events'));
 var chokidar = _interopDefault(require('chokidar'));
@@ -172,6 +172,25 @@ function adjustSourceMap(mapPath) {
   }
 }
 
+function getEncoding(buffer) {
+  const result = jscharder.detect(buffer);
+
+  if (!result || result.encoding === 'UTF-8') {
+    return 'utf-8';
+  }
+
+  return 'windows-1251';
+}
+function adjustEncoding(config) {
+  const input = fs.readFileSync(config.input);
+  const inputFileEncoding = getEncoding(input);
+  const output = fs.readFileSync(config.output);
+  const outputFileEncoding = getEncoding(output);
+  const sourceContent = iconv.decode(output, outputFileEncoding);
+  const content = iconv.encode(sourceContent, inputFileEncoding);
+  fs.writeFileSync(config.output, content);
+}
+
 const separator = '\n\n';
 const generateSourceMap = true;
 const encoding = 'utf-8';
@@ -195,7 +214,15 @@ function concat(input = [], output) {
       content,
       sourceMap
     } = concatenator;
-    fs.writeFileSync(output, content);
+    const contentEncoding = getEncoding(content);
+    const decodedContent = iconv.decode(content, contentEncoding).toString();
+    const decodedContentString = // eslint-disable-next-line
+    decodedContent.toString(contentEncoding) // eslint-disable-next-line
+    .replace(/\/\/# sourceMappingURL=(.*)\.map/g, '') + `\n//# sourceMappingURL=${path.basename(output)}.map`;
+    const outputFile = fs.existsSync(output) ? fs.readFileSync(output) : null;
+    const outputEncoding = outputFile ? getEncoding(outputFile) : contentEncoding;
+    const encodedContent = iconv.encode(decodedContentString, outputEncoding);
+    fs.writeFileSync(output, encodedContent);
     fs.writeFileSync(`${output}.map`, sourceMap);
     adjustSourceMap(`${output}.map`);
   }
@@ -633,25 +660,6 @@ async function adjustExtension(bundle, config) {
       fs.writeFileSync(configPhpPath, configContent);
     }
   }
-}
-
-function getEncoding(buffer) {
-  const result = jscharder.detect(buffer);
-
-  if (!result || result.encoding === 'UTF-8') {
-    return 'utf-8';
-  }
-
-  return 'windows-1251';
-}
-function adjustEncoding(config) {
-  const input = fs.readFileSync(config.input);
-  const inputFileEncoding = getEncoding(input);
-  const output = fs.readFileSync(config.output);
-  const outputFileEncoding = getEncoding(output);
-  const sourceContent = iconv.decode(output, outputFileEncoding);
-  const content = iconv.encode(sourceContent, inputFileEncoding);
-  fs.writeFileSync(config.output, content);
 }
 
 /*
