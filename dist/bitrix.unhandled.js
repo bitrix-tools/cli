@@ -89,7 +89,7 @@ function help() {
 }
 
 var name = "@bitrix/cli";
-var version = "2.1.12";
+var version = "2.1.13";
 
 function bitrixUnhandledCommand(params = argv) {
   if (params.help) {

@@ -26,6 +26,12 @@ function rollupConfig({
 }) {
   const enabledPlugins = [];
 
+  if (Array.isArray(plugins.custom)) {
+    plugins.custom.forEach(item => {
+      enabledPlugins.push(item);
+    });
+  }
+
   if (plugins.resolve) {
     enabledPlugins.push(resolve());
   }
