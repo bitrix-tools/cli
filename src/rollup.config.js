@@ -78,6 +78,11 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			plugins: [
 				{
 					load(id) {
+						if (!fs.existsSync(id))
+						{
+							return null;
+						}
+
 						const file = fs.readFileSync(id);
 						const fileEncoding = getEncoding(file);
 

@@ -84,6 +84,10 @@ function rollupConfig({
       treeshake: input.treeshake !== false,
       plugins: [{
         load(id) {
+          if (!fs.existsSync(id)) {
+            return null;
+          }
+
           const file = fs.readFileSync(id);
           const fileEncoding = getEncoding(file);
           const decoded = iconv__default.decode(file, fileEncoding);
