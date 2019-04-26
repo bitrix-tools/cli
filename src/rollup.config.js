@@ -4,7 +4,10 @@ import json from 'rollup-plugin-json';
 import babel from 'rollup-plugin-simple-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import iconv from 'iconv-lite';
+import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
+import {getEncoding} from './tools/build/adjust-encoding';
 
 export default function rollupConfig({input, output, plugins = {}}) {
 	const enabledPlugins = [];
@@ -72,7 +75,20 @@ export default function rollupConfig({input, output, plugins = {}}) {
 				'BX',
 			],
 			treeshake: input.treeshake !== false,
-			plugins: enabledPlugins,
+			plugins: [
+				{
+					load(id) {
+						const file = fs.readFileSync(id);
+						const fileEncoding = getEncoding(file);
+
+						const decoded = iconv.decode(file, fileEncoding);
+						const encoded = iconv.encode(decoded, 'utf-8');
+
+						return encoded.toString('utf-8');
+					},
+				},
+				...enabledPlugins,
+			],
 			onwarn: () => {},
 		},
 		output: {

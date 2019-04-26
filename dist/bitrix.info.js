@@ -39,7 +39,7 @@ function box(content) {
 }
 
 var name = "@bitrix/cli";
-var version = "2.1.13";
+var version = "2.1.14";
 
 function bitrixInfo() {
   const {

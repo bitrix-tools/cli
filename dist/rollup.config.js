@@ -11,12 +11,26 @@ var commonjs = _interopDefault(require('rollup-plugin-commonjs'));
 var os = _interopDefault(require('os'));
 var path = require('path');
 var path__default = _interopDefault(path);
+var fs = require('fs');
+var jscharder = _interopDefault(require('jschardet'));
+var iconv = require('iconv-lite');
+var iconv__default = _interopDefault(iconv);
 
 const appRoot = path.resolve(__dirname, '../');
 const lockFile = path.resolve(os.homedir(), '.bitrix.lock');
 
 function resolvePackageModule(moduleName) {
   return path__default.resolve(appRoot, 'node_modules', moduleName);
+}
+
+function getEncoding(buffer) {
+  const result = jscharder.detect(buffer);
+
+  if (!result || result.encoding === 'UTF-8') {
+    return 'utf-8';
+  }
+
+  return 'windows-1251';
 }
 
 function rollupConfig({
@@ -68,7 +82,16 @@ function rollupConfig({
       input: input.input,
       external: ['BX'],
       treeshake: input.treeshake !== false,
-      plugins: enabledPlugins,
+      plugins: [{
+        load(id) {
+          const file = fs.readFileSync(id);
+          const fileEncoding = getEncoding(file);
+          const decoded = iconv__default.decode(file, fileEncoding);
+          const encoded = iconv__default.encode(decoded, 'utf-8');
+          return encoded.toString('utf-8');
+        }
+
+      }, ...enabledPlugins],
       onwarn: () => {}
     },
     output: {
