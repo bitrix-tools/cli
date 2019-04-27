@@ -26,7 +26,7 @@ function resolvePackageModule(moduleName) {
 function getEncoding(buffer) {
   const result = jscharder.detect(buffer);
 
-  if (!result || result.encoding === 'UTF-8') {
+  if (!result || result.encoding === 'UTF-8' || result.encoding === 'ascii') {
     return 'utf-8';
   }
 
