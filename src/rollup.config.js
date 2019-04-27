@@ -11,6 +11,7 @@ import {getEncoding} from './tools/build/adjust-encoding';
 
 export default function rollupConfig({input, output, plugins = {}}) {
 	const enabledPlugins = [];
+	const isLoaded = id => !!enabledPlugins.find(item => item.name === id);
 
 	if (Array.isArray(plugins.custom))
 	{
@@ -19,24 +20,31 @@ export default function rollupConfig({input, output, plugins = {}}) {
 		});
 	}
 
-	if (plugins.resolve)
+	if (plugins.resolve && !isLoaded('node-resolve'))
 	{
 		enabledPlugins.push(resolve());
 	}
 
-	enabledPlugins.push(json());
-	enabledPlugins.push(postcss({
-		extract: true,
-		sourceMap: false,
-		plugins: [
-			autoprefixer({
-				browsers: [
-					'ie >= 11',
-					'last 4 version',
-				],
-			}),
-		],
-	}));
+	if (!isLoaded('json'))
+	{
+		enabledPlugins.push(json());
+	}
+
+	if (!isLoaded('postcss'))
+	{
+		enabledPlugins.push(postcss({
+			extract: true,
+			sourceMap: false,
+			plugins: [
+				autoprefixer({
+					browsers: [
+						'ie >= 11',
+						'last 4 version',
+					],
+				}),
+			],
+		}));
+	}
 
 	if (plugins.babel !== false)
 	{
@@ -61,7 +69,7 @@ export default function rollupConfig({input, output, plugins = {}}) {
 		}));
 	}
 
-	if (plugins.resolve)
+	if (plugins.resolve && !isLoaded('commonjs'))
 	{
 		enabledPlugins.push(commonjs({
 			sourceMap: false,

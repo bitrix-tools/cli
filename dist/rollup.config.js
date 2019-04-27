@@ -40,24 +40,31 @@ function rollupConfig({
 }) {
   const enabledPlugins = [];
 
+  const isLoaded = id => !!enabledPlugins.find(item => item.name === id);
+
   if (Array.isArray(plugins.custom)) {
     plugins.custom.forEach(item => {
       enabledPlugins.push(item);
     });
   }
 
-  if (plugins.resolve) {
+  if (plugins.resolve && !isLoaded('node-resolve')) {
     enabledPlugins.push(resolve());
   }
 
-  enabledPlugins.push(json());
-  enabledPlugins.push(postcss({
-    extract: true,
-    sourceMap: false,
-    plugins: [autoprefixer({
-      browsers: ['ie >= 11', 'last 4 version']
-    })]
-  }));
+  if (!isLoaded('json')) {
+    enabledPlugins.push(json());
+  }
+
+  if (!isLoaded('postcss')) {
+    enabledPlugins.push(postcss({
+      extract: true,
+      sourceMap: false,
+      plugins: [autoprefixer({
+        browsers: ['ie >= 11', 'last 4 version']
+      })]
+    }));
+  }
 
   if (plugins.babel !== false) {
     enabledPlugins.push(babel(plugins.babel || {
@@ -71,7 +78,7 @@ function rollupConfig({
     }));
   }
 
-  if (plugins.resolve) {
+  if (plugins.resolve && !isLoaded('commonjs')) {
     enabledPlugins.push(commonjs({
       sourceMap: false
     }));
