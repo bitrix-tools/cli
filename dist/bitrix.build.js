@@ -175,7 +175,7 @@ function adjustSourceMap(mapPath) {
 function getEncoding(buffer) {
   const result = jscharder.detect(buffer);
 
-  if (!result || result.encoding === 'UTF-8' || result.encoding === 'ascii') {
+  if (!result || result.encoding === 'UTF-8') {
     return 'utf-8';
   }
 
