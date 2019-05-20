@@ -47,6 +47,10 @@ global.Node = DOM.window.Node;
 global.Element = DOM.window.Element;
 global.DOMParser = DOM.window.DOMParser;
 global.FormData = DOM.window.FormData;
+global.File = DOM.window.File;
+global.Blob = DOM.window.Blob;
+global.BlobBuilder = DOM.window.BlobBuilder;
+global.FileReader = DOM.window.FileReader;
 Object.keys(DOM.window).forEach(property => {
   if (typeof global[property] === 'undefined') {
     global[property] = DOM.window[property];
