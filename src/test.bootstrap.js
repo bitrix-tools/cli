@@ -36,6 +36,7 @@ global.document = DOM.window.document;
 global.Node = DOM.window.Node;
 global.Element = DOM.window.Element;
 global.DOMParser = DOM.window.DOMParser;
+global.FormData = DOM.window.FormData;
 
 Object.keys(DOM.window).forEach((property) => {
 	if (typeof global[property] === 'undefined') {
