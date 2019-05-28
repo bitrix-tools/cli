@@ -9,9 +9,11 @@ import isComponentPath from '../utils/is-component-path';
 import buildComponentName from '../utils/build-component-name';
 import isTemplatePath from '../utils/is-template-path';
 import buildTemplateName from '../utils/build-template-name';
+import getNowTime from '../utils/get-now-time';
 
 function printRow(row) {
-	const nameCell = ` ${row.infoSymbol} Build ${row.type} ${row.name}`;
+	const reportTime = String(getNowTime()).grey;
+	const nameCell = ` ${row.infoSymbol} ${reportTime} Build ${row.type} ${row.name}`;
 	const testCell = `${row.testStatus || ''}`;
 	const sizeCell = `${row.jsSize ? `js: ${row.jsSize}` : ''}${row.cssSize ? `, css: ${row.cssSize}` : ''}`.grey;
 

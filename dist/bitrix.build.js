@@ -286,8 +286,17 @@ function buildTemplateName(filePath) {
   return res && res[2];
 }
 
+function getNowTime() {
+  const date = new Date();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 function printRow(row) {
-  const nameCell = ` ${row.infoSymbol} Build ${row.type} ${row.name}`;
+  const reportTime = String(getNowTime()).grey;
+  const nameCell = ` ${row.infoSymbol} ${reportTime} Build ${row.type} ${row.name}`;
   const testCell = `${row.testStatus || ''}`;
   const sizeCell = `${row.jsSize ? `js: ${row.jsSize}` : ''}${row.cssSize ? `, css: ${row.cssSize}` : ''}`.grey;
   Logger.log(`${nameCell} ${testCell} ${sizeCell}`);

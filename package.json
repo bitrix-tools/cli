@@ -1,6 +1,6 @@
 {
   "name": "@bitrix/cli",
-  "version": "2.1.19",
+  "version": "2.1.20",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "scripts": {
