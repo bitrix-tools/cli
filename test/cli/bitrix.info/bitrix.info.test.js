@@ -16,6 +16,7 @@ describe('cli/bitrix.info', () => {
 
 		const message = log.lastCall.args[0];
 
+		console.log(message);
 		assert.ok(message.includes('Flow'), 'Not includes flow');
 		assert.ok(message.includes('/@bitrix/cli/node_modules/flow-bin'), 'Not includes flow-bin path');
 
