@@ -172,6 +172,6 @@ $ bitrix test --path ./main/install/js/main/loader.
 <h2 id="create">Создание «экстеншна»</h2>
 
 Для создания «экстеншна»
-1. Перейдите в директорию `local/js/{module}` или `bitrix/modules/{module}/install/js/{module}`
+1. Перейдите в директорию `local/js/{module}`
 2. Выполните команду `bitrix create`
 3. Ответьте на вопросы мастера
