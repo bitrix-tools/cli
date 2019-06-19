@@ -3,6 +3,9 @@
   "version": "2.1.20",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
+  "engines": {
+    "node": ">= 7.5.0"
+  },
   "scripts": {
     "test": "LOGGER_LEVEL=0 npx mocha --require @babel/register --timeout 5000 test/**/*.test.js",
     "test:dev": "LOGGER_LEVEL=0 npx mocha --watch --require @babel/register --timeout 5000 test/**/*.test.js",
@@ -16,7 +19,12 @@
     "bitrix": "./bin/bitrix"
   },
   "repository": {
-    "git": "https://github.com/bitrix-tools/cli.git"
+    "type": "git",
+    "url": "https://github.com/bitrix-tools/cli.git"
+  },
+  "homepage": "https://github.com/bitrix-tools/cli#readme",
+  "bugs": {
+    "url": "https://github.com/bitrix-tools/cli/issues"
   },
   "author": "Bitrix",
   "license": "MIT",
@@ -84,7 +92,6 @@
     "bitrix",
     "bitrix24",
     "cli",
-    "builder",
     "bundler"
   ]
 }
