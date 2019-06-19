@@ -34,7 +34,7 @@ $ npm install -g @bitrix/cli
 
 YARN
 ```bash
-$ yarn add @bitrix/cli
+$ yarn global add @bitrix/cli
 ```
 
 <h2 id="config">Конфигурация</h2>
