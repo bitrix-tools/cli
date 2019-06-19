@@ -9,6 +9,7 @@ describe('tools/info', () => {
 	it('Should return object', () => {
 		const result = info();
 
+		console.log(result);
 		assert(
 			!!result
 			&& typeof result === 'object'
