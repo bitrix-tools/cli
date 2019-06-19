@@ -7,7 +7,7 @@
     "node": ">= 7.5.0"
   },
   "scripts": {
-    "test": "LOGGER_LEVEL=0 npx mocha --require @babel/register --timeout 5000 test/**/*.test.js",
+    "test": "LOGGER_LEVEL=0 npx mocha --exit --require @babel/register --timeout 5000 test/**/*.test.js",
     "test:dev": "LOGGER_LEVEL=0 npx mocha --watch --require @babel/register --timeout 5000 test/**/*.test.js",
     "test:cover": "LOGGER_LEVEL=0 npx istanbul cover ./node_modules/.bin/_mocha -- --require @babel/register --timeout 5000 test/**/*.test.js",
     "build": "npx rollup -c",
