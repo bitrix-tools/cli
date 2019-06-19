@@ -16,21 +16,18 @@ describe('cli/bitrix.info', () => {
 
 		const message = log.lastCall.args[0];
 
-		assert(message.includes('Flow'));
-		assert(message.includes('/@bitrix/cli/node_modules/flow-bin'));
+		assert.ok(message.includes('Flow'), 'Not includes flow');
+		assert.ok(message.includes('/@bitrix/cli/node_modules/flow-bin'), 'Not includes flow-bin path');
 
-		assert(message.includes('ESLint'));
-		assert(message.includes('/@bitrix/cli/node_modules/eslint'));
-		assert(message.includes('/@bitrix/cli/.eslintrc.js'));
+		assert.ok(message.includes('ESLint'), 'Not includes ESLint');
+		assert.ok(message.includes('/@bitrix/cli/node_modules/eslint'), 'Not includes eslint path');
+		assert.ok(message.includes('/@bitrix/cli/.eslintrc.js'), 'Not includes eslintrc.js path');
 
-		assert(message.includes('Mercurial'));
-		assert(message.includes('/@bitrix/cli/src/mercurial/hooks/preupdate.sh'));
-		assert(message.includes('/@bitrix/cli/src/mercurial/hooks/update.sh'));
+		assert.ok(message.includes('Mercurial'), 'Not includes Mercurial');
+		assert.ok(message.includes('/@bitrix/cli/src/mercurial/hooks/preupdate.sh'), 'Not includes preupdate.sh');
+		assert.ok(message.includes('/@bitrix/cli/src/mercurial/hooks/update.sh'), 'Not includes update.sh');
 
-		assert(message.includes('/@bitrix/cli/src/mercurial/hooks/preupdate.sh'));
-		assert(message.includes('/@bitrix/cli/src/mercurial/hooks/update.sh'));
-
-		assert(message.includes('Update: npm update -g @bitrix/cli'));
-		assert(message.includes('Remove: npm uninstall -g @bitrix/cli'));
+		assert.ok(message.includes('Update: npm update -g @bitrix/cli'), 'Not includes npm update');
+		assert.ok(message.includes('Remove: npm uninstall -g @bitrix/cli'), 'Not includes npm uninstall');
 	});
 });
