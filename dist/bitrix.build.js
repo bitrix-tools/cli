@@ -544,10 +544,17 @@ function getGlobals(imports, {
   return imports.reduce((accumulator, extensionName) => {
     const parsedExtensionName = extensionName.split('.');
     const moduleName = parsedExtensionName.shift();
-    const moduleRoot = path.join(context.split('modules')[0], 'modules', moduleName);
-    const moduleJsRoot = path.join(moduleRoot, 'install', 'js', moduleName);
-    const extensionPath = path.join(moduleJsRoot, path.join(...parsedExtensionName));
-    const configPath = path.join(extensionPath, 'bundle.config.js');
+    const localModuleJsRoot = path.join(context.split(path.join('local', 'js'))[0], 'local', 'js', moduleName);
+    const localExtensionPath = path.join(localModuleJsRoot, path.join(...parsedExtensionName));
+    let configPath = path.join(localExtensionPath, 'bundle.config.js');
+
+    if (!fs.existsSync(configPath)) {
+      const moduleRoot = path.join(context.split('modules')[0], 'modules', moduleName);
+      const moduleJsRoot = path.join(moduleRoot, 'install', 'js', moduleName);
+      const extensionPath = path.join(moduleJsRoot, path.join(...parsedExtensionName));
+      configPath = path.join(extensionPath, 'bundle.config.js');
+    }
+
     let moduleAlias = 'BX';
 
     if (fs.existsSync(configPath)) {
