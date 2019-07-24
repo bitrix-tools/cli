@@ -37,7 +37,7 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			sourceMap: false,
 			plugins: [
 				autoprefixer({
-					browsers: [
+					overrideBrowserslist: [
 						'ie >= 11',
 						'last 4 version',
 					],
