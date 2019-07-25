@@ -1,4 +1,5 @@
 examples
 src
+!src/templates
 test
 coverage
