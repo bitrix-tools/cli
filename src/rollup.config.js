@@ -62,6 +62,7 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			],
 			plugins: [
 				resolvePackageModule('@babel/plugin-external-helpers'),
+				resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
 				resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
 				resolvePackageModule('@babel/plugin-proposal-class-properties'),
 				resolvePackageModule('@babel/plugin-proposal-private-methods'),
