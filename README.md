@@ -140,8 +140,10 @@ $ bitrix build --path ./main/install/js/main/loader
 
 
 <h2 id="tests">Запуск тестов</h2>
-
-Запускает Mocha тесты и&nbsp;выводит подробный отчет о&nbsp;прохождении тестов. 
+```bash
+$ bitrix test
+```
+Команда запускает Mocha тесты и&nbsp;выводит подробный отчет о&nbsp;прохождении тестов. 
 > Тестами считаются&nbsp;JS файлы, расположенные в&nbsp;директории `./test`, 
   относительно файла `bundle.config.js`. В&nbsp;момент запуска тестов исходный код и&nbsp;код тестов, 
   налету обрабатывается сборщиком и&nbsp;после чего выполняется. Поэтому тесты можно писать на&nbsp;ES6+
@@ -166,7 +168,7 @@ $ bitrix test --modules main,ui,landing
 Запуск тестов для указанной директории. В&nbsp;значении укажите относительный путь к&nbsp;директории, 
 например:
 ```bash
-$ bitrix test --path ./main/install/js/main/loader.
+$ bitrix test --path ./main/install/js/main/loader
 ```
 
 <h2 id="create">Создание «экстеншна»</h2>
