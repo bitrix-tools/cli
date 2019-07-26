@@ -1,5 +1,5 @@
 *.js
 !.*
 !**/src/**
-*/src/old/**/*.js
+**/src/old/**
 *.d.ts
