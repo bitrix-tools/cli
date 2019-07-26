@@ -76,6 +76,7 @@ module.exports = {
 		],
 
 		'no-void': 'off',
+		radix: 'off',
 
 		// Flow inspections
 		'flowtype/no-types-missing-file-annotation': 'off',
