@@ -21,6 +21,7 @@ module.exports = {
 		'object-curly-spacing': ['error', 'never'],
 		'object-curly-newline': 'off',
 		'brace-style': 'off',
+		'arrow-body-style': 'off',
 		'implicit-arrow-linebreak': 'off',
 		'import/prefer-default-export': 'off',
 		'eol-last': 'off',
