@@ -16,6 +16,10 @@ module.exports = {
 
 	root: true,
 
+	globals: {
+		BX: 'readonly',
+	},
+
 	rules: {
 		'no-tabs': 'off',
 		'object-curly-spacing': ['error', 'never'],
