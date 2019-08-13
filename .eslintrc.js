@@ -75,6 +75,7 @@ module.exports = {
 				allowTaggedTemplates: true,
 			},
 		],
+		'no-control-regex': 'off',
 
 		'no-void': 'off',
 		radix: 'off',
