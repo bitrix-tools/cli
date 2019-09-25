@@ -10,7 +10,10 @@ export default function isAllowed(fileName) {
 
 	if (
 		(new RegExp('/components/(.*)/style.js')).test(normalizedFileName)
-		|| (new RegExp('/components/(.*)/style.css')).test(normalizedFileName)
+		|| (
+			(new RegExp('/components/(.*)/style.css')).test(normalizedFileName)
+			&& !(new RegExp('/components/(.*)/src/(.*)style.css')).test(normalizedFileName)
+		)
 	) {
 		return false;
 	}
