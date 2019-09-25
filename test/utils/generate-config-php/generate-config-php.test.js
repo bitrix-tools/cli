@@ -29,7 +29,10 @@ describe('utils/generate-config-php', () => {
 	it('Should return config if passed valid config without rel', () => {
 		const config = {
 			input: 'loader.js',
-			output: 'loader.bundle.js',
+			output: {
+				js: 'loader.bundle.js',
+				css: 'loader.bundle.css',
+			},
 			context: '/modules/main/install/js/main/loader',
 			rel: [
 				'main.polyfill.core',
@@ -47,7 +50,10 @@ describe('utils/generate-config-php', () => {
 	it('Should return config if passed valid config without rel (windows like paths)', () => {
 		const config = {
 			input: 'loader.js',
-			output: 'loader.bundle.js',
+			output: {
+				js: 'loader.bundle.js',
+				css: 'loader.bundle.css',
+			},
 			context: '\\modules\\main\\install\\js\\main\\loader',
 			rel: [
 				'main.polyfill.core',
@@ -65,7 +71,10 @@ describe('utils/generate-config-php', () => {
 	it('Should return config if passed valid config with rel', () => {
 		const config = {
 			input: 'loader.js',
-			output: 'loader.bundle.js',
+			output: {
+				js: 'loader.bundle.js',
+				css: 'loader.bundle.css',
+			},
 			context: '/modules/main/install/js/main/loader',
 			rel: [
 				'main.polyfill.core',

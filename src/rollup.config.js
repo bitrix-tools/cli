@@ -33,7 +33,7 @@ export default function rollupConfig({input, output, plugins = {}}) {
 	if (!isLoaded('postcss'))
 	{
 		enabledPlugins.push(postcss({
-			extract: true,
+			extract: output.css || true,
 			sourceMap: false,
 			plugins: [
 				autoprefixer({
@@ -106,7 +106,7 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			onwarn: () => {},
 		},
 		output: {
-			file: output.file,
+			file: output.js,
 			name: output.name || 'window',
 			format: 'iife',
 			sourcemap: true,

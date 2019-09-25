@@ -27,7 +27,10 @@ function getConfigByFile(configPath) {
 
 		return {
 			input: path.resolve(context, 'script.es6.js'),
-			output: path.resolve(context, 'script.js'),
+			output: {
+				js: path.resolve(context, 'script.js'),
+				css: path.resolve(context, 'style.css'),
+			},
 		};
 	}
 
@@ -78,9 +81,43 @@ export default function getConfigs(directory) {
 					};
 				}
 
+				const output = (() => {
+					const changeExt = (filePath, ext) => {
+						const pos = filePath.lastIndexOf('.');
+
+						if (pos > 0)
+						{
+							return `${filePath.substr(0, pos)}.${ext}`;
+						}
+
+						return filePath;
+					};
+
+					if (typeof currentConfig.output === 'object')
+					{
+						const {js} = currentConfig.output;
+						let {css} = currentConfig.output;
+
+						if (typeof css !== 'string')
+						{
+							css = changeExt(js, 'css');
+						}
+
+						return {
+							js: path.resolve(context, js),
+							css: path.resolve(context, css),
+						};
+					}
+
+					return {
+						js: path.resolve(context, currentConfig.output),
+						css: path.resolve(context, changeExt(currentConfig.output, 'css')),
+					};
+				})();
+
 				acc.push({
 					input: path.resolve(context, currentConfig.input),
-					output: path.resolve(context, currentConfig.output),
+					output,
 					name: currentConfig.namespace || '',
 					treeshake: currentConfig.treeshake !== false,
 					adjustConfigPhp: currentConfig.adjustConfigPhp !== false,

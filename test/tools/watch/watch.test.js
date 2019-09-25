@@ -82,8 +82,8 @@ function checkConfig(context, config, assertion = false) {
 		return false;
 	}
 
-	if (config.output !== output) {
-		assertion && assert(false, `Invalid output ${path.basename(output)}`);
+	if (config.output.js !== output) {
+		assertion && assert(false, `Invalid output ${path.basename(output.js)}`);
 		return false;
 	}
 

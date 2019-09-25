@@ -28,8 +28,8 @@ async function buildDirectory(dir, recursive = true) {
 
 		try {
 			const bundle = await rollupBundle(config);
-			await concat(config.concat.js, config.output);
-			await concat(config.concat.css, config.output);
+			await concat(config.concat.js, config.output.js);
+			await concat(config.concat.css, config.output.css);
 			await adjustExtension(bundle, config);
 			await adjustEncoding(config);
 

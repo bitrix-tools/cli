@@ -104,7 +104,7 @@ describe('tools/report', () => {
 
 		report({config});
 
-		assert(log.lastCall.args[0].includes(`Build bundle ${config.output}`));
+		assert(log.lastCall.args[0].includes(`Build bundle ${config.output.js}`));
 	});
 
 	it('Should print test status "tests passed"', () => {

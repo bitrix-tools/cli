@@ -44,13 +44,15 @@ describe('utils/get-configs', () => {
 			const config = configs[0];
 
 			let inputPath = path.resolve(extPath, './src/app.js');
-			let outputPath = path.resolve(extPath, './dist/app.bundle.js');
+			let outputJsPath = path.resolve(extPath, './dist/app.bundle.js');
+			let outputCssPath = path.resolve(extPath, './dist/app.bundle.css');
 
-			assert(config.context === extPath);
-			assert(config.input === inputPath);
-			assert(config.output === outputPath);
-			assert(config.name === 'BX.Main.MyExt');
-			assert(config.treeshake === true);
+			assert.ok(config.context === extPath, 'invalid context');
+			assert.ok(config.input === inputPath, 'invalid input path');
+			assert.ok(config.output.js === outputJsPath, 'invalid output.js path');
+			assert.ok(config.output.css === outputCssPath, 'invalid output.css path');
+			assert.ok(config.name === 'BX.Main.MyExt', 'invalid name');
+			assert.ok(config.treeshake === true, 'invalid treeshake');
 		});
 	});
 
@@ -75,11 +77,13 @@ describe('utils/get-configs', () => {
 			const config = configs[0];
 
 			let inputPath = path.resolve(extPath, './script.es6.js');
-			let outputPath = path.resolve(extPath, './script.js');
+			let outputJsPath = path.resolve(extPath, './script.js');
+			let outputCssPath = path.resolve(extPath, './style.css');
 
 			assert(config.context === extPath);
 			assert(config.input === inputPath);
-			assert(config.output === outputPath);
+			assert(config.output.js === outputJsPath);
+			assert(config.output.css === outputCssPath);
 			assert(config.name === '');
 			assert(config.treeshake === true);
 		});
@@ -90,11 +94,13 @@ describe('utils/get-configs', () => {
 			const config = configs[0];
 
 			let inputPath = path.resolve(extPath, './src/app.js');
-			let outputPath = path.resolve(extPath, './script.js');
+			let outputJsPath = path.resolve(extPath, './script.js');
+			let outputCssPath = path.resolve(extPath, './script.css');
 
 			assert(config.context === extPath);
 			assert(config.input === inputPath);
-			assert(config.output === outputPath);
+			assert(config.output.js === outputJsPath);
+			assert(config.output.css === outputCssPath);
 			assert(config.name === 'BX.Main.Component.Custom');
 			assert(config.treeshake === true);
 		});

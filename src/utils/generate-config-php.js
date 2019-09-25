@@ -17,7 +17,7 @@ function generateConfigPhp(config) {
 
 	const templatePath = path.resolve(appRoot, 'src/templates/config.php');
 	const template = fs.readFileSync(templatePath, 'utf-8');
-	const outputPath = path.resolve(slash(config.context), slash(config.output));
+	const outputPath = path.resolve(slash(config.context), slash(config.output.js));
 
 
 	const data = {

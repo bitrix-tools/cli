@@ -13,7 +13,8 @@ export default function buildRollupConfig(config) {
 			treeshake: config.treeshake !== false,
 		},
 		output: {
-			file: resolve(config.context, config.output),
+			js: resolve(config.context, config.output.js),
+			css: resolve(config.context, config.output.css),
 			name: config.name,
 		},
 		plugins: config.plugins,

@@ -10,14 +10,17 @@ describe('utils/build-rollup-config', () => {
 	it('Should return correct config if passed passed correct base config', () => {
 		let baseConfig = {
 			input: './app.js',
-			output: './app.bundle.js',
+			output: {
+				js: './app.bundle.js',
+				css: './app.bundle.css',
+			},
 			context: '/test/context'
 		};
 
 		let result = buildRollupConfig(baseConfig);
 
 		assert(result.input.input === path.resolve(baseConfig.context, baseConfig.input));
-		assert(result.output.file === path.resolve(baseConfig.context, baseConfig.output));
+		assert(result.output.file === path.resolve(baseConfig.context, baseConfig.output.js));
 		assert(result.output.name === 'window');
 
 		baseConfig.name = 'BX.Test';

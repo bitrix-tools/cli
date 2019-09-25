@@ -10,7 +10,10 @@ describe('utils/get-sourcemaps', () => {
 		const samples = [
 			{
 				source: {
-					output: '/main/install/js/main/loader/dist/loader.bundle.js',
+					output: {
+						js: '/main/install/js/main/loader/dist/loader.bundle.js',
+						css: '/main/install/js/main/loader/dist/loader.bundle.css',
+					},
 					context: '/main/install/js/main/loader'
 				},
 				result: {
@@ -20,7 +23,10 @@ describe('utils/get-sourcemaps', () => {
 			},
 			{
 				source: {
-					output: '/test/test.bundle.js',
+					output: {
+						js: '/test/test.bundle.js',
+						css: '/test/test.bundle.css',
+					},
 					context: '/test'
 				},
 				result: {
@@ -32,8 +38,8 @@ describe('utils/get-sourcemaps', () => {
 
 		samples.forEach(entry => {
 			let result = getSourcemaps(entry.source);
-			assert(result.js === entry.result.js);
-			assert(result.css === entry.result.css);
+			assert.strictEqual(result.js, entry.result.js);
+			assert.strictEqual(result.css, entry.result.css);
 		});
 	});
 
@@ -41,7 +47,10 @@ describe('utils/get-sourcemaps', () => {
 		const samples = [
 			{
 				source: {
-					output: '\\main\\install\\js\\main\\loader\\dist\\loader.bundle.js',
+					output: {
+						js: '\\main\\install\\js\\main\\loader\\dist\\loader.bundle.js',
+						css: '\\main\\install\\js\\main\\loader\\dist\\loader.bundle.css',
+					},
 					context: '\\main\\install\\js\\main\\loader'
 				},
 				result: {
@@ -51,7 +60,10 @@ describe('utils/get-sourcemaps', () => {
 			},
 			{
 				source: {
-					output: '\\test\\test.bundle.js',
+					output: {
+						js: '\\test\\test.bundle.js',
+						css: '\\test\\test.bundle.css',
+					},
 					context: '\\test'
 				},
 				result: {

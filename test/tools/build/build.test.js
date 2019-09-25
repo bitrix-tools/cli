@@ -118,8 +118,8 @@ function removeDist(distPath) {
 			fs.unlinkSync(path.resolve(distPath, '../script.js.map'));
 		}
 
-		if (fs.existsSync(path.resolve(distPath, '../script.css'))) {
-			fs.unlinkSync(path.resolve(distPath, '../script.css'));
+		if (fs.existsSync(path.resolve(distPath, '../style.css'))) {
+			fs.unlinkSync(path.resolve(distPath, '../style.css'));
 		}
 
 		return;
@@ -147,9 +147,7 @@ function checkBuild(extPath, assertion = false) {
 	if (extPath.includes(path.join('components', 'bitrix'))) {
 		const scriptJsPath = path.resolve(extPath, 'script.js');
 		const scriptJsMapPath = path.resolve(extPath, 'script.js.map');
-		const scriptCssPath = path.resolve(extPath, 'script.css');
-		const styleJsPath = path.resolve(extPath, 'style.js.map');
-		const styleJsMapPath = path.resolve(extPath, 'style.js.map');
+		const styleCssPath = path.resolve(extPath, 'style.css');
 		const configPhpPath = path.resolve(extPath, 'config.php');
 
 		if (!fs.existsSync(scriptJsPath)) {
@@ -162,18 +160,8 @@ function checkBuild(extPath, assertion = false) {
 			return false;
 		}
 
-		if (!fs.existsSync(scriptCssPath)) {
-			assertion && assert(false, `${path.basename(scriptCssPath)} not exists`);
-			return false;
-		}
-
-		if (fs.existsSync(styleJsPath)) {
-			assertion && assert(false, `${path.basename(styleJsPath)} exists`);
-			return false;
-		}
-
-		if (fs.existsSync(styleJsMapPath)) {
-			assertion && assert(false, `${path.basename(styleJsMapPath)} exists`);
+		if (!fs.existsSync(styleCssPath)) {
+			assertion && assert(false, `${path.basename(styleCssPath)} not exists`);
 			return false;
 		}
 
@@ -249,7 +237,7 @@ function checkBuild(extPath, assertion = false) {
 	}
 
 	if (distConfigPhp !== resConfigPhp) {
-		assertion && assert(false, `invalid ${path.basename(distConfigPhpPath)}`);
+		assertion && assert.deepStrictEqual(distConfigPhp, resConfigPhp, `invalid ${path.basename(distConfigPhpPath)}`);
 		return false;
 	}
 

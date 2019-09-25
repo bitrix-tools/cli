@@ -57,14 +57,14 @@ export default function report({config, testResult, error}) {
 		reportData.testStatus = 'no tests'.grey;
 	}
 
-	const jsBundle = config.output;
+	const jsBundle = config.output.js;
 	if (fs.existsSync(jsBundle)) {
 		const stat = fs.statSync(jsBundle);
 		reportData.jsSize = filesize(stat.size, {round: 0});
 		reportData.summarySize = stat.size;
 	}
 
-	const cssBundle = config.output.replace('.js', '.css');
+	const cssBundle = config.output.css;
 	if (fs.existsSync(cssBundle)) {
 		const stat = fs.statSync(cssBundle);
 		reportData.cssSize = filesize(stat.size, {round: 0});
@@ -103,6 +103,6 @@ export default function report({config, testResult, error}) {
 		return;
 	}
 
-	printRow({...reportData, type: 'bundle', name: config.output});
+	printRow({...reportData, type: 'bundle', name: config.output.js});
 	printError(error);
 }
