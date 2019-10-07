@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 import {resolve, join} from 'path';
 import {existsSync} from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
+import weak from 'weak';
 
 global.sinon = sinon;
 global.assert = assert;
@@ -22,6 +23,7 @@ global.suiteTeardown = mocha.suiteTeardown;
 global.teardown = mocha.teardown;
 global.test = mocha.test;
 global.run = mocha.run;
+global.weak = weak;
 
 const DOM = new JSDOM('', {
 	url: 'https://example.org/',

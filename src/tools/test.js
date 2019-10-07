@@ -42,6 +42,8 @@ export async function testDirectory(dir, report = true) {
 			globals: Object.keys(global),
 			allowUncaught: true,
 			reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
+			checkLeaks: true,
+			timeout: 10000,
 		});
 
 		if (tests.length) {
