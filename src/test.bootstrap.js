@@ -4,8 +4,13 @@ import assert from 'assert';
 import * as sinon from 'sinon';
 import {resolve, join} from 'path';
 import {existsSync} from 'fs';
-import resolvePackageModule from './utils/resolve-package-module';
 import weak from 'weak';
+import v8 from 'v8';
+import vm from 'vm';
+import resolvePackageModule from './utils/resolve-package-module';
+
+v8.setFlagsFromString('--expose-gc');
+global.gc = vm.runInNewContext('gc');
 
 global.sinon = sinon;
 global.assert = assert;
