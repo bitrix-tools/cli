@@ -4,13 +4,23 @@ import assert from 'assert';
 import * as sinon from 'sinon';
 import {resolve, join} from 'path';
 import {existsSync} from 'fs';
-import weak from 'weak';
 import v8 from 'v8';
 import vm from 'vm';
 import resolvePackageModule from './utils/resolve-package-module';
 
 v8.setFlagsFromString('--expose-gc');
 global.gc = vm.runInNewContext('gc');
+
+let weak;
+try {
+	// eslint-disable-next-line global-require,import/no-extraneous-dependencies
+	weak = require('weak');
+} catch (e) {
+	weak = (obj, callback) => {
+		callback();
+		console.warn('@bitrix/cli: weak is not installed');
+	};
+}
 
 global.sinon = sinon;
 global.assert = assert;

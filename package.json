@@ -1,6 +1,6 @@
 {
   "name": "@bitrix/cli",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "engines": {
@@ -77,7 +77,9 @@
     "rollup-plugin-simple-babel": "^1.0.5",
     "sinon": "^7.1.1",
     "slash": "^2.0.0",
-    "update-notifier": "^2.5.0",
+    "update-notifier": "^2.5.0"
+  },
+  "optionalDependencies": {
     "weak": "^1.0.1"
   },
   "devDependencies": {
