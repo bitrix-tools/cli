@@ -42,7 +42,7 @@ export default async function bitrixCreate() {
 		Run ${`bitrix build -p ./${answers.name}`.bold} for build extension
 		
 		${'Include extension in php'.bold}
-		\\Bitrix\\Main\\Extension::load('${extInfo.extensionName}');
+		\\Bitrix\\Main\\UI\\Extension::load('${extInfo.extensionName}');
 		
 		${'or import in your js code'.bold}
 		import {${extInfo.functionName}} from '${extInfo.extensionName}';
