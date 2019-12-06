@@ -22,7 +22,9 @@ export default function rollupConfig({input, output, plugins = {}}) {
 
 	if (plugins.resolve && !isLoaded('node-resolve'))
 	{
-		enabledPlugins.push(resolve());
+		enabledPlugins.push(resolve({
+			browser: true,
+		}));
 	}
 
 	if (!isLoaded('json'))
