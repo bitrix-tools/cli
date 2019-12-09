@@ -60,5 +60,19 @@ describe('utils/build-module-path', () => {
 		samples.forEach(entry => {
 			assert(buildModulePath(entry.source) === entry.result);
 		});
-	})
+	});
+
+	it('Should return local extension path', () => {
+		const sourcePath = '/Users/vladimirbelov/Documents/www/bitrix24/local/js/main/loader/src/loader.js';
+		const resultPath = '/local/js/main/loader/src/loader.js';
+
+		assert.strictEqual(buildModulePath(sourcePath), resultPath);
+	});
+
+	it('Should return local extension path (Windows)', () => {
+		const sourcePath = '\\Users\\vladimirbelov\\Documents\\www\\bitrix24\\local\\js\\main\\loader\\src\\loader.js';
+		const resultPath = '/local/js/main/loader/src/loader.js';
+
+		assert.strictEqual(buildModulePath(sourcePath), resultPath);
+	});
 });

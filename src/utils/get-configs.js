@@ -12,7 +12,7 @@ function prepareConcat(files, context) {
 
 	Object.keys(files).forEach((key) => {
 		if (Array.isArray(files[key])) {
-			result[key] = files[key].map(filePath => (
+			result[key] = files[key].map((filePath) => (
 				path.resolve(context, filePath)
 			));
 		}
@@ -126,6 +126,8 @@ export default function getConfigs(directory) {
 					plugins,
 					context: path.resolve(context),
 					concat: prepareConcat(currentConfig.concat, path.resolve(context)),
+					cssImages: currentConfig.cssImages || {},
+					contentImages: currentConfig.contentImages || {},
 				});
 			});
 

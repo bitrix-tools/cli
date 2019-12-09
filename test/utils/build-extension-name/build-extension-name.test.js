@@ -59,4 +59,20 @@ describe('utils/build-extension-name', () => {
 			assert(buildExtensionName(entry.source, entry.context) === entry.result);
 		});
 	});
+
+	it('Should return correct name form local extension', () => {
+		const sourcePath = '/Users/vladimirbelov/Documents/www/bitrix24/local/js/main/loader/src/loader.js';
+		const sourceContext = '/Users/vladimirbelov/Documents/www/bitrix24/local/js/main/loader/';
+		const resultName = 'main.loader';
+
+		assert.strictEqual(buildExtensionName(sourcePath, sourceContext), resultName);
+	});
+
+	it('Should return correct name form local extension (Windows)', () => {
+		const sourcePath = '\\Users\\vladimirbelov\\Documents\\www\\bitrix24\\local\\js\\main\\loader\\src\\loader.js';
+		const sourceContext = '\\Users\\vladimirbelov\\Documents\\www\\bitrix24\\local\\js\\main\\loader';
+		const resultName = 'main.loader';
+
+		assert.strictEqual(buildExtensionName(sourcePath, sourceContext), resultName);
+	});
 });

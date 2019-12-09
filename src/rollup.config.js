@@ -8,10 +8,21 @@ import iconv from 'iconv-lite';
 import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
+import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';
+import rollupImage from './plugins/rollup/rollup-plugin-image';
 
-export default function rollupConfig({input, output, plugins = {}}) {
+export default function rollupConfig({
+	input,
+	output,
+	context,
+	plugins = {},
+	cssImages = {},
+	contentImages = {},
+}) {
 	const enabledPlugins = [];
-	const isLoaded = id => !!enabledPlugins.find(item => item.name === id);
+	const isLoaded = (id) => !!enabledPlugins.find((item) => {
+		return item.name === id;
+	});
 
 	if (Array.isArray(plugins.custom))
 	{
@@ -38,6 +49,11 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			extract: output.css || true,
 			sourceMap: false,
 			plugins: [
+				postcssBackgroundUrl(
+					cssImages,
+					output.css,
+					context,
+				),
 				autoprefixer({
 					overrideBrowserslist: [
 						'ie >= 11',
@@ -87,6 +103,19 @@ export default function rollupConfig({input, output, plugins = {}}) {
 			],
 			treeshake: input.treeshake !== false,
 			plugins: [
+				(() => {
+					if (!isLoaded('url'))
+					{
+						return rollupImage({
+							contentImages,
+							context,
+							input: input.input,
+							output: output.js,
+						});
+					}
+
+					return undefined;
+				})(),
 				{
 					load(id) {
 						if (!fs.existsSync(id))

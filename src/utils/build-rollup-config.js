@@ -18,5 +18,8 @@ export default function buildRollupConfig(config) {
 			name: config.name,
 		},
 		plugins: config.plugins,
+		cssImages: config.cssImages,
+		contentImages: config.contentImages,
+		context: config.context,
 	});
 }

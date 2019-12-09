@@ -111,7 +111,11 @@ export default [
 			'path',
 			'fs',
 			'events',
-			'util'
+			'util',
+			'postcss-url/src/lib/decl-processor',
+			'iconv-lite',
+			'v8',
+			'vm',
 		])
 	});
 });

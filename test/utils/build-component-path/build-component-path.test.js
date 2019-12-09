@@ -65,4 +65,18 @@ describe('utils/build-component-path', () => {
 			assert(buildComponentPath(entry.source) === entry.result);
 		});
 	});
+
+	it('Should return correct path for local component', () => {
+		const sourcePath = '/Users/vladimirbelov/Documents/www/bitrix24/local/components/mynamespace/mycomponent/templates/.default/script.js';
+		const resultPath = '/local/components/mynamespace/mycomponent/templates/.default/script.js';
+
+		assert.strictEqual(buildComponentPath(sourcePath), resultPath);
+	});
+
+	it('Should return correct path for local component (Windows)', () => {
+		const sourcePath = '\\Users\\vladimirbelov\\Documents\\www\\bitrix24\\local\\components\\mynamespace\\mycomponent\\templates\\.default\\script.js';
+		const resultPath = '/local/components/mynamespace/mycomponent/templates/.default/script.js';
+
+		assert.strictEqual(buildComponentPath(sourcePath), resultPath);
+	});
 });

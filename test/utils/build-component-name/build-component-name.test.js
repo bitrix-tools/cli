@@ -53,4 +53,18 @@ describe('utils/build-component-name', () => {
 			assert(buildComponentName(entry.source) === entry.result);
 		});
 	});
+
+	it('Should return component name for local component', () => {
+		const sourcePath = '/Users/vladimirbelov/Documents/www/bitrix24/local/components/mynamespace/mycomponent/templates/.default/script.js';
+		const resultName = 'mynamespace:mycomponent';
+
+		assert.strictEqual(buildComponentName(sourcePath), resultName);
+	});
+
+	it('Should return component name for local component (Windows)', () => {
+		const sourcePath = '\\Users\\vladimirbelov\\Documents\\www\\bitrix24\\local\\components\\mynamespace\\mycomponent\\templates\\.default\\script.js';
+		const resultName = 'mynamespace:mycomponent';
+
+		assert.strictEqual(buildComponentName(sourcePath), resultName);
+	});
 });
