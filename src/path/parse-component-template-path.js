@@ -10,6 +10,15 @@ interface Result {
 	filePath: string,
 }
 
+/**
+ * Parses component template path
+ * @example
+ * /bitrix/modules/main/install/components/bitrix/news.list/templates/.default/script.js
+ * /local/modules/main/install/components/bitrix/news.list/templates/.default/script.js
+ * /.../modules/main/install/components/bitrix/news.list/templates/.default/script.js
+ * /bitrix/components/bitrix/news.list/templates/.default/script.js
+ * /local/components/bitrix/news.list/templates/.default/script.js
+ */
 export default function parseComponentTemplatePath(sourcePath: string = ''): ?Result {
 	const preparedPath = slash(sourcePath);
 	const installComponentsExp = new RegExp(
