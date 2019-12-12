@@ -2,7 +2,7 @@
 import slash from 'slash';
 import * as path from 'path';
 
-interface ParseModuleInstallPathResult {
+interface Result {
 	root: string,
 	module: string,
 	jsDir: string,
@@ -18,7 +18,7 @@ interface ParseModuleInstallPathResult {
  * /../local/modules/main/install/js/main/core/core.js
  * /../modules/main/install/js/main/core/core.js
  */
-export default function parseExtensionPath(sourcePath: string = ''): ?ParseModuleInstallPathResult {
+export default function parseExtensionPath(sourcePath: string = ''): ?Result {
 	const preparedPath = slash(sourcePath);
 	const installJsExp = new RegExp('/(.[a-z0-9-_]+)/modules/(.[a-z0-9-_]+)/install/js/(.[a-z0-9-_]+)/');
 	const productJsExp = new RegExp('/(.[a-z0-9-_]+)/js/((.[a-z0-9-_]+))/');
