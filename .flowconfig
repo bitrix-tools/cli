@@ -1,3 +1,2 @@
 [ignore]
 <PROJECT_ROOT>/test/.*
-<PROJECT_ROOT>/node_modules/.*
