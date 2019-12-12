@@ -16,7 +16,7 @@ export default function parseComponentTemplatePath(sourcePath: string = ''): ?Re
 		'/(.[a-z0-9_-]+)/modules/.[a-z0-9_-]+/install/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
 	);
 	const productComponentsExp = new RegExp(
-		'/(.[a-z0-9_-]+)/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
+		'/(bitrix|local)/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
 	);
 	const installComponentsResult = (
 		preparedPath.match(installComponentsExp)
