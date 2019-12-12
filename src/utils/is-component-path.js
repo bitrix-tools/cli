@@ -1,16 +1,7 @@
-import slash from 'slash';
+// @flow
+import parseComponentTemplatePath from '../path/parse-component-template-path';
 
-export default function isComponentPath(filePath) {
-	const exp = new RegExp('/(.[a-z0-9]+)/install/components/(.[a-z0-9]+)/');
-	const res = `${slash(filePath)}`.match(exp);
-
-	if (!!res && !!res[1] && !!res[2])
-	{
-		return true;
-	}
-
-	const localExp = new RegExp('/local/components/(.[a-z0-9]+)/');
-	const localRes = `${slash(filePath)}`.match(localExp);
-
-	return !!localRes;
-};
+export default function isComponentPath(filePath: string): boolean {
+	const parsed = parseComponentTemplatePath(filePath);
+	return !!parsed;
+}
