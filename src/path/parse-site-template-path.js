@@ -8,6 +8,12 @@ interface Result {
 	filePath: string,
 }
 
+/**
+ * Parses site template path
+ * @example
+ * /.../modules/install/templates/.../
+ * /.../templates/.../
+ */
 export default function parseSiteTemplatePath(sourcePath: string = ''): ?Result {
 	const preparedPath = slash(sourcePath);
 	const installTemplatesExp = new RegExp('/(.[a-z0-9_-]+)/modules/.[a-z0-9_-]+/install/templates/(.[a-z0-9_-]+)/');
@@ -22,11 +28,8 @@ export default function parseSiteTemplatePath(sourcePath: string = ''): ?Result 
 		&& !!templateResult[1]
 		&& !!templateResult[2]
 	) {
-		const root = (() => {
-			const [, rootDirname] = templateResult;
-			return ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
-		})();
-		const [templatePath,, template] = templateResult;
+		const [templatePath, rootDirname, template] = templateResult;
+		const root = ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
 		const [, filePath] = preparedPath.split(path.join(templatePath));
 
 		return {
