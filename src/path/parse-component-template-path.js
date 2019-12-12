@@ -27,22 +27,30 @@ export default function parseComponentTemplatePath(sourcePath: string = ''): ?Re
 	const productComponentsExp = new RegExp(
 		'/(bitrix|local)/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
 	);
-	const installComponentsResult = (
+	const moduleTemplateComponentsExp = new RegExp(
+		'/(.[a-z0-9_-]+)/modules/.[a-z0-9_-]+/install/templates/.[a-z0-9_-]+/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
+	);
+	const productTemplateComponentsExp = new RegExp(
+		'/(bitrix|local)/templates/.[a-z0-9_-]+/components/(.[a-z0-9_-]+)/(.[.a-z0-9_-]+)/templates/(.[.a-z0-9_-]+)/',
+	);
+	const componentsResult = (
 		preparedPath.match(installComponentsExp)
 		|| preparedPath.match(productComponentsExp)
+		|| preparedPath.match(moduleTemplateComponentsExp)
+		|| preparedPath.match(productTemplateComponentsExp)
 	);
 
 	if (
-		!!installComponentsResult
-		&& !!installComponentsResult[1]
-		&& !!installComponentsResult[2]
-		&& !!installComponentsResult[3]
-		&& !!installComponentsResult[4]
+		!!componentsResult
+		&& !!componentsResult[1]
+		&& !!componentsResult[2]
+		&& !!componentsResult[3]
+		&& !!componentsResult[4]
 	) {
-		const [templatePath, , namespace, component, template] = installComponentsResult;
+		const [templatePath, , namespace, component, template] = componentsResult;
 		const [, filePath] = preparedPath.split(path.join(templatePath));
 		const root = (() => {
-			const [, rootDirname] = installComponentsResult;
+			const [, rootDirname] = componentsResult;
 			return ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
 		})();
 
