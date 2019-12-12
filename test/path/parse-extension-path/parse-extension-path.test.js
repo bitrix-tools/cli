@@ -12,6 +12,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core'],
+					filePath: 'core.js',
 				},
 			},
 			{
@@ -21,6 +22,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core', 'events'],
+					filePath: 'event.js',
 				},
 			},
 			{
@@ -30,6 +32,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -39,6 +42,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -48,6 +52,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable', 'sensor', 'touch'],
+					filePath: 'touch.js',
 				},
 			},
 		];
@@ -66,6 +71,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core'],
+					filePath: 'core.js',
 				},
 			},
 			{
@@ -75,6 +81,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core', 'events'],
+					filePath: 'event.js',
 				},
 			},
 			{
@@ -84,6 +91,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -93,6 +101,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -102,6 +111,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable', 'sensor', 'touch'],
+					filePath: 'touch.js',
 				},
 			},
 		];
@@ -120,6 +130,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core'],
+					filePath: 'core.js',
 				},
 			},
 			{
@@ -129,6 +140,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'main',
 					jsDir: 'main',
 					extension: ['core', 'events'],
+					filePath: 'event.js',
 				},
 			},
 			{
@@ -138,6 +150,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -147,6 +160,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable'],
+					filePath: 'draggable.js',
 				},
 			},
 			{
@@ -156,6 +170,7 @@ describe('path/parseExtensionPath', () => {
 					module: 'ui',
 					jsDir: 'ui',
 					extension: ['draggable', 'sensor', 'touch'],
+					filePath: 'touch.js',
 				},
 			},
 		];

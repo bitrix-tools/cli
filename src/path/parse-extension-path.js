@@ -7,6 +7,7 @@ interface Result {
 	module: string,
 	jsDir: string,
 	extension: Array<string>,
+	filePath: string,
 }
 
 /**
@@ -41,13 +42,15 @@ export default function parseExtensionPath(sourcePath: string = ''): ?Result {
 			return ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
 		})();
 
-		const [,, module, jsDir] = moduleResult;
+		const [extPath,, module, jsDir] = moduleResult;
+		const [, filePath] = preparedPath.split(path.join(extPath, ...extension, '/'));
 
 		return {
 			root,
 			module,
 			jsDir,
 			extension,
+			filePath,
 		};
 	}
 
