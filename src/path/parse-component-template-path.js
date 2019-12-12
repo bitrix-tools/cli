@@ -16,8 +16,16 @@ interface Result {
  * /bitrix/modules/main/install/components/bitrix/news.list/templates/.default/script.js
  * /local/modules/main/install/components/bitrix/news.list/templates/.default/script.js
  * /.../modules/main/install/components/bitrix/news.list/templates/.default/script.js
+ *
+ * /bitrix/modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
+ * /local/modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
+ * /.../modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
+ *
  * /bitrix/components/bitrix/news.list/templates/.default/script.js
  * /local/components/bitrix/news.list/templates/.default/script.js
+ *
+ * /bitrix/templates/.../components/bitrix/news.list/templates/.default/script.js
+ * /local/templates/.../components/bitrix/news.list/templates/.default/script.js
  */
 export default function parseComponentTemplatePath(sourcePath: string = ''): ?Result {
 	const preparedPath = slash(sourcePath);
