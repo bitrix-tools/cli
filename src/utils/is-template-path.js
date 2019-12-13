@@ -1,7 +1,7 @@
-import slash from 'slash';
+// @flow
+import parseSiteTemplatePath from '../path/parse-site-template-path';
 
-export default function isTemplatePath(filePath) {
-	const exp = new RegExp('/(.[a-z0-9_-]+)/install/templates/(.[a-z0-9_-]+)/');
-	const res = `${slash(filePath)}`.match(exp);
-	return !!res && !!res[1] && !!res[2];
+export default function isTemplatePath(filePath: string): boolean {
+	const parsed = parseSiteTemplatePath(filePath);
+	return !!parsed;
 }
