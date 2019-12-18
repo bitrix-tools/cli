@@ -8,8 +8,8 @@ describe('utils/is-template-path', () => {
 
 	it('Should return true for modules paths', () => {
 		const validPaths = [
-			'/main/install/templates/.default/script.es6.js',
-			'/main/install/templates/my-template/'
+			'/repos/modules/main/install/templates/.default/script.es6.js',
+			'/repos/modules/main/install/templates/my-template/'
 		];
 
 		validPaths.forEach(path => {

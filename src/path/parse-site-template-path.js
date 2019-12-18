@@ -17,7 +17,7 @@ interface Result {
 export default function parseSiteTemplatePath(sourcePath: string = ''): ?Result {
 	const preparedPath = slash(sourcePath);
 	const installTemplatesExp = new RegExp('/(.[a-z0-9_-]+)/modules/.[a-z0-9_-]+/install/templates/(.[a-z0-9_-]+)/');
-	const productTemplatesExp = new RegExp('/(.[a-z0-9-_]+)/templates/((.[a-z0-9-_]+))/');
+	const productTemplatesExp = new RegExp('/(local|bitrix)/templates/((.[a-z0-9-_]+))/');
 	const templateResult = (
 		preparedPath.match(installTemplatesExp)
 		|| preparedPath.match(productTemplatesExp)
