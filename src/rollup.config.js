@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
 import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';
-import rollupImage from './plugins/rollup/rollup-plugin-image';
+import rollupFiles from './plugins/rollup/rollup-plugin-files';
 
 export default function rollupConfig({
 	input,
@@ -17,7 +17,7 @@ export default function rollupConfig({
 	context,
 	plugins = {},
 	cssImages = {},
-	contentImages = {},
+	resolveFilesImport = {},
 }) {
 	const enabledPlugins = [];
 	const isLoaded = (id) => !!enabledPlugins.find((item) => {
@@ -104,10 +104,10 @@ export default function rollupConfig({
 			treeshake: input.treeshake !== false,
 			plugins: [
 				(() => {
-					if (!isLoaded('url'))
+					if (!isLoaded('url') && resolveFilesImport !== false)
 					{
-						return rollupImage({
-							contentImages,
+						return rollupFiles({
+							resolveFilesImport,
 							context,
 							input: input.input,
 							output: output.js,

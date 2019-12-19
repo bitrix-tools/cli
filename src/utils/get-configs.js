@@ -127,7 +127,7 @@ export default function getConfigs(directory) {
 					context: path.resolve(context),
 					concat: prepareConcat(currentConfig.concat, path.resolve(context)),
 					cssImages: currentConfig.cssImages || {},
-					contentImages: currentConfig.contentImages || {},
+					resolveFilesImport: currentConfig.resolveFilesImport || {},
 				});
 			});
 

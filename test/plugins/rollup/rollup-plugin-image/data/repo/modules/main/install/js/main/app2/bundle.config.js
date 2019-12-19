@@ -3,4 +3,7 @@ module.exports = {
 	output: './dist/app.bundle.js',
 	namespace: 'BX.Main',
 	adjustConfigPhp: false,
+	resolveFilesImport: {
+		output: './dist/test'
+	},
 };
