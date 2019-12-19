@@ -23,7 +23,7 @@ describe('plugins/rollup/rollup-plugin-image', () => {
 		efs.removeSync(path.resolve(extensionPath, 'dist'));
 	});
 
-	it.only('Should resolve imported image', async () => {
+	it('Should resolve imported image', async () => {
 		const extensionPath = path.resolve(__dirname, 'data', 'repo/modules/main/install/js/main/app2');
 		await build(extensionPath);
 
