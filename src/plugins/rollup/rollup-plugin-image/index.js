@@ -6,6 +6,7 @@ import isComponentPath from '../../../utils/is-component-path';
 import buildComponentPath from '../../../utils/build-component-path';
 import isTemplatePath from '../../../utils/is-template-path';
 import buildTemplatePath from '../../../utils/build-template-path';
+import resolveToProductPath from '../../../path/resolve-to-product-path';
 
 export default function rollupImage({contentImages, input, output, context} = {}) {
 	const {output: imagesOutput, ...restContentImages} = contentImages;
@@ -42,12 +43,16 @@ export default function rollupImage({contentImages, input, output, context} = {}
 		return context;
 	})();
 
+	console.log(context);
+	console.log(resolveToProductPath(context));
+
 	const rollupUrlOptions = {
 		fileName: '[dirname][name][extname]',
 		...restContentImages,
 		publicPath: path.join(modulePath, destDir, '/'),
 		destDir,
 		sourceDir: path.dirname(input),
+		limit: 0,
 	};
 
 	return rollupUrl(rollupUrlOptions);
