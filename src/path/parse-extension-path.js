@@ -1,6 +1,7 @@
 // @flow
 import slash from 'slash';
 import * as path from 'path';
+import findExtensionContext from './find-extension-context';
 
 interface Result {
 	root: string,
@@ -20,7 +21,7 @@ interface Result {
  * /../modules/main/install/js/main/core/core.js
  */
 export default function parseExtensionPath(sourcePath: string = ''): ?Result {
-	const preparedPath = slash(sourcePath);
+	const preparedPath: string = slash(sourcePath);
 	const installJsExp = new RegExp('/(.[a-z0-9-_]+)/modules/(.[a-z0-9-_]+)/install/js/(.[a-z0-9-_]+)/');
 	const productJsExp = new RegExp('/(.[a-z0-9-_]+)/js/((.[a-z0-9-_]+))/');
 	const moduleResult = preparedPath.match(installJsExp) || preparedPath.match(productJsExp);
@@ -32,26 +33,26 @@ export default function parseExtensionPath(sourcePath: string = ''): ?Result {
 		&& !!moduleResult[3]
 	)
 	{
-		const extension = (() => {
-			const [, extPath = ''] = preparedPath.split(moduleResult[0]);
-			return path.dirname(extPath).split(path.sep);
-		})();
+		const context = findExtensionContext(preparedPath);
 
-		const root = (() => {
-			const [, rootDirname] = moduleResult;
-			return ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
-		})();
+		if (context)
+		{
+			const [jsPath, rootDirname, module, jsDir] = moduleResult;
+			const root = ['bitrix', 'local'].includes(rootDirname) ? rootDirname : 'bitrix';
+			const [, filePath] = preparedPath.split(path.join(context, '/'));
+			const extension = (() => {
+				const [, extPath = ''] = context.split(jsPath);
+				return extPath.split('/');
+			})();
 
-		const [extPath,, module, jsDir] = moduleResult;
-		const [, filePath] = preparedPath.split(path.join(extPath, ...extension, '/'));
-
-		return {
-			root,
-			module,
-			jsDir,
-			extension,
-			filePath,
-		};
+			return {
+				root,
+				module,
+				jsDir,
+				extension,
+				filePath,
+			};
+		}
 	}
 
 	return null;

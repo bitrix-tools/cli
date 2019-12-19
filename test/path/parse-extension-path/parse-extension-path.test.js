@@ -1,12 +1,13 @@
 import assert from 'assert';
 import {describe, it} from 'mocha';
+import * as path from 'path';
 import parseExtensionPath from '../../../src/path/parse-extension-path';
 
 describe('path/parseExtensionPath', () => {
 	it('Should return result if passed valid module install path', () => {
 		const paths = [
 			{
-				path: '/www/bitrix/modules/main/install/js/main/core/core.js',
+				path: path.resolve(__dirname, 'data', 'bitrix/modules/main/install/js/main/core/core.js'),
 				result: {
 					root: 'bitrix',
 					module: 'main',
@@ -16,7 +17,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/bitrix/modules/main/install/js/main/core/events/event.js',
+				path: path.resolve(__dirname, 'data', 'bitrix/modules/main/install/js/main/core/events/event.js'),
 				result: {
 					root: 'bitrix',
 					module: 'main',
@@ -26,7 +27,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/bitrix/modules/ui/install/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'bitrix/modules/ui/install/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'bitrix',
 					module: 'ui',
@@ -36,7 +37,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/local/modules/ui/install/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'local/modules/ui/install/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'local',
 					module: 'ui',
@@ -46,7 +47,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/bitrix/modules/ui/install/js/ui/draggable/sensor/touch/touch.js',
+				path: path.resolve(__dirname, 'data', 'bitrix/modules/ui/install/js/ui/draggable/sensor/touch/touch.js'),
 				result: {
 					root: 'bitrix',
 					module: 'ui',
@@ -65,7 +66,7 @@ describe('path/parseExtensionPath', () => {
 	it('Should return result if passed repository path', () => {
 		const paths = [
 			{
-				path: '/www/test/modules/main/install/js/main/core/core.js',
+				path: path.resolve(__dirname, 'data', 'repo/modules/main/install/js/main/core/core.js'),
 				result: {
 					root: 'bitrix',
 					module: 'main',
@@ -75,7 +76,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/repo/modules/main/install/js/main/core/events/event.js',
+				path: path.resolve(__dirname, 'data', 'repo/modules/main/install/js/main/core/events/event.js'),
 				result: {
 					root: 'bitrix',
 					module: 'main',
@@ -85,7 +86,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/modules/modules/ui/install/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'repo/modules/modules/ui/install/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'bitrix',
 					module: 'ui',
@@ -95,7 +96,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/bitrix24/modules/ui/install/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'www/bitrix24/modules/ui/install/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'bitrix',
 					module: 'ui',
@@ -105,7 +106,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/app/modules/ui/install/js/ui/draggable/sensor/touch/touch.js',
+				path: path.resolve(__dirname, 'data', 'app/modules/ui/install/js/ui/draggable/sensor/touch/touch.js'),
 				result: {
 					root: 'bitrix',
 					module: 'ui',
@@ -124,7 +125,7 @@ describe('path/parseExtensionPath', () => {
 	it('Should return result if passed local js path', () => {
 		const paths = [
 			{
-				path: '/www/local/js/main/core/core.js',
+				path: path.resolve(__dirname, 'data', 'www/local/js/main/core/core.js'),
 				result: {
 					root: 'local',
 					module: 'main',
@@ -134,7 +135,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/local/js/main/core/events/event.js',
+				path: path.resolve(__dirname, 'data', 'www/local/js/main/core/events/event.js'),
 				result: {
 					root: 'local',
 					module: 'main',
@@ -144,7 +145,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/local/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'www/local/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'local',
 					module: 'ui',
@@ -154,7 +155,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/www/local/js/ui/draggable/draggable.js',
+				path: path.resolve(__dirname, 'data', 'www/local/js/ui/draggable/draggable.js'),
 				result: {
 					root: 'local',
 					module: 'ui',
@@ -164,7 +165,7 @@ describe('path/parseExtensionPath', () => {
 				},
 			},
 			{
-				path: '/app/local/js/ui/draggable/sensor/touch/touch.js',
+				path: path.resolve(__dirname, 'data', 'app/local/js/ui/draggable/sensor/touch/touch.js'),
 				result: {
 					root: 'local',
 					module: 'ui',
@@ -182,8 +183,8 @@ describe('path/parseExtensionPath', () => {
 
 	it('Should return null if passed invalid path', () => {
 		const paths = [
-			'/bitrix/modules/ui/install/test/ui/draggable/sensor/touch/touch.js',
-			'/bitrix/modules/ui/install2/test/ui/draggable/sensor/touch/touch.js',
+			path.resolve(__dirname, 'data', 'bitrix/modules/ui/install/test/ui/draggable/sensor/touch/touch.js'),
+			path.resolve(__dirname, 'data', 'bitrix/modules/ui/install2/test/ui/draggable/sensor/touch/touch.js'),
 		];
 
 		paths.forEach((path) => {
