@@ -17,8 +17,6 @@ interface Result {
  * /local/modules/main/install/components/bitrix/news.list/templates/.default/script.js
  * /.../modules/main/install/components/bitrix/news.list/templates/.default/script.js
  *
- * /bitrix/modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
- * /local/modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
  * /.../modules/main/install/templates/.../components/bitrix/news.list/templates/.default/script.js
  *
  * /bitrix/components/bitrix/news.list/templates/.default/script.js

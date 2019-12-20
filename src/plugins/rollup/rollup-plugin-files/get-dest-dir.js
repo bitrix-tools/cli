@@ -16,11 +16,12 @@ export default function getDestDir({destDir, output, context}: GetDestDirOptions
 	}
 
 	const outputDirname = path.dirname(output);
+	const preparedContext = path.join(context, '/');
 
-	if (isComponentPath(context) || isTemplatePath(context)) {
-		const relativeOutputPath = path.relative(context, outputDirname);
+	if (isComponentPath(preparedContext) || isTemplatePath(preparedContext)) {
+		const relativeOutputPath = path.relative(preparedContext, outputDirname);
 		return path.join(relativeOutputPath, 'dist');
 	}
 
-	return path.relative(context, outputDirname);
+	return path.relative(preparedContext, outputDirname);
 }

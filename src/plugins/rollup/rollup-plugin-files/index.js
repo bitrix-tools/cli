@@ -18,7 +18,7 @@ interface RollupFilesOptions {
 }
 
 export default function rollupFiles(options: RollupFilesOptions): ?{[key: string]: any} {
-	const productContext = resolveToProductPath(options.context);
+	const productContext = resolveToProductPath(path.join(options.context, '/'));
 
 	if (productContext)
 	{
