@@ -100,4 +100,25 @@ describe('plugins/rollup/rollup-plugin-files', () => {
 			efs.removeSync(path.resolve(componentsPath, 'script.js.map'));
 		});
 	});
+
+	describe('template', () => {
+		it('Should resolve imported image', async () => {
+			const componentsPath = path.resolve(__dirname, 'data', 'repo/modules/main/install/templates/.default');
+			await build(componentsPath);
+
+			const distImagesPath = path.resolve(componentsPath, 'dist/images/icon.svg');
+			assert.ok(fs.existsSync(distImagesPath), 'Image does not exists in destDir');
+
+			const distBundlePath = path.resolve(componentsPath, 'script.js');
+			const resultBundlePath = path.resolve(componentsPath, 'result/script.js');
+			const distBundle = fs.readFileSync(distBundlePath, 'utf8');
+			const resultBundle = fs.readFileSync(resultBundlePath, 'utf8');
+
+			assert.deepStrictEqual(distBundle, resultBundle);
+
+			efs.removeSync(path.resolve(componentsPath, 'dist'));
+			efs.removeSync(path.resolve(componentsPath, 'script.js'));
+			efs.removeSync(path.resolve(componentsPath, 'script.js.map'));
+		});
+	});
 });
