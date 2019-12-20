@@ -12,6 +12,7 @@
   "plugins": [
     "@babel/plugin-transform-flow-strip-types",
     "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-private-methods",
     "@babel/plugin-transform-runtime",
     "babel-plugin-rewire"
   ]
