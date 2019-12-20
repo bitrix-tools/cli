@@ -175,7 +175,7 @@ $ bitrix build --path ./main/install/js/main/loader
 
 <h2 id="tests">Запуск тестов</h2>  
 ```bash
-$ bitrix test 
+$ bitrix test
 ```
 
 Команда запускает Mocha тесты и&nbsp;выводит подробный отчет о&nbsp;прохождении тестов. 
