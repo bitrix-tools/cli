@@ -69,6 +69,7 @@
     "mustache": "^3.0.1",
     "ora": "^3.0.0",
     "postcss": "^7.0.24",
+    "postcss-svgo": "^4.0.2",
     "postcss-url": "^8.0.0",
     "rollup": "^0.67.3",
     "rollup-plugin-babel": "^4.0.3",

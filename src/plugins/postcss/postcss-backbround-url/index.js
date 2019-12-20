@@ -1,35 +1,33 @@
+// @flow
 import postcss from 'postcss';
 import * as path from 'path';
 import {declProcessor} from 'postcss-url/src/lib/decl-processor';
+import getDestDir from '../../rollup/rollup-plugin-files/get-dest-dir';
 
 const postcssBackgroundUrl = postcss.plugin(
 	'postcss-background-url',
 	(options, sourceTo, context) => {
-		const preparedOptions = (() => {
-			if (Array.isArray(options))
-			{
-				return options;
-			}
-
-			return [options];
-		})();
+		const preparedOptions = Array.isArray(options) ? options : [options];
 
 		const multipleOptions = preparedOptions.map((entry) => {
-			const {type: url = 'rebase', output, ...restOptions} = entry || {};
+			const {type: url = 'inline', output, ...restOptions} = entry || {};
 
-			if (url === 'copy')
+			const assetsPath = getDestDir({
+				destDir: output,
+				output: sourceTo,
+				context,
+			});
+
+			if (typeof output === 'string')
 			{
-				if (typeof output === 'string')
-				{
-					restOptions.assetsPath = path.resolve(context, output);
-				}
-				else
-				{
-					restOptions.assetsPath = path.resolve(path.dirname(sourceTo), 'images');
-				}
+				restOptions.assetsPath = path.resolve(context, assetsPath);
+			}
+			else
+			{
+				restOptions.assetsPath = path.resolve(context, assetsPath, 'images');
 			}
 
-			return {...restOptions, url};
+			return {maxSize: 14, fallback: 'copy', ...restOptions, url};
 		});
 
 		return (styles, result) => {

@@ -5,6 +5,7 @@ import babel from 'rollup-plugin-simple-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import iconv from 'iconv-lite';
+import postcssSvgo from 'postcss-svgo';
 import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
@@ -54,6 +55,16 @@ export default function rollupConfig({
 					output.css,
 					context,
 				),
+				(() => {
+					if (cssImages.svgo !== false)
+					{
+						return postcssSvgo({
+							encode: true,
+						});
+					}
+
+					return undefined;
+				})(),
 				autoprefixer({
 					overrideBrowserslist: [
 						'ie >= 11',
