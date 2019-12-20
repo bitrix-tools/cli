@@ -1,0 +1,15 @@
+.icon {
+	background-image: url("../images/icon.svg");
+}
+
+.icon2 {
+	background-image: url("../images/icon2.png");
+}
+
+.big {
+	background-image: url("../images/big.jpg");
+}
+
+.test-abs {
+	background-image: url("/bitrix/images/main/test.jpg");
+}
