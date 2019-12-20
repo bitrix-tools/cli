@@ -74,6 +74,11 @@ export default function getConfigs(directory) {
 			configs.forEach((currentConfig) => {
 				let {plugins} = currentConfig;
 
+				if (currentConfig.protected && context !== directory)
+				{
+					return;
+				}
+
 				if (typeof plugins !== 'object')
 				{
 					plugins = {
