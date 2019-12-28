@@ -16,8 +16,8 @@
 	var componentInstance = new Component();
 	var component2Instance = new Component2();
 
-	exports.componentInstance = componentInstance;
 	exports.component2Instance = component2Instance;
+	exports.componentInstance = componentInstance;
 
-}((this.window = this.window || {})));
+}(this.window = this.window || {}));
 //# sourceMappingURL=app.bundle.js.map

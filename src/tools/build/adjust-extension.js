@@ -3,7 +3,7 @@ import * as path from 'path';
 import isModulePath from '../../utils/is-module-path';
 import generateConfigPhp, {renderRel} from '../../utils/generate-config-php';
 
-export default async function adjustExtension(bundle, config) {
+export default async function adjustExtension(bundleImports, config) {
 	const bundleConfigPath = path.resolve(config.context, 'bundle.config.js');
 	const configPhpPath = path.resolve(config.context, 'config.php');
 
@@ -13,7 +13,7 @@ export default async function adjustExtension(bundle, config) {
 		}
 
 		const extNameExp = /^(\w).(.[\w.])/;
-		let imports = [...bundle.imports].filter(item => extNameExp.test(item));
+		let imports = [...bundleImports].filter(item => extNameExp.test(item));
 
 		if (!imports.includes('main.core') && !imports.includes('main.polyfill.core')) {
 			imports = ['main.polyfill.core', ...imports];

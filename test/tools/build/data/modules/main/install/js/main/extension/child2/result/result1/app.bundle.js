@@ -1,4 +1,4 @@
-(function (exports) {
+(function () {
 	'use strict';
 
 	var Component = function Component() {
@@ -9,5 +9,5 @@
 
 	void new Component();
 
-}((this.window = this.window || {})));
+}());
 //# sourceMappingURL=app.bundle.js.map

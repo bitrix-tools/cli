@@ -1,10 +1,12 @@
+// @flow
+
 import {resolve, basename} from 'path';
 import Logger from '@bitrix/logger';
 import Directory from '../entities/directory';
 import concat from './concat';
 import report from './report';
 import test from './test';
-import 'colors';
+import colors from 'colors/safe';
 import rollupBundle from './build/rollup';
 import adjustExtension from './build/adjust-extension';
 import adjustEncoding from './build/adjust-encoding';
@@ -27,10 +29,10 @@ async function buildDirectory(dir, recursive = true) {
 		let testResult;
 
 		try {
-			const bundle = await rollupBundle(config);
+			const {imports} = await rollupBundle(config);
 			await concat(config.concat.js, config.output.js);
 			await concat(config.concat.css, config.output.css);
-			await adjustExtension(bundle, config);
+			await adjustExtension(imports, config);
 			await adjustEncoding(config);
 
 			if (argv.test || argv.t) {
@@ -45,10 +47,10 @@ async function buildDirectory(dir, recursive = true) {
 	}
 }
 
-async function build(dir, recursive) {
+async function build(dir: string, recursive: boolean) {
 	if (Array.isArray(dir)) {
 		for (const item of dir) {
-			Logger.log(`Build module ${basename(item)}`.bold);
+			Logger.log(colors.bold(`Build module ${basename(item)}`));
 			await buildDirectory(item, recursive);
 		}
 	} else if (typeof dir === 'string') {

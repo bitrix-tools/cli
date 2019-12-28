@@ -1,56 +1,14 @@
+// @flow
+
 import glob from 'fast-glob';
 import * as path from 'path';
 import slash from 'slash';
-import isEs6File from './is-es6-file';
+import makeIterable from '../internal/make-iterable';
+import prepareConcatConfig from '../internal/prepare-concat-config';
+import loadSourceBundleConfig from '../internal/load-source-bundle-config';
+import type BundleConfig from '../@types/config';
 
-function prepareConcat(files, context) {
-	if (typeof files !== 'object') {
-		return {};
-	}
-
-	const result = {};
-
-	Object.keys(files).forEach((key) => {
-		if (Array.isArray(files[key])) {
-			result[key] = files[key].map((filePath) => (
-				path.resolve(context, filePath)
-			));
-		}
-	});
-
-	return result;
-}
-
-function getConfigByFile(configPath) {
-	if (isEs6File(configPath)) {
-		const context = configPath.replace('script.es6.js', '');
-
-		return {
-			input: path.resolve(context, 'script.es6.js'),
-			output: {
-				js: path.resolve(context, 'script.js'),
-				css: path.resolve(context, 'style.css'),
-			},
-		};
-	}
-
-	// eslint-disable-next-line
-	return require(configPath);
-}
-
-function makeIterable(value) {
-	if (Array.isArray(value)) {
-		return value;
-	}
-
-	if (typeof value !== 'undefined' && value !== null) {
-		return [value];
-	}
-
-	return [];
-}
-
-export default function getConfigs(directory) {
+export default function getConfigs(directory: string): BundleConfig {
 	const normalizedDirectory = `${slash(directory)}`;
 
 	const pattern = [
@@ -68,7 +26,7 @@ export default function getConfigs(directory) {
 		.sync(pattern, options)
 		.reduce((acc, file) => {
 			const context = path.dirname(file);
-			const config = getConfigByFile(file);
+			const config = loadSourceBundleConfig(file);
 			const configs = makeIterable(config);
 
 			configs.forEach((currentConfig) => {
@@ -130,7 +88,7 @@ export default function getConfigs(directory) {
 					rel: makeIterable(currentConfig.rel),
 					plugins,
 					context: path.resolve(context),
-					concat: prepareConcat(currentConfig.concat, path.resolve(context)),
+					concat: prepareConcatConfig(currentConfig.concat, path.resolve(context)),
 					cssImages: currentConfig.cssImages || {},
 					resolveFilesImport: currentConfig.resolveFilesImport || {},
 				});
