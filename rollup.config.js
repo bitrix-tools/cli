@@ -1,5 +1,5 @@
-import json from 'rollup-plugin-json';
-import commonJs from 'rollup-plugin-commonjs';
+import json from '@rollup/plugin-json';
+import commonJs from '@rollup/plugin-commonjs';
 import babel from 'rollup-plugin-simple-babel';
 import pkg from './package.json';
 
