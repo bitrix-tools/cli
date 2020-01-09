@@ -1,8 +1,11 @@
+// @flow
+
 import {resolve} from 'path';
 import invalidateModuleCache from './invalidate-module-cache';
 import {appRoot} from '../constants';
+import type BundleConfig from '../@types/config';
 
-export default function buildRollupConfig(config) {
+export default function buildRollupConfig(config: BundleConfig) {
 	invalidateModuleCache(resolve(appRoot, 'dist/rollup.config.js'));
 	// eslint-disable-next-line
 	const rollupConfig = require(resolve(appRoot, 'dist/rollup.config.js'));

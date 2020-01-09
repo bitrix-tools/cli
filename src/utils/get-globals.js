@@ -1,7 +1,10 @@
+// @flow
+
 import {join} from 'path';
 import {existsSync} from 'fs';
+import type BundleConfig from '../@types/config';
 
-export default function getGlobals(imports: string[], {context}) {
+export default function getGlobals(imports: string[], {context}: BundleConfig): {[key: string]: string} {
 	return imports.reduce((accumulator, extensionName) => {
 		const parsedExtensionName = extensionName.split('.');
 		const moduleName = parsedExtensionName.shift();
