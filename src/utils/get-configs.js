@@ -22,8 +22,10 @@ function prepareConcat(files, context) {
 }
 
 function getConfigByFile(configPath) {
-	if (isEs6File(configPath)) {
-		const context = configPath.replace('script.es6.js', '');
+	const preparedConfigPath = slash(configPath);
+
+	if (isEs6File(preparedConfigPath)) {
+		const context = preparedConfigPath.replace('script.es6.js', '');
 
 		return {
 			input: path.resolve(context, 'script.es6.js'),
@@ -35,7 +37,7 @@ function getConfigByFile(configPath) {
 	}
 
 	// eslint-disable-next-line
-	return require(configPath);
+	return require(preparedConfigPath);
 }
 
 function makeIterable(value) {
@@ -67,14 +69,14 @@ export default function getConfigs(directory) {
 	return glob
 		.sync(pattern, options)
 		.reduce((acc, file) => {
-			const context = path.dirname(file);
+			const context = slash(path.dirname(file));
 			const config = getConfigByFile(file);
 			const configs = makeIterable(config);
 
 			configs.forEach((currentConfig) => {
 				let {plugins} = currentConfig;
 
-				if (currentConfig.protected && context !== directory)
+				if (currentConfig.protected && context !== normalizedDirectory)
 				{
 					return;
 				}
