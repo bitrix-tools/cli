@@ -94,6 +94,9 @@ function moduleResolver(sourcePath, currentFile) {
 			const config = require(configPath);
 			return resolve(extPath, config.input);
 		}
+
+		// @fixme: Temporary stub for extensions without bundle.config.js
+		return 'assert';
 	}
 
 	return '';
