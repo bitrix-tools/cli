@@ -25,14 +25,14 @@ export default function getConfigs(directory: string): BundleConfig {
 	return glob
 		.sync(pattern, options)
 		.reduce((acc, file) => {
-			const context = path.dirname(file);
+			const context = slash(path.dirname(file));
 			const config = loadSourceBundleConfig(file);
 			const configs = makeIterable(config);
 
 			configs.forEach((currentConfig) => {
 				let {plugins} = currentConfig;
 
-				if (currentConfig.protected && context !== directory)
+				if (currentConfig.protected && context !== normalizedDirectory)
 				{
 					return;
 				}
