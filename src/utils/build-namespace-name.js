@@ -1,11 +1,25 @@
-export default function buildNamespaceName({root = '', extensionName} = {}) {
-	if (typeof extensionName === 'string') {
-		const fragments = extensionName.split('.')
-			.filter((item, index, arr) => index + 1 < arr.length)
-			.map(item => `${item.charAt(0).toUpperCase()}${item.slice(1)}`);
-		const namespace = fragments.join('.');
+// @flow
+interface BuildNamespaceOptions {
+	root: string,
+	extensionName: string,
+}
 
-		if (typeof root === 'string' && root !== '') {
+function buildNamespaceName({root = '', extensionName}: BuildNamespaceOptions = {}) {
+	if (typeof extensionName === 'string') {
+		const namespace = extensionName
+			.split('.')
+			.slice(0, -1)
+			.map((item) => {
+				if (item.length === 2) {
+					return item.toUpperCase();
+				}
+
+				return `${item.charAt(0).toUpperCase()}${item.slice(1)}`;
+			})
+			.join('.');
+
+		if (typeof root === 'string' && root !== '')
+		{
 			return `${root}.${namespace}`;
 		}
 
@@ -14,3 +28,5 @@ export default function buildNamespaceName({root = '', extensionName} = {}) {
 
 	return root;
 }
+
+export default buildNamespaceName;

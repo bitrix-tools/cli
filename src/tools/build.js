@@ -2,11 +2,11 @@
 
 import {resolve, basename} from 'path';
 import Logger from '@bitrix/logger';
+import colors from 'colors/safe';
 import Directory from '../entities/directory';
 import concat from './concat';
 import report from './report';
 import test from './test';
-import colors from 'colors/safe';
 import rollupBundle from './build/rollup';
 import adjustExtension from './build/adjust-extension';
 import adjustEncoding from './build/adjust-encoding';

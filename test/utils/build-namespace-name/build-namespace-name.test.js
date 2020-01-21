@@ -39,4 +39,11 @@ describe('utils/build-extension-name', () => {
 	it('Should return empty string if params doesn\'t passed', () => {
 		assert(buildNamespaceName() === '');
 	});
+
+	it('Should return valid namespace', () => {
+		const extensionName = 'ui.fonts.opensans.condensed';
+		const result = 'BX.UI.Fonts.Opensans';
+
+		assert.deepStrictEqual(buildNamespaceName({root: 'BX', extensionName}), result);
+	});
 });
