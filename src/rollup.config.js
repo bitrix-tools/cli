@@ -95,6 +95,7 @@ export default function rollupConfig({
 				resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
 				resolvePackageModule('@babel/plugin-proposal-class-properties'),
 				resolvePackageModule('@babel/plugin-proposal-private-methods'),
+				resolvePackageModule('@babel/plugin-transform-classes'),
 			],
 		}));
 	}
