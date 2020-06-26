@@ -23,6 +23,7 @@ export default function isAllowed(fileName) {
 	switch (ext) {
 		case '.js':
 		case '.jsx':
+		case '.vue':
 		case '.css':
 		case '.scss':
 			return true;
