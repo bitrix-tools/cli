@@ -1,7 +1,7 @@
 // @flow
-
 import {join} from 'path';
 import {existsSync} from 'fs';
+import {getExtensionPath} from '../path/get-extension-path';
 import type BundleConfig from '../@types/config';
 
 export default function getGlobals(imports: string[], {context}: BundleConfig): {[key: string]: string} {
@@ -19,6 +19,13 @@ export default function getGlobals(imports: string[], {context}: BundleConfig): 
 			const moduleJsRoot = join(moduleRoot, 'install', 'js', moduleName);
 			const extensionPath = join(moduleJsRoot, join(...parsedExtensionName));
 			configPath = join(extensionPath, 'bundle.config.js');
+		}
+
+		if (!existsSync(configPath)) {
+			const extensionPath = getExtensionPath(extensionName, context);
+			if (extensionPath) {
+				configPath = join(extensionPath, 'bundle.config.js');
+			}
 		}
 
 		let moduleAlias = 'BX';
