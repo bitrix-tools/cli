@@ -1,6 +1,7 @@
 // @flow
 import * as path from 'path';
 import rollupUrl from '@rollup/plugin-url';
+import slash from 'slash';
 import resolveToProductPath from '../../../path/resolve-to-product-path';
 import getDestDir from './get-dest-dir';
 
@@ -30,9 +31,9 @@ export default function rollupFiles(options: RollupFilesOptions): ?{[key: string
 
 		const rollupUrlOptions = {
 			fileName: '[dirname][name][extname]',
-			publicPath: path.join(productContext, destDir, '/'),
-			destDir: path.join(options.context, destDir),
-			sourceDir: path.dirname(options.input),
+			publicPath: slash(path.join(productContext, destDir, '/')),
+			destDir: slash(path.join(options.context, destDir)),
+			sourceDir: slash(path.dirname(options.input)),
 			include: options.resolveFilesImport.include,
 			exclude: options.resolveFilesImport.exclude,
 			limit: 0,
