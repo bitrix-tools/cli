@@ -19,10 +19,22 @@ export default function rollupConfig({
 	plugins = {},
 	cssImages = {},
 	resolveFilesImport = {},
+	targets,
 }) {
 	const enabledPlugins = [];
 	const isLoaded = (id) => !!enabledPlugins.find((item) => {
 		return item.name === id;
+	});
+
+	const compatMode = targets.some((rule) => {
+		const parsed = String(rule).toLowerCase().split(' ');
+		return (
+			!parsed.includes('not')
+			&& (
+				parsed.includes('ie')
+				|| parsed.includes('ie_mob')
+			)
+		);
 	});
 
 	if (Array.isArray(plugins.custom))
@@ -66,10 +78,7 @@ export default function rollupConfig({
 					return undefined;
 				})(),
 				autoprefixer({
-					overrideBrowserslist: [
-						'ie >= 11',
-						'last 4 version',
-					],
+					overrideBrowserslist: targets,
 				}),
 			],
 		}));
@@ -83,19 +92,28 @@ export default function rollupConfig({
 				[
 					resolvePackageModule('@babel/preset-env'),
 					{
-						targets: {
-							ie: '11',
-						},
+						targets,
+						bugfixes: !compatMode,
+						loose: !compatMode,
 					},
 				],
 			],
 			plugins: [
 				resolvePackageModule('@babel/plugin-external-helpers'),
-				resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
 				resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
-				resolvePackageModule('@babel/plugin-proposal-class-properties'),
-				resolvePackageModule('@babel/plugin-proposal-private-methods'),
-				resolvePackageModule('@babel/plugin-transform-classes'),
+				...(() => {
+					if (compatMode)
+					{
+						return [
+							resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
+							resolvePackageModule('@babel/plugin-proposal-class-properties'),
+							resolvePackageModule('@babel/plugin-proposal-private-methods'),
+							resolvePackageModule('@babel/plugin-transform-classes'),
+						];
+					}
+
+					return [];
+				})(),
 			],
 		}));
 	}

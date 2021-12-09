@@ -2,6 +2,7 @@ import glob from 'fast-glob';
 import * as path from 'path';
 import slash from 'slash';
 import isEs6File from './is-es6-file';
+import {getTargets} from './get-targets';
 
 function prepareConcat(files, context) {
 	if (typeof files !== 'object') {
@@ -135,6 +136,28 @@ export default function getConfigs(directory) {
 					concat: prepareConcat(currentConfig.concat, path.resolve(context)),
 					cssImages: currentConfig.cssImages || {},
 					resolveFilesImport: currentConfig.resolveFilesImport || {},
+					targets: (() => {
+						if (Array.isArray(currentConfig.browserslist))
+						{
+							return currentConfig.browserslist.map((rule) => {
+								return rule.trim();
+							});
+						}
+
+						if (typeof currentConfig.browserslist === 'string')
+						{
+							return currentConfig.browserslist.split(',').map((rule) => {
+								return rule.trim();
+							});
+						}
+
+						if (currentConfig.browserslist === true)
+						{
+							return getTargets(context);
+						}
+
+						return getTargets(null);
+					})(),
 				});
 			});
 

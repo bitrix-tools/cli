@@ -21,5 +21,6 @@ export default function buildRollupConfig(config) {
 		cssImages: config.cssImages,
 		resolveFilesImport: config.resolveFilesImport,
 		context: config.context,
+		targets: config.targets,
 	});
 }

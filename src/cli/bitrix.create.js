@@ -1,38 +1,49 @@
+import Logger from '@bitrix/logger';
 import createExtension from '../tools/create/extension';
 import params from '../process/params';
 import argv from '../process/argv';
 import ask from '../tools/ask';
 import box from '../tools/box';
 import 'colors';
-import Logger from '@bitrix/logger';
 
 export default async function bitrixCreate() {
-	const answers = await ask([
+	const answers = await (() => {
+		if (argv.y)
 		{
-			name: 'Extension name',
-			id: 'name',
-			type: 'input',
-			default: typeof argv._[1] === 'string' ? argv._[1] : '',
-			validate: (input) => {
-				if (typeof input === 'string' && input.length) {
-					return true;
-				}
-				return 'Name should be not empty string';
+			return {
+				name: typeof argv._[1] === 'string' ? argv._[1] : '',
+				tests: true,
+				browserslist: true,
+			};
+		}
+
+		return ask([
+			{
+				name: 'Extension name',
+				id: 'name',
+				type: 'input',
+				default: typeof argv._[1] === 'string' ? argv._[1] : '',
+				validate: (input) => {
+					if (typeof input === 'string' && input.length) {
+						return true;
+					}
+					return 'Name should be not empty string';
+				},
 			},
-		},
-		{
-			name: 'Enable tests',
-			id: 'tests',
-			type: 'confirm',
-			default: true,
-		},
-		{
-			name: 'Enable Flow',
-			id: 'flow',
-			type: 'confirm',
-			default: false,
-		},
-	]);
+			{
+				name: 'Enable tests',
+				id: 'tests',
+				type: 'confirm',
+				default: true,
+			},
+			{
+				name: 'Use Browserslist',
+				id: 'browserslist',
+				type: 'confirm',
+				default: true,
+			},
+		]);
+	})();
 
 	const extInfo = createExtension(params.path, answers);
 	const info = box(`
