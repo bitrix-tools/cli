@@ -158,6 +158,19 @@ export default function getConfigs(directory) {
 
 						return getTargets(null);
 					})(),
+					transformClasses: currentConfig.transformClasses === true,
+					minification: (() => {
+						if (
+							currentConfig.minification !== null
+							&& typeof currentConfig.minification === 'object'
+						)
+						{
+							return currentConfig.minification;
+						}
+
+						return currentConfig.minification === true;
+					})(),
+					sourceMaps: currentConfig.sourceMaps !== false,
 				});
 			});
 

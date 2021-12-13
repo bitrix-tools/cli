@@ -38,6 +38,26 @@ export default function createExtension(directory, options = defaultOptions) {
 		},
 	});
 
+	const additionalOptions = (() => {
+		let acc = '';
+		if (options.browserslist)
+		{
+			acc += `\n\tbrowserslist: ${options.browserslist},`;
+		}
+
+		if (options.minification)
+		{
+			acc += `\n\tminification: ${options.minification},`;
+		}
+
+		if (options.sourceMaps === false)
+		{
+			acc += `\n\tsourceMaps: ${options.sourceMaps},`;
+		}
+
+		return acc;
+	})();
+
 	render({
 		input: configTemplatePath,
 		output: configPath,
@@ -45,14 +65,7 @@ export default function createExtension(directory, options = defaultOptions) {
 			input: slash(relative(extensionPath, inputPath)),
 			output: slash(relative(extensionPath, outputPath)),
 			namespace: namespaceName,
-			browserslist: (() => {
-				if (options.browserslist)
-				{
-					return `\n\tbrowserslist: ${options.browserslist},`;
-				}
-
-				return '';
-			})(),
+			additionalOptions,
 		},
 	});
 

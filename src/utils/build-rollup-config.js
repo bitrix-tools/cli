@@ -22,5 +22,8 @@ export default function buildRollupConfig(config) {
 		resolveFilesImport: config.resolveFilesImport,
 		context: config.context,
 		targets: config.targets,
+		transformClasses: config.transformClasses,
+		minification: config.minification,
+		sourceMaps: config.sourceMaps,
 	});
 }

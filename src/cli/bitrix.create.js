@@ -42,6 +42,18 @@ export default async function bitrixCreate() {
 				type: 'confirm',
 				default: true,
 			},
+			{
+				name: 'Enable minification',
+				id: 'minification',
+				type: 'confirm',
+				default: false,
+			},
+			{
+				name: 'Enable sourceMaps',
+				id: 'sourceMaps',
+				type: 'confirm',
+				default: true,
+			},
 		]);
 	})();
 

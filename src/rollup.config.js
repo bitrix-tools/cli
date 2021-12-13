@@ -6,6 +6,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import iconv from 'iconv-lite';
 import postcssSvgo from 'postcss-svgo';
+import {terser} from 'rollup-plugin-terser';
 import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
@@ -20,6 +21,9 @@ export default function rollupConfig({
 	cssImages = {},
 	resolveFilesImport = {},
 	targets,
+	transformClasses,
+	minification,
+	sourceMaps,
 }) {
 	const enabledPlugins = [];
 	const isLoaded = (id) => !!enabledPlugins.find((item) => {
@@ -87,14 +91,14 @@ export default function rollupConfig({
 	if (plugins.babel !== false)
 	{
 		enabledPlugins.push(babel(plugins.babel || {
-			sourceMaps: true,
+			sourceMaps,
 			presets: [
 				[
 					resolvePackageModule('@babel/preset-env'),
 					{
 						targets,
 						bugfixes: !compatMode,
-						loose: !compatMode,
+						loose: !compatMode && !transformClasses,
 					},
 				],
 			],
@@ -102,17 +106,31 @@ export default function rollupConfig({
 				resolvePackageModule('@babel/plugin-external-helpers'),
 				resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
 				...(() => {
+					const babelPlugins = [];
+
 					if (compatMode)
 					{
-						return [
-							resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
-							resolvePackageModule('@babel/plugin-proposal-class-properties'),
-							resolvePackageModule('@babel/plugin-proposal-private-methods'),
-							resolvePackageModule('@babel/plugin-transform-classes'),
-						];
+						Object.assign(
+							babelPlugins,
+							[
+								resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
+							],
+						);
 					}
 
-					return [];
+					if (compatMode || transformClasses)
+					{
+						Object.assign(
+							babelPlugins,
+							[
+								resolvePackageModule('@babel/plugin-proposal-class-properties'),
+								resolvePackageModule('@babel/plugin-proposal-private-methods'),
+								resolvePackageModule('@babel/plugin-transform-classes'),
+							],
+						);
+					}
+
+					return babelPlugins;
 				})(),
 			],
 		}));
@@ -123,6 +141,22 @@ export default function rollupConfig({
 		enabledPlugins.push(commonjs({
 			sourceMap: false,
 		}));
+	}
+
+	if (minification)
+	{
+		const terserPlugin = (() => {
+			if (
+				typeof minification === 'object'
+			)
+			{
+				return terser(minification);
+			}
+
+			return terser();
+		})();
+
+		enabledPlugins.push(terserPlugin);
 	}
 
 	return {
@@ -170,7 +204,7 @@ export default function rollupConfig({
 			file: output.js,
 			name: output.name || 'window',
 			format: 'iife',
-			sourcemap: true,
+			sourcemap: sourceMaps,
 			extend: true,
 			exports: 'named',
 			globals: {
