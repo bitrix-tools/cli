@@ -127,7 +127,27 @@ module.exports = {
 
         // По умолчанию []
         exclude: Array<string>,
-    },   
+    },
+    
+    // Определяет правила Browserslist 
+    // false — не использовать (по умолчанию)
+    // true — использовать файл .browserslist / .browserslistrc
+    browserslist: boolean | string | Array<string>,
+  
+    // Включает или отключает минификацию 
+    // По умолчанию отключено 
+    // Может принимать объект настроек Terser
+    // false — не минифицировать (по умолчанию)
+    // true — минифицировать с настройками по умолчанию 
+    // object — минифицировать с указанными настройками 
+    minification: boolean | object,
+  
+    // Включает или отключает преобразование нативных JS классов 
+    // По умолчанию значенение параметра выставляется автоматически на основании browserslist
+    transformClasses: boolean,
+  
+    // Включает или отключает создание Source Maps файлов 
+    sourceMaps: boolean,
 };
 ```
 
