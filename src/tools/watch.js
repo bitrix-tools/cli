@@ -21,6 +21,7 @@ function createPattern(directories) {
 			acc.push(slash(path.resolve(currentConfig.context, '**/*.js')));
 			acc.push(slash(path.resolve(currentConfig.context, '**/*.css')));
 			acc.push(slash(path.resolve(currentConfig.context, '**/*.scss')));
+			acc.push(slash(path.resolve(currentConfig.context, '**/*.vue')));
 		});
 
 		return acc;
