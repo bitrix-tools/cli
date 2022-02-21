@@ -12,7 +12,19 @@ export default function getGlobals(imports: string[], {context}) {
 
 		if (!existsSync(configPath))
 		{
-			const moduleRoot = join(context.split('modules')[0], 'modules', moduleName);
+			const moduleRoot = (() => {
+				if (context.includes('local'))
+				{
+					const projectRoot = context.split('local')[0];
+					const bitrixModulesRoot = join(projectRoot, 'bitrix', 'modules');
+					if (existsSync(bitrixModulesRoot))
+					{
+						return join(bitrixModulesRoot, moduleName);
+					}
+				}
+
+				return join(context.split('modules')[0], 'modules', moduleName);
+			})();
 			const moduleJsRoot = join(moduleRoot, 'install', 'js', moduleName);
 			const extensionPath = join(moduleJsRoot, join(...parsedExtensionName));
 			configPath = join(extensionPath, 'bundle.config.js');
