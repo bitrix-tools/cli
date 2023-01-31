@@ -7,6 +7,7 @@ import makeIterable from '../internal/make-iterable';
 import prepareConcatConfig from '../internal/prepare-concat-config';
 import loadSourceBundleConfig from '../internal/load-source-bundle-config';
 import type BundleConfig from '../@types/config';
+import {getTargets} from './get-targets';
 
 export default function getConfigs(directory: string): BundleConfig {
 	const normalizedDirectory = `${slash(directory)}`;
@@ -91,6 +92,41 @@ export default function getConfigs(directory: string): BundleConfig {
 					concat: prepareConcatConfig(currentConfig.concat, path.resolve(context)),
 					cssImages: currentConfig.cssImages || {},
 					resolveFilesImport: currentConfig.resolveFilesImport || {},
+					targets: (() => {
+						if (Array.isArray(currentConfig.browserslist))
+						{
+							return currentConfig.browserslist.map((rule) => {
+								return rule.trim();
+							});
+						}
+
+						if (typeof currentConfig.browserslist === 'string')
+						{
+							return currentConfig.browserslist.split(',').map((rule) => {
+								return rule.trim();
+							});
+						}
+
+						if (currentConfig.browserslist === true)
+						{
+							return getTargets(context);
+						}
+
+						return getTargets(null);
+					})(),
+					transformClasses: currentConfig.transformClasses === true,
+					minification: (() => {
+						if (
+							currentConfig.minification !== null
+							&& typeof currentConfig.minification === 'object'
+						)
+						{
+							return currentConfig.minification;
+						}
+
+						return currentConfig.minification === true;
+					})(),
+					sourceMaps: currentConfig.sourceMaps !== false,
 				});
 			});
 

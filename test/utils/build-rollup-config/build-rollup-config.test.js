@@ -14,7 +14,11 @@ describe('utils/build-rollup-config', () => {
 				js: './app.bundle.js',
 				css: './app.bundle.css',
 			},
-			context: '/test/context'
+			context: '/test/context',
+			targets: [
+				'IE 11',
+				'last 4 version',
+			]
 		};
 
 		let result = buildRollupConfig(baseConfig);

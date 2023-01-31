@@ -24,5 +24,9 @@ export default function buildRollupConfig(config: BundleConfig) {
 		cssImages: config.cssImages,
 		resolveFilesImport: config.resolveFilesImport,
 		context: config.context,
+		targets: config.targets,
+		transformClasses: config.transformClasses,
+		minification: config.minification,
+		sourceMaps: config.sourceMaps,
 	});
 }

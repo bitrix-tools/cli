@@ -1,5 +1,7 @@
 module.exports = {
 	input: '{{{input}}}',
 	output: '{{{output}}}',
-	namespace: '{{{namespace}}}'
+	namespace: '{{{namespace}}}',{{{
+		additionalOptions
+	}}}
 };

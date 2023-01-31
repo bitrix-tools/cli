@@ -7,11 +7,11 @@ import buildExtensionName from '../../utils/build-extension-name';
 import render from '../render';
 import buildNamespaceName from '../../utils/build-namespace-name';
 
-const templatePath = resolve(appRoot, 'src/templates/extension');
-const configTemplatePath = resolve(templatePath, 'bundle.config.js');
-const inputTemplatePath = resolve(templatePath, 'input.js');
-const inputFlowTemplatePath = resolve(templatePath, 'input.flow.js');
-const defaultOptions = {test: true, flow: false};
+const templatePath = resolve(appRoot, 'src/templates');
+const extensionTemplatePath = resolve(templatePath, 'extension');
+const configTemplatePath = resolve(extensionTemplatePath, 'bundle.config.js');
+const inputTemplatePath = resolve(extensionTemplatePath, 'input.js');
+const defaultOptions = {test: true};
 
 export default function createExtension(directory, options = defaultOptions) {
 	if (typeof directory !== 'string') {
@@ -30,14 +30,33 @@ export default function createExtension(directory, options = defaultOptions) {
 	const namespaceName = buildNamespaceName({root: 'BX', extensionName});
 
 	render({
-		input: options.flow ? inputFlowTemplatePath : inputTemplatePath,
+		input: inputTemplatePath,
 		output: inputPath,
 		data: {
 			name: camelcase(options.name, {pascalCase: true}),
 			nameLower: `${options.name}`.toLowerCase(),
-			flow: options.flow,
 		},
 	});
+
+	const additionalOptions = (() => {
+		let acc = '';
+		if (options.browserslist)
+		{
+			acc += `\n\tbrowserslist: ${options.browserslist},`;
+		}
+
+		if (options.minification)
+		{
+			acc += `\n\tminification: ${options.minification},`;
+		}
+
+		if (options.sourceMaps === false)
+		{
+			acc += `\n\tsourceMaps: ${options.sourceMaps},`;
+		}
+
+		return acc;
+	})();
 
 	render({
 		input: configTemplatePath,
@@ -46,11 +65,12 @@ export default function createExtension(directory, options = defaultOptions) {
 			input: slash(relative(extensionPath, inputPath)),
 			output: slash(relative(extensionPath, outputPath)),
 			namespace: namespaceName,
+			additionalOptions,
 		},
 	});
 
 	if (options.tests) {
-		const testTemplatePath = resolve(templatePath, 'test.js');
+		const testTemplatePath = resolve(extensionTemplatePath, 'test.js');
 		const testFilePath = resolve(extensionPath, `test/${options.name}/${options.name}.test.js`);
 
 		render({

@@ -6,6 +6,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import iconv from 'iconv-lite';
 import postcssSvgo from 'postcss-svgo';
+import {terser} from 'rollup-plugin-terser';
 import * as fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
@@ -19,10 +20,25 @@ export default function rollupConfig({
 	plugins = {},
 	cssImages = {},
 	resolveFilesImport = {},
+	targets,
+	transformClasses,
+	minification,
+	sourceMaps,
 }) {
 	const enabledPlugins = [];
 	const isLoaded = (id) => !!enabledPlugins.find((item) => {
 		return item.name === id;
+	});
+
+	const compatMode = targets.some((rule) => {
+		const parsed = String(rule).toLowerCase().split(' ');
+		return (
+			!parsed.includes('not')
+			&& (
+				parsed.includes('ie')
+				|| parsed.includes('ie_mob')
+			)
+		);
 	});
 
 	if (Array.isArray(plugins.custom))
@@ -66,10 +82,7 @@ export default function rollupConfig({
 					return undefined;
 				})(),
 				autoprefixer({
-					overrideBrowserslist: [
-						'ie >= 11',
-						'last 4 version',
-					],
+					overrideBrowserslist: targets,
 				}),
 			],
 		}));
@@ -78,23 +91,47 @@ export default function rollupConfig({
 	if (plugins.babel !== false)
 	{
 		enabledPlugins.push(babel(plugins.babel || {
-			sourceMaps: true,
+			sourceMaps,
 			presets: [
 				[
 					resolvePackageModule('@babel/preset-env'),
 					{
-						targets: {
-							ie: '11',
-						},
+						targets,
+						bugfixes: !compatMode,
+						loose: !compatMode && !transformClasses,
 					},
 				],
 			],
 			plugins: [
 				resolvePackageModule('@babel/plugin-external-helpers'),
-				resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
 				resolvePackageModule('@babel/plugin-transform-flow-strip-types'),
-				resolvePackageModule('@babel/plugin-proposal-class-properties'),
-				resolvePackageModule('@babel/plugin-proposal-private-methods'),
+				...(() => {
+					const babelPlugins = [];
+
+					if (compatMode)
+					{
+						Object.assign(
+							babelPlugins,
+							[
+								resolvePackageModule('@babel/plugin-proposal-object-rest-spread'),
+							],
+						);
+					}
+
+					if (compatMode || transformClasses)
+					{
+						Object.assign(
+							babelPlugins,
+							[
+								resolvePackageModule('@babel/plugin-proposal-class-properties'),
+								resolvePackageModule('@babel/plugin-proposal-private-methods'),
+								resolvePackageModule('@babel/plugin-transform-classes'),
+							],
+						);
+					}
+
+					return babelPlugins;
+				})(),
 			],
 		}));
 	}
@@ -104,6 +141,22 @@ export default function rollupConfig({
 		enabledPlugins.push(commonjs({
 			sourceMap: false,
 		}));
+	}
+
+	if (minification)
+	{
+		const terserPlugin = (() => {
+			if (
+				typeof minification === 'object'
+			)
+			{
+				return terser(minification);
+			}
+
+			return terser();
+		})();
+
+		enabledPlugins.push(terserPlugin);
 	}
 
 	return {
@@ -151,7 +204,7 @@ export default function rollupConfig({
 			file: output.js,
 			name: output.name || 'window',
 			format: 'iife',
-			sourcemap: true,
+			sourcemap: sourceMaps,
 			extend: true,
 			exports: 'named',
 			globals: {
