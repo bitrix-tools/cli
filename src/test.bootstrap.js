@@ -2,11 +2,11 @@ import {JSDOM} from 'jsdom';
 import mocha from 'mocha';
 import assert from 'assert';
 import * as sinon from 'sinon';
-import {resolve, join} from 'path';
-import {existsSync} from 'fs';
+import path from 'path';
 import v8 from 'v8';
 import vm from 'vm';
 import resolvePackageModule from './utils/resolve-package-module';
+import resolveExtension from './utils/resolve-extension';
 
 v8.setFlagsFromString('--expose-gc');
 global.gc = vm.runInNewContext('gc');
@@ -75,27 +75,28 @@ require.extensions['.css'] = () => null;
 require.extensions['.png'] = () => null;
 require.extensions['.jpg'] = () => null;
 
+function isExtensionName(value: string) {
+	return /(^\w+)\.(.*)/.test(String(value));
+}
+
 function moduleResolver(sourcePath, currentFile) {
-	const exp = /(^\w+)\.(.*)/;
-	const root = currentFile.split('modules')[0];
+	if (isExtensionName(sourcePath))
+	{
+		const resolverResult = resolveExtension({
+			name: sourcePath,
+			sourcePath: currentFile,
+		});
 
-	if (exp.test(sourcePath)) {
-		const modulesPath = resolve(root, 'modules');
-		const splitedName = sourcePath.split('.');
-		const moduleName = splitedName.shift();
-
-		const moduleJsPath = resolve(modulesPath, moduleName, 'install', 'js', moduleName);
-		const extPath = resolve(moduleJsPath, join(...splitedName));
-
-		const configPath = resolve(extPath, 'bundle.config.js');
-
-		if (existsSync(configPath)) {
-			// eslint-disable-next-line
-			const config = require(configPath);
-			return resolve(extPath, config.input);
+		if (resolverResult)
+		{
+			return resolverResult.input;
 		}
 
-		// @fixme: Temporary stub for extensions without bundle.config.js
+		return 'assert';
+	}
+
+	if (!sourcePath.startsWith('.'))
+	{
 		return 'assert';
 	}
 
@@ -103,18 +104,19 @@ function moduleResolver(sourcePath, currentFile) {
 }
 
 require('@babel/register')({
+	cache: false,
 	cwd: (() => {
 		const cwd = process.cwd();
 
 		if (cwd.includes('/modules')) {
-			return cwd.split('/modules')[0];
+			return path.resolve(cwd.split('/modules')[0], '../../../../../');
 		}
 
 		if (cwd.includes('/bitrix')) {
-			return cwd.split('/bitrix')[0];
+			return path.resolve(cwd.split('/bitrix')[0], '../../../../../');
 		}
 
-		return resolve(cwd, '../../../../../');
+		return path.resolve(cwd, '../../../../../');
 	})(),
 	presets: [
 		resolvePackageModule('@babel/preset-env'),

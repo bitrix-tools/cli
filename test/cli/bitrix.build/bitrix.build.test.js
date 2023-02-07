@@ -34,7 +34,7 @@ describe('cli/bitrix.build', () => {
 
 		for (let extPath of extensions) {
 			await bitrixBuild({path: extPath});
-			await checkBuild(extPath);
+			void checkBuild(extPath, true);
 		}
 	});
 
@@ -77,7 +77,7 @@ describe('cli/bitrix.build', () => {
 			await bitrixBuild(sample);
 
 			for (let ext of sample.ext) {
-				await checkBuild(ext);
+				await checkBuild(ext, true);
 			}
 		}
 	});
@@ -88,7 +88,7 @@ describe('cli/bitrix.build', () => {
 		await bitrixBuild({path: path.resolve(__dirname, 'data/modules')});
 
 		for (let ext of extensions) {
-			await checkBuild(ext);
+			await checkBuild(ext, true);
 		}
 	});
 
@@ -223,8 +223,8 @@ function removeDist(distPath) {
 			fs.unlinkSync(path.resolve(distPath, '../script.js.map'));
 		}
 
-		if (fs.existsSync(path.resolve(distPath, '../script.css'))) {
-			fs.unlinkSync(path.resolve(distPath, '../script.css'));
+		if (fs.existsSync(path.resolve(distPath, '../style.css'))) {
+			fs.unlinkSync(path.resolve(distPath, '../style.css'));
 		}
 
 		return;
@@ -252,7 +252,7 @@ function checkBuild(extPath, assertion = false) {
 	if (extPath.includes(path.join('components', 'bitrix'))) {
 		const scriptJsPath = path.resolve(extPath, 'script.js');
 		const scriptJsMapPath = path.resolve(extPath, 'script.js.map');
-		const scriptCssPath = path.resolve(extPath, 'script.css');
+		const styleCssPath = path.resolve(extPath, 'style.css');
 		const styleJsPath = path.resolve(extPath, 'style.js.map');
 		const styleJsMapPath = path.resolve(extPath, 'style.js.map');
 		const configPhpPath = path.resolve(extPath, 'config.php');
@@ -267,8 +267,8 @@ function checkBuild(extPath, assertion = false) {
 			return false;
 		}
 
-		if (!fs.existsSync(scriptCssPath)) {
-			assertion && assert(false, `${path.basename(scriptCssPath)} not exists`);
+		if (!fs.existsSync(styleCssPath)) {
+			assertion && assert(false, `${path.basename(styleCssPath)} not exists`);
 			return false;
 		}
 
@@ -339,22 +339,26 @@ function checkBuild(extPath, assertion = false) {
 	const resConfigPhp = fs.readFileSync(resConfigPhpPath, 'utf-8');
 
 	if (distBundleJs !== resBundleJs) {
-		assertion && assert(false, `invalid ${path.basename(distBundleJsPath)}`);
+		console.log('extPath:', extPath);
+		assertion && assert.deepEqual(distBundleJs, resBundleJs, `invalid ${path.basename(distBundleJsPath)}`);
 		return false;
 	}
 
 	if (distBundleJsMap !== resBundleJsMap) {
-		assertion && assert(false, `invalid ${path.basename(distBundleJsMapPath)}`);
+		console.log('extPath:', extPath);
+		assertion && assert.deepEqual(distBundleJsMap, resBundleJsMap, `invalid ${path.basename(distBundleJsMapPath)}`);
 		return false;
 	}
 
 	if (distBundleCss !== resBundleCss) {
-		assertion && assert(false, `invalid ${path.basename(distBundleCssPath)}`);
+		console.log('extPath:', extPath);
+		assertion && assert.deepEqual(distBundleCss, resBundleCss, `invalid ${path.basename(distBundleCssPath)}`);
 		return false;
 	}
 
 	if (distConfigPhp !== resConfigPhp) {
-		assertion && assert(false, `invalid ${path.basename(distConfigPhp)}`);
+		console.log('extPath:', extPath);
+		assertion && assert.deepEqual(distConfigPhp, resConfigPhp, `invalid ${path.basename(distConfigPhpPath)}`);
 		return false;
 	}
 

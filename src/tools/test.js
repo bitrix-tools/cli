@@ -1,6 +1,7 @@
 import Mocha from 'mocha';
 import glob from 'fast-glob';
 import path from 'path';
+import fs from 'fs';
 import Logger from '@bitrix/logger';
 import argv from '../process/argv';
 import invalidateModuleCache from '../utils/invalidate-module-cache';
@@ -32,7 +33,13 @@ export async function testDirectory(dir, report = true) {
 	}
 
 	for (const config of configs) {
-		const tests = glob.sync(path.resolve(config.context, 'test/**/*.js'));
+		const tests = (() => {
+			if (fs.existsSync(path.resolve(config.context, 'test'))) {
+				return glob.sync(path.resolve(config.context, 'test/**/*.js'))
+			}
+
+			return [];
+		})();
 
 		if (tests.length === 0) {
 			result.push('notests');

@@ -1,6 +1,6 @@
 // @flow
 import * as path from 'path';
-import rollupUrl from '@rollup/plugin-url';
+import rollupUrl from 'rollup-plugin-url';
 import slash from 'slash';
 import resolveToProductPath from '../../../path/resolve-to-product-path';
 import getDestDir from './get-dest-dir';

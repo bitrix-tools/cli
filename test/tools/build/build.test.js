@@ -1,7 +1,7 @@
 import assert from 'assert';
 import build from '../../../src/tools/build';
-import * as path from 'path';
-import * as fs from 'fs';
+import path from 'path';
+import fs from 'fs';
 
 const modules = path.resolve(__dirname, 'data/modules');
 
@@ -72,8 +72,11 @@ describe('tools/build', () => {
 	it('Should build all extensions from passed modules directory', async () => {
 		await build(modules, RECURSIVE);
 
-		extensions.forEach(extPath => {
-			checkBuild(extPath, WITH_ASSERTION);
+		await new Promise((resolve) => {
+			extensions.forEach(extPath => {
+				checkBuild(extPath, WITH_ASSERTION);
+			});
+			resolve();
 		});
 	});
 
@@ -104,7 +107,7 @@ describe('tools/build', () => {
 
 		const configPhp = fs.readFileSync(configPhpPath, 'utf-8');
 
-		assert(configPhp === 'test')
+		assert(configPhp === 'test');
 	});
 });
 
@@ -222,21 +225,25 @@ function checkBuild(extPath, assertion = false) {
 	const resConfigPhp = fs.readFileSync(resConfigPhpPath, 'utf-8');
 
 	if (distBundleJs !== resBundleJs) {
-		assertion && assert(false, `invalid ${path.basename(distBundleJsPath)}`);
+		console.log('extPath', extPath);
+		assertion && assert.deepEqual(distBundleJs, resBundleJs, `invalid ${path.basename(distBundleJsPath)}`);
 		return false;
 	}
 
 	if (distBundleJsMap !== resBundleJsMap) {
-		assertion && assert(false, `invalid ${path.basename(distBundleJsMapPath)}`);
+		console.log('extPath', extPath);
+		assertion && assert.deepEqual(distBundleJsMap, resBundleJsMap, `invalid ${path.basename(distBundleJsMapPath)}`);
 		return false;
 	}
 
 	if (distBundleCss !== resBundleCss) {
-		assertion && assert(false, `invalid ${path.basename(distBundleCssPath)}`);
+		console.log('extPath', extPath);
+		assertion && assert.deepEqual(distBundleCss, resBundleCss, `invalid ${path.basename(distBundleCssPath)}`);
 		return false;
 	}
 
 	if (distConfigPhp !== resConfigPhp) {
+		console.log('extPath', extPath);
 		assertion && assert.deepStrictEqual(distConfigPhp, resConfigPhp, `invalid ${path.basename(distConfigPhpPath)}`);
 		return false;
 	}

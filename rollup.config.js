@@ -1,9 +1,9 @@
-import json from '@rollup/plugin-json';
-import commonJs from '@rollup/plugin-commonjs';
-import babel from 'rollup-plugin-simple-babel';
-import pkg from './package.json';
+const json = require('rollup-plugin-json');
+const commonJs = require('rollup-plugin-commonjs');
+const babel = require('rollup-plugin-simple-babel');
+const pkg = require('./package.json');
 
-export default [
+module.exports = [
 	{
 		input: './src/cli/bitrix.build.js',
 		output: {
