@@ -1,5 +1,5 @@
 import slash from 'slash';
-import * as path from 'path';
+import path from 'path';
 
 export default function buildExtensionName(filePath, context) {
 	const moduleExp = new RegExp('/(.[a-z0-9_-]+)/install/js/(.[a-z0-9_-]+)/');

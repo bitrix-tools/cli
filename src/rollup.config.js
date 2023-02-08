@@ -7,7 +7,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import iconv from 'iconv-lite';
 import postcssSvgo from 'postcss-svgo';
 import terser from 'rollup-plugin-terser';
-import * as fs from 'fs';
+import fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
 import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';

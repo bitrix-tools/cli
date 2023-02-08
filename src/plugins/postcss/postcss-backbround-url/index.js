@@ -1,6 +1,6 @@
 // @flow
 import postcss from 'postcss';
-import * as path from 'path';
+import path from 'path';
 import {declProcessor} from 'postcss-url/src/lib/decl-processor';
 import getDestDir from '../../rollup/rollup-plugin-files/get-dest-dir';
 

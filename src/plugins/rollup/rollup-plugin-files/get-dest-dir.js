@@ -1,5 +1,5 @@
 // @flow
-import * as path from 'path';
+import path from 'path';
 import isComponentPath from '../../../utils/is-component-path';
 import isTemplatePath from '../../../utils/is-template-path';
 

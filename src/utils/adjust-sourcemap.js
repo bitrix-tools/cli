@@ -1,5 +1,5 @@
 import fs from 'fs';
-import * as path from 'path';
+import path from 'path';
 import slash from 'slash';
 
 export default function adjustSourceMap(mapPath) {

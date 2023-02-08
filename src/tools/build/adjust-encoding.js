@@ -1,6 +1,6 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import jscharder from 'jschardet';
-import * as iconv from 'iconv-lite';
+import iconv from 'iconv-lite';
 
 export function getEncoding(buffer)
 {

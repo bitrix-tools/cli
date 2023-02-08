@@ -1,7 +1,7 @@
 import 'colors';
-import * as path from 'path';
-import * as os from 'os';
-import * as fs from 'fs';
+import path from 'path';
+import os from 'os';
+import fs from 'fs';
 import logSymbols from 'log-symbols';
 import Logger from '@bitrix/logger';
 import bitrixAdjust from './bitrix.adjust';

@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom';
 import mocha from 'mocha';
 import assert from 'assert';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import path from 'path';
 import v8 from 'v8';
 import vm from 'vm';
@@ -46,6 +46,7 @@ const DOM = new JSDOM('', {
 	contentType: 'text/html',
 	includeNodeLocations: true,
 	storageQuota: 10000000,
+	pretendToBeVisual: true,
 });
 
 global.window = DOM.window;
@@ -95,7 +96,12 @@ function moduleResolver(sourcePath, currentFile) {
 		return 'assert';
 	}
 
-	if (!sourcePath.startsWith('.'))
+	if (
+		!sourcePath.startsWith('.')
+		&& !currentFile.includes('@bitrix')
+		&& !currentFile.includes('node_modules')
+		&& !currentFile.endsWith('.test.js')
+	)
 	{
 		return 'assert';
 	}

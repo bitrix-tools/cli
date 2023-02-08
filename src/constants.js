@@ -1,5 +1,5 @@
 import os from 'os';
-import {resolve} from 'path';
+import path from 'path';
 
-export const appRoot = resolve(__dirname, '../');
-export const lockFile = resolve(os.homedir(), '.bitrix.lock');
+export const appRoot = path.resolve(__dirname, '../');
+export const lockFile = path.resolve(os.homedir(), '.bitrix.lock');

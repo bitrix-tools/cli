@@ -1,7 +1,7 @@
 import Concat from 'concat-with-sourcemaps';
-import * as iconv from 'iconv-lite';
-import {existsSync, readFileSync, writeFileSync} from 'fs';
-import {resolve, dirname, basename} from 'path';
+import iconv from 'iconv-lite';
+import fs from 'fs';
+import path from 'path';
 import adjustSourceMap from '../utils/adjust-sourcemap';
 import {getEncoding} from './build/adjust-encoding';
 
@@ -14,17 +14,17 @@ export default function concat(input: string[] = [], output: string) {
 		const concatenator = new Concat(generateSourceMap, output, separator);
 
 		input
-			.filter(existsSync)
+			.filter(fs.existsSync)
 			.forEach((filePath) => {
-				const fileContent = readFileSync(filePath);
+				const fileContent = fs.readFileSync(filePath);
 				const sourceMapPath = `${filePath}.map`;
 				let sourceMapContent;
 
-				if (existsSync(sourceMapPath)) {
-					const mapContent = JSON.parse(readFileSync(sourceMapPath, encoding));
+				if (fs.existsSync(sourceMapPath)) {
+					const mapContent = JSON.parse(fs.readFileSync(sourceMapPath, encoding));
 
 					mapContent.sources = mapContent.sources.map(sourcePath => (
-						resolve(dirname(sourceMapPath), sourcePath)
+						path.resolve(path.dirname(sourceMapPath), sourcePath)
 					));
 
 					sourceMapContent = JSON.stringify(mapContent);
@@ -42,16 +42,16 @@ export default function concat(input: string[] = [], output: string) {
 			decodedContent.toString(contentEncoding)
 			// eslint-disable-next-line
 			.replace(/\/\/# sourceMappingURL=(.*)\.map/g, '') +
-			`\n//# sourceMappingURL=${basename(output)}.map`
+			`\n//# sourceMappingURL=${path.basename(output)}.map`
 		);
 
-		const outputFile = existsSync(output) ? readFileSync(output) : null;
+		const outputFile = fs.existsSync(output) ? fs.readFileSync(output) : null;
 		const outputEncoding = outputFile ? getEncoding(outputFile) : contentEncoding;
 		const encodedContent = iconv.encode(decodedContentString, outputEncoding);
 
 
-		writeFileSync(output, encodedContent);
-		writeFileSync(`${output}.map`, sourceMap);
+		fs.writeFileSync(output, encodedContent);
+		fs.writeFileSync(`${output}.map`, sourceMap);
 		adjustSourceMap(`${output}.map`);
 	}
 }

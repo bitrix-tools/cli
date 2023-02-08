@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as mustache from 'mustache';
+import fs from 'fs';
+import mustache from 'mustache';
 import fse from 'fs-extra';
 
 export default function render({input, output, data = {}}) {

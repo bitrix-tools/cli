@@ -1,7 +1,7 @@
-import * as path from 'path';
-import * as fs from 'fs';
+import path from 'path';
+import fs from 'fs';
 import ini from 'ini';
-import * as os from 'os';
+import os from 'os';
 import {appRoot} from '../constants';
 import argv from '../process/argv';
 import 'colors';

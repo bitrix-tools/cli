@@ -1,16 +1,16 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import camelcase from 'camelcase';
-import {resolve, relative} from 'path';
+import path from 'path';
 import slash from 'slash';
 import {appRoot} from '../../constants';
 import buildExtensionName from '../../utils/build-extension-name';
 import render from '../render';
 import buildNamespaceName from '../../utils/build-namespace-name';
 
-const templatePath = resolve(appRoot, 'src/templates');
-const extensionTemplatePath = resolve(templatePath, 'extension');
-const configTemplatePath = resolve(extensionTemplatePath, 'bundle.config.js');
-const inputTemplatePath = resolve(extensionTemplatePath, 'input.js');
+const templatePath = path.resolve(appRoot, 'src/templates');
+const extensionTemplatePath = path.resolve(templatePath, 'extension');
+const configTemplatePath = path.resolve(extensionTemplatePath, 'bundle.config.js');
+const inputTemplatePath = path.resolve(extensionTemplatePath, 'input.js');
 const defaultOptions = {test: true};
 
 export default function createExtension(directory, options = defaultOptions) {
@@ -22,10 +22,10 @@ export default function createExtension(directory, options = defaultOptions) {
 		throw new Error('directory is not exists');
 	}
 
-	const extensionPath = resolve(directory, options.name.toLowerCase());
-	const inputPath = resolve(extensionPath, `src/${options.name}.js`);
-	const outputPath = resolve(extensionPath, `dist/${options.name}.bundle.js`);
-	const configPath = resolve(extensionPath, 'bundle.config.js');
+	const extensionPath = path.resolve(directory, options.name.toLowerCase());
+	const inputPath = path.resolve(extensionPath, `src/${options.name}.js`);
+	const outputPath = path.resolve(extensionPath, `dist/${options.name}.bundle.js`);
+	const configPath = path.resolve(extensionPath, 'bundle.config.js');
 	const extensionName = buildExtensionName(inputPath, extensionPath);
 	const namespaceName = buildNamespaceName({root: 'BX', extensionName});
 
@@ -62,16 +62,16 @@ export default function createExtension(directory, options = defaultOptions) {
 		input: configTemplatePath,
 		output: configPath,
 		data: {
-			input: slash(relative(extensionPath, inputPath)),
-			output: slash(relative(extensionPath, outputPath)),
+			input: slash(path.relative(extensionPath, inputPath)),
+			output: slash(path.relative(extensionPath, outputPath)),
 			namespace: namespaceName,
 			additionalOptions,
 		},
 	});
 
 	if (options.tests) {
-		const testTemplatePath = resolve(extensionTemplatePath, 'test.js');
-		const testFilePath = resolve(extensionPath, `test/${options.name}/${options.name}.test.js`);
+		const testTemplatePath = path.resolve(extensionTemplatePath, 'test.js');
+		const testFilePath = path.resolve(extensionPath, `test/${options.name}/${options.name}.test.js`);
 
 		render({
 			input: testTemplatePath,

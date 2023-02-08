@@ -1,6 +1,6 @@
 // @flow
 
-import * as path from 'path';
+import path from 'path';
 import isEs6File from '../utils/is-es6-file';
 import type SourceBundleConfig from '../@types/source-bundle-config';
 

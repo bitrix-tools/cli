@@ -1,7 +1,7 @@
 // @flow
 
 import glob from 'fast-glob';
-import * as path from 'path';
+import path from 'path';
 import slash from 'slash';
 import makeIterable from '../internal/make-iterable';
 import prepareConcatConfig from '../internal/prepare-concat-config';

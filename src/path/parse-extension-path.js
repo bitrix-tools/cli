@@ -1,6 +1,6 @@
 // @flow
 import slash from 'slash';
-import * as path from 'path';
+import path from 'path';
 import findExtensionContext from './find-extension-context';
 
 interface Result {

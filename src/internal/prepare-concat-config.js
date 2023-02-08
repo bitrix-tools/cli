@@ -1,6 +1,6 @@
 // @flow
 
-import * as path from "path";
+import path from "path";
 import type ConcatConfig from '../@types/concat-config';
 
 export default function prepareConcatConfig(files: ConcatConfig, context: string): ConcatConfig {

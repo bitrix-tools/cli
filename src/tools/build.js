@@ -1,6 +1,6 @@
 // @flow
 
-import {resolve, basename} from 'path';
+import path from 'path';
 import Logger from '@bitrix/logger';
 import colors from 'colors/safe';
 import Directory from '../entities/directory';
@@ -23,7 +23,7 @@ async function buildDirectory(dir, recursive = true) {
 	const configs = directory.getConfigs(recursive);
 
 	// @todo Remove global state change
-	global.currentDirectory = resolve(dir);
+	global.currentDirectory = path.resolve(dir);
 
 	for (const config of configs) {
 		let testResult;
@@ -50,7 +50,7 @@ async function buildDirectory(dir, recursive = true) {
 async function build(dir: string, recursive: boolean) {
 	if (Array.isArray(dir)) {
 		for (const item of dir) {
-			Logger.log(colors.bold(`Build module ${basename(item)}`));
+			Logger.log(colors.bold(`Build module ${path.basename(item)}`));
 			await buildDirectory(item, recursive);
 		}
 	} else if (typeof dir === 'string') {

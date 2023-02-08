@@ -1,7 +1,7 @@
 import 'colors';
 import logSymbols from 'log-symbols';
 import filesize from 'filesize';
-import * as fs from 'fs';
+import fs from 'fs';
 import Logger from '@bitrix/logger';
 import isModulePath from '../utils/is-module-path';
 import buildExtensionName from '../utils/build-extension-name';
