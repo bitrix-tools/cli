@@ -181,7 +181,8 @@ describe('tools/report', () => {
 		};
 		report({config, error});
 
-		assert(log.lastCall.args[0].includes('Error: testtest'));
+		assert(log.secondCall.args[0].includes('Build error: testtest'));
+		assert(log.thirdCall.args[0].includes('file:'));
 	});
 
 	it('Should print error message if passed error with code PLUGIN_ERROR', () => {
@@ -196,10 +197,13 @@ describe('tools/report', () => {
 		const error = {
 			code: 'PLUGIN_ERROR',
 			message: 'testtest1',
+			id: '/test/path/to/file.js',
+			loc: {line: 21, column: 3},
 		};
 		report({config, error});
 
-		assert(log.lastCall.args[0].includes('Error: testtest1'));
+		assert(log.secondCall.args[0].includes('Build error: testtest1'));
+		assert(log.secondCall.args[0].includes('file:'));
 	});
 
 	it('Should throw if passed another error', () => {
