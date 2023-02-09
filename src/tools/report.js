@@ -2,6 +2,8 @@ import 'colors';
 import logSymbols from 'log-symbols';
 import filesize from 'filesize';
 import fs from 'fs';
+import path from 'path';
+import url from 'url';
 import Logger from '@bitrix/logger';
 import isModulePath from '../utils/is-module-path';
 import buildExtensionName from '../utils/build-extension-name';
@@ -20,15 +22,31 @@ function printRow(row) {
 	Logger.log(`${nameCell} ${testCell} ${sizeCell}`);
 }
 
-function printError(error) {
+function printError(error, config) {
 	if (error) {
 		if (error.code === 'UNRESOLVED_IMPORT') {
-			Logger.log(`    Error: ${error.message}`.red);
+			const fileUrl = url.pathToFileURL(
+				path.join(
+					config.context,
+					error.message.split('from ').at(-1),
+				),
+			);
+			Logger.log(`   Build error: ${error.message}`.red);
+			Logger.log(`   ${fileUrl.href}`.red);
 			return;
 		}
 
 		if (error.code === 'PLUGIN_ERROR') {
-			Logger.log(`    Error: ${error.message.replace('undefined:', '')}`.red);
+			let errorMessage = error.message.replace('unknown: ', '');
+			const fileUrl = url.pathToFileURL(`${error.id}:${error.loc.line}:${error.loc.column}`);
+			if (fileUrl)
+			{
+				errorMessage = errorMessage.split('\n');
+				errorMessage.splice(1, 0, `   ${fileUrl.href}`);
+				errorMessage = errorMessage.join('\n');
+			}
+
+			Logger.log(`   Build error: ${errorMessage}`.red);
 			return;
 		}
 
@@ -83,7 +101,7 @@ export default function report({config, testResult, error}) {
 		const name = buildExtensionName(config.input, config.context);
 
 		printRow({...reportData, type: 'extension', name});
-		printError(error);
+		printError(error, config);
 		return;
 	}
 
@@ -91,7 +109,7 @@ export default function report({config, testResult, error}) {
 		const name = buildComponentName(config.input);
 
 		printRow({...reportData, type: 'component', name});
-		printError(error);
+		printError(error, config);
 		return;
 	}
 
@@ -99,10 +117,10 @@ export default function report({config, testResult, error}) {
 		const name = buildTemplateName(config.input);
 
 		printRow({...reportData, type: 'template', name});
-		printError(error);
+		printError(error, config);
 		return;
 	}
 
 	printRow({...reportData, type: 'bundle', name: config.output.js});
-	printError(error);
+	printError(error, config);
 }
