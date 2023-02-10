@@ -12,6 +12,7 @@ import buildComponentName from '../utils/build-component-name';
 import isTemplatePath from '../utils/is-template-path';
 import buildTemplateName from '../utils/build-template-name';
 import getNowTime from '../utils/get-now-time';
+import isLocalPath from '../utils/is-local-path';
 
 function printRow(row) {
 	const reportTime = String(getNowTime()).grey;
@@ -97,7 +98,7 @@ export default function report({config, testResult, error}) {
 		reportData.infoSymbol = logSymbols.success;
 	}
 
-	if (isModulePath(config.input)) {
+	if (isModulePath(config.input) || isLocalPath(config.input)) {
 		const name = buildExtensionName(config.input, config.context);
 
 		printRow({...reportData, type: 'extension', name});
