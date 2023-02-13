@@ -10,7 +10,7 @@ const allowedConfigs = [
 ];
 
 export function getTargets(context: string): Array<string> {
-	if (typeof context === 'string')
+	if (typeof context === 'string' && context !== '')
 	{
 		const rcFilePath = path.resolve(context, rcFileName);
 		if (fs.existsSync(rcFilePath))
@@ -25,7 +25,10 @@ export function getTargets(context: string): Array<string> {
 		}
 		else
 		{
-			if (context !== path.sep)
+			if (
+				context !== path.sep
+				&& !/^[A-Z]:\\$/.test(context)
+			)
 			{
 				return getTargets(path.dirname(context));
 			}
