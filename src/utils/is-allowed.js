@@ -1,5 +1,6 @@
 import slash from 'slash';
 import path from 'path';
+import getTrackedExtensions from './get-tracked-extensions';
 
 export default function isAllowed(fileName) {
 	if (typeof fileName !== 'string') {
@@ -18,15 +19,6 @@ export default function isAllowed(fileName) {
 		return false;
 	}
 
-	const ext = path.extname(normalizedFileName);
-
-	switch (ext) {
-		case '.js':
-		case '.jsx':
-		case '.css':
-		case '.scss':
-			return true;
-		default:
-			return false;
-	}
+	return getTrackedExtensions()
+		.includes(path.extname(normalizedFileName));
 }

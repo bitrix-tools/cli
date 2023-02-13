@@ -6,11 +6,14 @@ import Directory from '../entities/directory';
 import repository from '../process/repository';
 import isAllowed from '../utils/is-allowed';
 import isInput from '../utils/is-input';
+import getTrackedExtensions from '../utils/get-tracked-extensions';
 
 function isAllowedChanges(directories, file) {
 	return directories
 		.every(dir => isAllowed(file) && isInput(dir, file));
 }
+
+const trackedExtensions = getTrackedExtensions();
 
 function createPattern(directories) {
 	return directories.reduce((acc, dir) => {
@@ -18,9 +21,9 @@ function createPattern(directories) {
 		const directoryConfigs = directory.getConfigs();
 
 		directoryConfigs.forEach((currentConfig) => {
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.js')));
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.css')));
-			acc.push(slash(path.resolve(currentConfig.context, '**/*.scss')));
+			trackedExtensions.forEach((extName) => {
+				acc.push(slash(path.resolve(currentConfig.context, `**/*${extName}`)));
+			});
 		});
 
 		return acc;
