@@ -7,4 +7,5 @@ export default {
 	v: 'version',
 	c: 'create',
 	n: 'name',
+	e: 'extensions',
 };

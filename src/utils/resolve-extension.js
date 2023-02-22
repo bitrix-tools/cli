@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import isLocalPath from './is-local-path';
-import isModulePath from './is-module-path';
+import resolveRootDirectoryByCwd from './resolve-root-directory-by-cwd';
 
 type ResolverOptions = {
 	name: string,
 	sourcePath: string,
+	cwd?: string,
 };
 
 type ResolverResult = {
@@ -14,45 +14,39 @@ type ResolverResult = {
 	bundleConfig: string,
 };
 
-function belongLocalExtension(path: string) {
-	return isLocalPath(path);
-}
-
-function belongModulesExtension(path: string) {
-	return isModulePath(path);
-}
-
 export default function resolveExtension(options: ResolverOptions): ?ResolverResult {
 	const extensionPath = (() => {
-		const nameSegments = String(options.name).split('.');
-
-		if (belongLocalExtension(options.sourcePath))
-		{
-			const [productRoot] = String(options.sourcePath).split(path.join('local', 'js'));
-
-			const localExtensionPath = path.join(productRoot, 'local', 'js', ...nameSegments);
-			if (fs.existsSync(localExtensionPath))
+		const rootDirectory = (() => {
+			if (options.cwd)
 			{
-				return localExtensionPath;
+				return resolveRootDirectoryByCwd(options.cwd);
 			}
 
-			const productExtensionPath = path.join(productRoot, 'bitrix', 'js', ...nameSegments);
-			if (fs.existsSync(productExtensionPath))
-			{
-				return productExtensionPath;
-			}
-
-			return null;
-		}
-
-		if (belongModulesExtension(options.sourcePath))
+			return resolveRootDirectoryByCwd(path.dirname(options.sourcePath))
+		})();
+		if (rootDirectory)
 		{
-			const [modulesRoot] = /.*modules/.exec(String(options.sourcePath));
+			const nameSegments = options.name.split('.');
 			const [moduleName] = nameSegments;
-			const moduleExtensionPath = path.join(modulesRoot, moduleName, 'install', 'js', ...nameSegments);
-			if (fs.existsSync(moduleExtensionPath))
+
+			if (rootDirectory.type === 'modules')
 			{
-				return moduleExtensionPath;
+				return path.join(rootDirectory.rootPath, moduleName, 'install', 'js', ...nameSegments);
+			}
+
+			if (rootDirectory.type === 'product')
+			{
+				const localExtension = path.join(rootDirectory.rootPath, 'local', 'js', ...nameSegments);
+				if (fs.existsSync(localExtension))
+				{
+					return localExtension;
+				}
+
+				const productExtension = path.join(rootDirectory.rootPath, 'bitrix', 'js', ...nameSegments);
+				if (fs.existsSync(productExtension))
+				{
+					return productExtension;
+				}
 			}
 		}
 

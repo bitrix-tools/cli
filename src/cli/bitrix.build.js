@@ -3,6 +3,7 @@ import build from '../tools/build';
 import params from '../process/params';
 import argv from '../process/argv';
 import watch from '../tools/watch';
+import resolveExtension from '../utils/resolve-extension';
 
 /*
 	eslint
@@ -10,13 +11,53 @@ import watch from '../tools/watch';
  	"no-await-in-loop": "off"
 */
 
-async function bitrixBuild({path, modules = []} = params) {
-	await build(modules.length ? modules : path);
+async function bitrixBuild({path, extensions, modules = []} = params) {
+	if (Array.isArray(extensions) && extensions.length > 0)
+	{
+		for (const extensionName of extensions) {
+			const resolverResult = resolveExtension({name: extensionName, cwd: path});
+			if (resolverResult)
+			{
+				await build(resolverResult.context, false);
+			}
+		}
+	}
+	else
+	{
+		await build(modules.length ? modules : path);
+	}
 
 	if (argv.watch) {
 		return new Promise((resolve) => {
 			const progressbar = new Ora();
-			const directories = modules.length ? modules : [path];
+
+			const directories = (() => {
+				if (
+					modules.length > 0
+					&& (
+						!Array.isArray(extensions)
+						|| extensions.length === 0
+					)
+				)
+				{
+					return modules;
+				}
+
+				if (Array.isArray(extensions) && extensions.length > 0)
+				{
+					return extensions.reduce((acc, extensionName) => {
+						const resolverResult = resolveExtension({name: extensionName, cwd: path});
+						if (resolverResult)
+						{
+							acc.push(resolverResult.context);
+						}
+
+						return acc;
+					}, []);
+				}
+
+				return [path];
+			})();
 
 			const emitter = watch(directories)
 				.on('start', (watcher) => {

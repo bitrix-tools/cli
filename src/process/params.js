@@ -22,6 +22,17 @@ export default {
 		return modules;
 	},
 
+	get extensions() {
+		if (typeof argv.extensions === 'string')
+		{
+			return (argv.extensions)
+				.split(',')
+				.map(module => module.trim())
+		}
+
+		return [];
+	},
+
 	get name() {
 		return argv.name || argv._[1];
 	},

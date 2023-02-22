@@ -4,14 +4,55 @@ import argv from '../process/argv';
 import Ora from 'ora';
 import watch from '../tools/watch';
 import 'colors';
+import resolveExtension from '../utils/resolve-extension';
 
-async function bitrixTest({ path, modules = [] } = params) {
-	await test(modules.length ? modules : path);
+async function bitrixTest({path, extensions, modules = []} = params) {
+	if (Array.isArray(extensions) && extensions.length > 0)
+	{
+		for (const extensionName of extensions) {
+			const resolverResult = resolveExtension({name: extensionName, cwd: path});
+			if (resolverResult)
+			{
+				await test(resolverResult.context);
+			}
+		}
+	}
+	else
+	{
+		await test(modules.length ? modules : path);
+	}
 
 	if (argv.watch) {
 		return await new Promise((resolve) => {
 			const progressbar = new Ora();
-			const directories = modules.length ? modules : [path];
+
+			const directories = (() => {
+				if (
+					modules.length > 0
+					&& (
+						!Array.isArray(extensions)
+						|| extensions.length === 0
+					)
+				)
+				{
+					return modules;
+				}
+
+				if (Array.isArray(extensions) && extensions.length > 0)
+				{
+					return extensions.reduce((acc, extensionName) => {
+						const resolverResult = resolveExtension({name: extensionName, cwd: path});
+						if (resolverResult)
+						{
+							acc.push(resolverResult.context);
+						}
+
+						return acc;
+					}, []);
+				}
+
+				return [path];
+			})();
 
 			const emitter = watch(directories)
 				.on('start', (watcher) => {
