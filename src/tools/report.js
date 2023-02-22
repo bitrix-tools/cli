@@ -51,6 +51,14 @@ function printError(error, config) {
 			return;
 		}
 
+		if (error.code === 'MISSING_EXPORT')
+		{
+			const fileUrl = url.pathToFileURL(`${error.loc.file}:${error.loc.line}:${error.loc.column}`);
+			Logger.log(`   Build error: ${error.message}`.red);
+			Logger.log(`   ${fileUrl.href}`.red);
+			return;
+		}
+
 		throw new Error(error);
 	}
 }
