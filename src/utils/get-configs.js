@@ -127,6 +127,12 @@ export default function getConfigs(directory: string): BundleConfig {
 						return currentConfig.minification === true;
 					})(),
 					sourceMaps: currentConfig.sourceMaps !== false,
+					tests: {
+						localization: {
+							autoLoad: currentConfig?.tests?.localization?.autoLoad ?? true,
+							languageId: currentConfig?.tests?.localization?.languageId ?? 'en',
+						},
+					},
 				});
 			});
 

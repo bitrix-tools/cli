@@ -7,6 +7,8 @@ import argv from '../process/argv';
 import invalidateModuleCache from '../utils/invalidate-module-cache';
 import {appRoot} from '../constants';
 import Directory from '../entities/directory';
+import loadMessages from '../utils/load-messages';
+import buildExtensionName from '../utils/build-extension-name';
 
 /*
 	eslint
@@ -51,6 +53,20 @@ export async function testDirectory(dir, report = true) {
 			reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
 			checkLeaks: true,
 			timeout: 10000,
+			rootHooks: {
+				beforeAll: () => {
+					if (config.tests.localization.autoLoad)
+					{
+						loadMessages({
+							extension: {
+								name: buildExtensionName(config.input, config.context),
+								lang: config.tests.localization.languageId,
+								cwd: config.context,
+							},
+						});
+					}
+				},
+			},
 		});
 
 		if (tests.length) {

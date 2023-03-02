@@ -101,8 +101,10 @@ module.exports = [
 			json(),
 			babel({
 				plugins: [
-					"@babel/plugin-transform-flow-strip-types"
-				]
+					'@babel/plugin-transform-flow-strip-types',
+					'@babel/plugin-proposal-optional-chaining',
+					'@babel/plugin-proposal-nullish-coalescing-operator',
+				],
 			}),
 			commonJs(),
 		],
@@ -116,6 +118,8 @@ module.exports = [
 			'iconv-lite',
 			'v8',
 			'vm',
+			'colors/safe',
+			'url',
 		])
 	});
 });

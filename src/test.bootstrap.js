@@ -7,6 +7,7 @@ import v8 from 'v8';
 import vm from 'vm';
 import resolvePackageModule from './utils/resolve-package-module';
 import resolveExtension from './utils/resolve-extension';
+import loadMessages from './utils/load-messages';
 
 v8.setFlagsFromString('--expose-gc');
 global.gc = vm.runInNewContext('gc');
@@ -39,6 +40,7 @@ global.teardown = mocha.teardown;
 global.test = mocha.test;
 global.run = mocha.run;
 global.weak = weak;
+global.loadMessages = loadMessages;
 
 const DOM = new JSDOM('', {
 	url: 'https://example.org/',
