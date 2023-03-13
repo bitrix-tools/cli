@@ -47,6 +47,13 @@ module.exports = [
 		}
 	},
 	{
+		input: './src/cli/bitrix.run.js',
+		output: {
+			format: 'cjs',
+			file: './dist/bitrix.run.js'
+		}
+	},
+	{
 		input: './src/cli/bitrix.settings.js',
 		output: {
 			format: 'cjs',
