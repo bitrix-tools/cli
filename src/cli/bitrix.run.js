@@ -9,6 +9,7 @@ import box from '../tools/box';
 import resolveRootDirectoryByCwd from '../utils/resolve-root-directory-by-cwd';
 import render from '../tools/render';
 import resolveExtensionSource from '../utils/resolve-extension';
+import resolveRootDirectory from '../utils/resolve-root-directory-by-cwd';
 import build from '../tools/build';
 import buildExtensionName from '../utils/build-extension-name';
 import buildNamespaceName from '../utils/build-namespace-name';
@@ -26,6 +27,7 @@ const api = {
     resolveExtension,
     buildExtensionName,
     buildNamespaceName,
+    rootDirectory: resolveRootDirectory(params.path),
 };
 
 export default async function bitrixRun()
