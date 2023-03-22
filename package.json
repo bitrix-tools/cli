@@ -1,10 +1,10 @@
 {
   "name": "@bitrix/cli",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "engines": {
-    "node": ">= 7.5.0"
+    "node": ">=14.16"
   },
   "scripts": {
     "test": "LOGGER_LEVEL=0 npx mocha --exit --require @babel/register --timeout 5000 test/**/*.test.js",
@@ -78,11 +78,11 @@
     "rollup-plugin-node-resolve": "4.0.0",
     "rollup-plugin-postcss-independed": "1.8.1",
     "rollup-plugin-simple-babel": "1.0.6",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-terser": "^5.3.1",
     "rollup-plugin-url": "3.0.0",
     "sinon": "7.1.1",
     "slash": "2.0.0",
-    "update-notifier": "2.5.0"
+    "update-notifier": "^6.0.2"
   },
   "optionalDependencies": {
     "weak": "^1.0.1"

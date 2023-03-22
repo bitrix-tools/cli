@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 
-const updateNotifier = require('update-notifier');
 const pkg = require('../package.json');
 const command = require('../dist/process/command');
 const fs = require('fs');
 const path = require('path');
 
-updateNotifier({pkg, ...pkg}).notify({
-	isGlobal: true,
-});
+import('update-notifier')
+	.then(({default: updateNotifier}) => {
+		updateNotifier({
+			pkg,
+			updateCheckInterval: 0,
+		}).notify({
+			isGlobal: true,
+		});
+	});
 
 const commandHandler = path.resolve(__dirname, `../dist/bitrix.${command}.js`);
 

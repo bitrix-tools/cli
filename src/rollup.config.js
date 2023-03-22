@@ -6,7 +6,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import iconv from 'iconv-lite';
 import postcssSvgo from 'postcss-svgo';
-import terser from 'rollup-plugin-terser';
+import {terser} from 'rollup-plugin-terser';
 import fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
 import {getEncoding} from './tools/build/adjust-encoding';
