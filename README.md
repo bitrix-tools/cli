@@ -173,7 +173,7 @@ $ bitrix build
 
 ### Дополнительные параметры
 
-#### --watch [<fileExtension>[, ...]], -w=[<fileExtension>[, ...]]
+#### --watch [\<fileExtension\>[, ...]], -w=[\<fileExtension\>[, ...]]
 Режим отслеживания изменений. Пересобирает бандлы после изменения исходных файлов.
 В качестве значения можно указать список расширений файлов, в которых нужно отслеживать изменения.
 ```bash
@@ -198,14 +198,14 @@ $ bitrix build -w=defaults,json,mjs,svg
 $ bitrix build --test
 ```
 
-#### --modules <moduleName>[, ...], -m=<moduleName>[, ...]
+#### --modules \<moduleName\>[, ...], -m=\<moduleName\>[, ...]
 Сборка только указанных модулей. Параметр поддерживается только в&nbsp;корневой с&nbsp;модулями `local/js` и `bitrix/modules`.
 В&nbsp;значении укажите имена модулей через запятую, например:
 ```bash
 $ bitrix build --modules main,ui,landing
 ```
 
-#### --path <path>, -p=<path>
+#### --path \<path\>, -p=\<path\>
 Запуск сборки для указанной директории. В&nbsp;значении укажите относительный путь к&nbsp;директории,
 например:
 ```bash
@@ -216,7 +216,7 @@ $ bitrix build --path ./main/install/js/main/loader
 $ bitrix build -p=./main/install/js/main/loader
 ```
 
-#### --extensions <extensionName>[, ...], -e=<extensionName>[, ...]
+#### --extensions \<extensionName\>[, ...], -e=\<extensionName\>[, ...]
 Запускает сборку указанных экстеншнов. В качестве значения нужно указать имя экстеншна, 
 либо список имен через запятую. Команду можно запускать из любой директории проекта.
 ```bash
@@ -235,7 +235,7 @@ $ bitrix test
 
 ### Дополнительные параметры
 
-#### --watch [<fileExtension>[, ...]], -w=[<fileExtension>[, ...]]
+#### --watch [\<fileExtension\>[, ...]], -w=[\<fileExtension\>[, ...]]
 Режим отслеживания изменений. Запускает тесты после изменения исходных файлов и&nbsp;кода тестов.
 В качестве значения можно указать список расширений файлов, в которых нужно отслеживать изменения.
 ```bash
@@ -252,7 +252,7 @@ $ bitrix test -w=defaults,json,mjs,svg
 > `defaults` — набор расширений файлов которые отслеживаются по умолчанию.
 Он равен `js,jsx,vue,css,scss`.
 
-#### --modules <moduleName>[, ...], -m=<moduleName>[, ...]
+#### --modules \<moduleName\>[, ...], -m=\<moduleName\>[, ...]
 Тестирование только указанных модулей. Параметр поддерживается только в
 корневой директории репозитория. В&nbsp;значении укажите имена модулей через запятую,
 например:
@@ -260,7 +260,7 @@ $ bitrix test -w=defaults,json,mjs,svg
 $ bitrix test --modules main,ui,landing
 ```
 
-#### --path <path>, -p=<path>
+#### --path \<path\>, -p=\<path\>
 Запуск тестов для указанной директории. В&nbsp;значении укажите относительный путь к&nbsp;директории,
 например:
 ```bash
@@ -271,7 +271,7 @@ $ bitrix test --path ./main/install/js/main/loader
 $ bitrix test -p=./main/install/js/main/loader
 ```
 
-#### --extensions <extensionName>[, ...], -e=<extensionName>[, ...]
+#### --extensions \<extensionName\>[, ...], -e=\<extensionName\>[, ...]
 Запускает тесты в указанных экстеншнах. В качестве значения нужно указать имя экстеншна,
 либо список имен через запятую. Команду можно запускать из любой директории проекта.
 ```bash
