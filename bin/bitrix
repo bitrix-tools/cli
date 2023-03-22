@@ -9,7 +9,6 @@ import('update-notifier')
 	.then(({default: updateNotifier}) => {
 		updateNotifier({
 			pkg,
-			updateCheckInterval: 0,
 		}).notify({
 			isGlobal: true,
 		});
