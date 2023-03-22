@@ -2,7 +2,7 @@ import colors from 'colors';
 import Logger from '@bitrix/logger';
 
 function space(count) {
-	return ' '.repeat(count);
+	return ' '.repeat(Math.max(count, 2));
 }
 
 export default class Help {
@@ -26,7 +26,7 @@ export default class Help {
 		return this;
 	}
 
-	command(command, description) {
+	command(command, value, description) {
 		let preparedDescription = description;
 
 		if (preparedDescription.includes('\n')) {
@@ -41,24 +41,59 @@ export default class Help {
 				}, '');
 		}
 
-		this.data.push(`${space(this.offset + 2)}${command}${space(20 - command.length)}${preparedDescription}`);
+		this.data.push([
+			`${space(this.offset + 2)}${command}`,
+			value,
+			preparedDescription,
+		]);
 		return this;
 	}
 
-	option(option, description) {
-		this.data.push(`${space(this.offset + 4)}${option}${space(18 - option.length)}${description}`);
+	option(option, value = '', description = '') {
+		this.data.push([
+			`${space(this.offset + 3)}${option}`,
+			value,
+			description,
+		]);
 		return this;
 	}
 
 	separator() {
-		this.data.push(`${space(this.offset)}${colors.gray('-'.repeat(60))}`);
+		this.data.push(`${space(this.offset)}${colors.gray('-'.repeat(80))}`);
 		return this;
 	}
 
 	print() {
+		const [col1Size, col2Size, col3Size] = this.data.reduce((acc, item) => {
+			if (Array.isArray(item))
+			{
+				acc[0] = Math.max(acc[0], item[0].length);
+				acc[1] = Math.max(acc[1], item[1].length);
+				acc[2] = Math.max(acc[2], item[2].length);
+			}
+
+			return acc;
+		}, [0, 0, 0]);
+
 		['\n', ...this.data, '\n'].forEach((item) => {
-			// eslint-disable-next-line
-			Logger.log(`${item}`);
+			if (Array.isArray(item))
+			{
+				const col1Spaces = space(
+					(Math.max(item[0].length, col1Size) - Math.min(item[0].length, col1Size)) + (this.offset - 2),
+				);
+				const col2Spaces = space(
+					(Math.max(item[1].length, col2Size) - Math.min(item[1].length, col2Size)) + (this.offset - 2),
+				);
+				const col3Spaces = space(
+					(Math.max(item[2].length, col3Size) - Math.min(item[2].length, col3Size)) + (this.offset - 2),
+				);
+
+				Logger.log(`${item[0]}${col1Spaces}${item[1]}${col2Spaces}${item[2]}${col3Spaces}`);
+			}
+			else
+			{
+				Logger.log(item);
+			}
 		});
 	}
 }
