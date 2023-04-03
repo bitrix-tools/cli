@@ -112,7 +112,6 @@ function moduleResolver(sourcePath, currentFile) {
 }
 
 require('@babel/register')({
-	cache: false,
 	cwd: (() => {
 		const cwd = process.cwd();
 
