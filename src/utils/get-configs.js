@@ -82,6 +82,7 @@ export default function getConfigs(directory: string): BundleConfig {
 				acc.push({
 					input: path.resolve(context, currentConfig.input),
 					output,
+					globals: currentConfig.globals || {},
 					name: currentConfig.namespace || '',
 					treeshake: currentConfig.treeshake !== false,
 					adjustConfigPhp: currentConfig.adjustConfigPhp !== false,
