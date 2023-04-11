@@ -6,6 +6,7 @@ interface BundleConfig {
 		js: string,
 		css: string,
 	},
+	globals: {[key: string]: string},
 	name: string,
 	treeshake: boolean,
 	adjustConfigPhp: boolean,
