@@ -207,6 +207,7 @@ export default function rollupConfig({
 			sourcemap: sourceMaps,
 			extend: true,
 			exports: 'named',
+			banner: '/* eslint-disable */',
 			globals: {
 				BX: 'BX',
 				window: 'window',
