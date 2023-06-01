@@ -50,7 +50,7 @@
         "ora": "3.0.0",
         "postcss": "7.0.36",
         "postcss-svgo": "4.0.2",
-        "ostcss-url": "8.0.0",
+        "postcss-url": "8.0.0",
         "rollup": "0.67.3",
         "rollup-plugin-babel": "4.0.3",
         "rollup-plugin-commonjs": "9.2.0",
