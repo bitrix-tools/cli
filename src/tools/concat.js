@@ -45,10 +45,14 @@ export default function concat(input: string[] = [], output: string) {
 			`\n//# sourceMappingURL=${path.basename(output)}.map`
 		);
 
+		const resultFileContent = (() => {
+			const cleanContent = decodedContentString.replace(/\/\*(\s+)?eslint-disable(\s+)?\*\/\n/g, '');
+			return `/* eslint-disable */\n${cleanContent}`;
+		})();
+
 		const outputFile = fs.existsSync(output) ? fs.readFileSync(output) : null;
 		const outputEncoding = outputFile ? getEncoding(outputFile) : contentEncoding;
-		const encodedContent = iconv.encode(decodedContentString, outputEncoding);
-
+		const encodedContent = iconv.encode(resultFileContent, outputEncoding);
 
 		fs.writeFileSync(output, encodedContent);
 		fs.writeFileSync(`${output}.map`, sourceMap);
