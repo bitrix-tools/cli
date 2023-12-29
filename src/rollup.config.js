@@ -4,12 +4,9 @@ import json from 'rollup-plugin-json';
 import babel from 'rollup-plugin-simple-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import iconv from 'iconv-lite';
 import postcssSvgo from 'postcss-svgo';
 import {terser} from 'rollup-plugin-terser';
-import fs from 'fs';
 import resolvePackageModule from './utils/resolve-package-module';
-import {getEncoding} from './tools/build/adjust-encoding';
 import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';
 import rollupFiles from './plugins/rollup/rollup-plugin-files';
 
@@ -180,22 +177,6 @@ export default function rollupConfig({
 
 					return undefined;
 				})(),
-				{
-					load(id) {
-						if (!fs.existsSync(id))
-						{
-							return null;
-						}
-
-						const file = fs.readFileSync(id);
-						const fileEncoding = getEncoding(file);
-
-						const decoded = iconv.decode(file, fileEncoding);
-						const encoded = iconv.encode(decoded, 'utf-8');
-
-						return encoded.toString('utf-8');
-					},
-				},
 				...enabledPlugins,
 			],
 			onwarn: () => {},

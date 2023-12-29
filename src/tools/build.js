@@ -9,7 +9,6 @@ import report from './report';
 import test from './test';
 import rollupBundle from './build/rollup';
 import adjustExtension from './build/adjust-extension';
-import adjustEncoding from './build/adjust-encoding';
 import argv from '../process/argv';
 
 /*
@@ -33,7 +32,6 @@ async function buildDirectory(dir, recursive = true) {
 			await concat(config.concat.js, config.output.js);
 			await concat(config.concat.css, config.output.css);
 			await adjustExtension(imports, config);
-			await adjustEncoding(config);
 
 			if (argv.test || argv.t) {
 				testResult = await test(config.context);

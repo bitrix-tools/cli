@@ -1,13 +1,10 @@
 import Concat from 'concat-with-sourcemaps';
-import iconv from 'iconv-lite';
 import fs from 'fs';
 import path from 'path';
 import adjustSourceMap from '../utils/adjust-sourcemap';
-import {getEncoding} from './build/adjust-encoding';
 
 const separator = '\n\n';
 const generateSourceMap = true;
-const encoding = 'utf-8';
 
 export default function concat(input: string[] = [], output: string) {
 	if (Array.isArray(input) && input.length) {
@@ -21,40 +18,35 @@ export default function concat(input: string[] = [], output: string) {
 				let sourceMapContent;
 
 				if (fs.existsSync(sourceMapPath)) {
-					const mapContent = JSON.parse(fs.readFileSync(sourceMapPath, encoding));
+					const mapContent = fs.readFileSync(sourceMapPath, 'utf-8');
+					const mapJSON = JSON.parse(mapContent);
 
-					mapContent.sources = mapContent.sources.map(sourcePath => (
+					mapJSON.sources = mapJSON.sources.map(sourcePath => (
 						path.resolve(path.dirname(sourceMapPath), sourcePath)
 					));
 
-					sourceMapContent = JSON.stringify(mapContent);
+					sourceMapContent = JSON.stringify(mapJSON);
 				}
 
 				concatenator.add(filePath, fileContent, sourceMapContent);
 			});
 
 		const {content, sourceMap} = concatenator;
-		const contentEncoding = getEncoding(content);
-		const decodedContent = iconv.decode(content, contentEncoding).toString();
-
-		const decodedContentString = (
-			// eslint-disable-next-line
-			decodedContent.toString(contentEncoding)
-			// eslint-disable-next-line
-			.replace(/\/\/# sourceMappingURL=(.*)\.map/g, '') +
-			`\n//# sourceMappingURL=${path.basename(output)}.map`
-		);
 
 		const resultFileContent = (() => {
-			const cleanContent = decodedContentString.replace(/\/\*(\s+)?eslint-disable(\s+)?\*\/\n/g, '');
+			const cleanContent = content
+				.toString()
+				.replace(/\/\*(\s+)?eslint-disable(\s+)?\*\/\n/g, '')
+				.replace(
+					/\/\/# sourceMappingURL=(.*)\.map/g,
+					'',
+				)
+				+ `\n//# sourceMappingURL=${path.basename(output)}.map`;
+
 			return `/* eslint-disable */\n${cleanContent}`;
 		})();
 
-		const outputFile = fs.existsSync(output) ? fs.readFileSync(output) : null;
-		const outputEncoding = outputFile ? getEncoding(outputFile) : contentEncoding;
-		const encodedContent = iconv.encode(resultFileContent, outputEncoding);
-
-		fs.writeFileSync(output, encodedContent);
+		fs.writeFileSync(output, resultFileContent);
 		fs.writeFileSync(`${output}.map`, sourceMap);
 		adjustSourceMap(`${output}.map`);
 	}
