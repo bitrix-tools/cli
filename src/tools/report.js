@@ -26,37 +26,46 @@ function printRow(row) {
 function printError(error, config) {
 	if (error) {
 		if (error.code === 'UNRESOLVED_IMPORT') {
-			const fileUrl = url.pathToFileURL(
-				path.join(
-					config.context,
-					error.message.split('from ').at(-1),
-				),
-			);
-			Logger.log(`   Build error: ${error.message}`.red);
-			Logger.log(`   ${fileUrl.href}`.red);
-			return;
+			if (typeof error.message === 'string')
+			{
+				const fileUrl = url.pathToFileURL(
+					path.join(
+						config.context,
+						error.message.split('from ').at(-1),
+					),
+				);
+				Logger.log(`   Build error: ${error.message}`.red);
+				Logger.log(`   ${fileUrl.href}`.red);
+				return;
+			}
 		}
 
 		if (error.code === 'PLUGIN_ERROR') {
-			let errorMessage = error.message.replace('unknown: ', '');
-			const fileUrl = url.pathToFileURL(`${error.id}:${error.loc.line}:${error.loc.column}`);
-			if (fileUrl)
+			if (typeof error.loc === 'object' && error.loc !== null)
 			{
-				errorMessage = errorMessage.split('\n');
-				errorMessage.splice(1, 0, `   ${fileUrl.href}`);
-				errorMessage = errorMessage.join('\n');
-			}
+				let errorMessage = error.message.replace('unknown: ', '');
+				const fileUrl = url.pathToFileURL(`${error.id}:${error.loc.line}:${error.loc.column}`);
+				if (fileUrl)
+				{
+					errorMessage = errorMessage.split('\n');
+					errorMessage.splice(1, 0, `   ${fileUrl.href}`);
+					errorMessage = errorMessage.join('\n');
+				}
 
-			Logger.log(`   Build error: ${errorMessage}`.red);
-			return;
+				Logger.log(`   Build error: ${errorMessage}`.red);
+				return;
+			}
 		}
 
 		if (error.code === 'MISSING_EXPORT')
 		{
-			const fileUrl = url.pathToFileURL(`${error.loc.file}:${error.loc.line}:${error.loc.column}`);
-			Logger.log(`   Build error: ${error.message}`.red);
-			Logger.log(`   ${fileUrl.href}`.red);
-			return;
+			if (typeof error.loc === 'object' && error.loc !== null)
+			{
+				const fileUrl = url.pathToFileURL(`${error.loc.file}:${error.loc.line}:${error.loc.column}`);
+				Logger.log(`   Build error: ${error.message}`.red);
+				Logger.log(`   ${fileUrl.href}`.red);
+				return;
+			}
 		}
 
 		throw new Error(error);
