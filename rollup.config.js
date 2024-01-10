@@ -19,13 +19,6 @@ module.exports = [
 		}
 	},
 	{
-		input: './src/cli/bitrix.flow.js',
-		output: {
-			format: 'cjs',
-			file: './dist/bitrix.flow.js'
-		}
-	},
-	{
 		input: './src/cli/bitrix.unhandled.js',
 		output: {
 			format: 'cjs',

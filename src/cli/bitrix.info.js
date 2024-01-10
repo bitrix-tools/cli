@@ -10,13 +10,6 @@ export default function bitrixInfo() {
 	const result = box(`
 		Info ${pkg.name}, v${pkg.version}
 		
-		${'Flow'.bold}
-		Package: ${location.flow}
-		
-		${'ESLint'.bold}
-		Package: ${location.eslint}
-		Config: ${location.eslintrc}
-		
 		${'Mercurial'.bold}
 		hooks.preupdate: ${location.mercurial.preupdate}
 		hooks.update: ${location.mercurial.update}
