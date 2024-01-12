@@ -96,7 +96,7 @@ describe('tools/test', () => {
 			const extension = path.resolve(__dirname, 'data/extension2');
 			const result = await testDirectory(extension);
 
-			assert(result === 'notests');
+			assert(result === 'no-tests');
 		});
 
 		it('Should set global variable (temporary) currentDirectory, if passed report = false', async () => {
@@ -156,10 +156,10 @@ describe('tools/test', () => {
 			const result = await testDirectory(extension);
 
 			assert(files.length === 2);
-			assert(result === 'failure');
+			assert(result === 'failed');
 		});
 
-		it('Should return status "notests" if passed path to extension without tests', async () => {
+		it('Should return status "no-tests" if passed path to extension without tests', async () => {
 			const extension = path.resolve(__dirname, 'data/extension3');
 			const mochaStub = sinon.stub();
 			const files = [];
@@ -181,7 +181,7 @@ describe('tools/test', () => {
 			const result = await testDirectory(extension);
 
 			assert(files.length === 0);
-			assert(result === 'notests');
+			assert(result === 'no-tests');
 		});
 
 		it('Should be call reporterStub if passed report = false', async () => {

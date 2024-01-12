@@ -34,7 +34,7 @@ export async function testDirectory(dir, report = true) {
 		global.currentDirectory = path.resolve(dir);
 	}
 
-	for (const config of configs) {
+	for await (const config of configs) {
 		const tests = (() => {
 			if (fs.existsSync(path.resolve(config.context, 'test'))) {
 				return glob.sync(path.resolve(config.context, 'test/**/*.js'))
@@ -44,12 +44,11 @@ export async function testDirectory(dir, report = true) {
 		})();
 
 		if (tests.length === 0) {
-			result.push('notests');
+			result.push('no-tests');
 		}
 
 		const mocha = new Mocha({
 			globals: Object.keys(global),
-			allowUncaught: true,
 			reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
 			checkLeaks: true,
 			timeout: 10000,
@@ -88,8 +87,8 @@ export async function testDirectory(dir, report = true) {
 		}
 	}
 
-	if (result.every(res => res === 'notests')) {
-		return 'notests';
+	if (result.every(res => res === 'no-tests')) {
+		return 'no-tests';
 	}
 
 	if (result.some(res => res === 'passed')
@@ -97,7 +96,7 @@ export async function testDirectory(dir, report = true) {
 		return 'passed';
 	}
 
-	return 'failure';
+	return 'failed';
 }
 
 export default async function test(dir, report = true) {
