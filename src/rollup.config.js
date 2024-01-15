@@ -5,10 +5,12 @@ import babel from 'rollup-plugin-simple-babel';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import postcssSvgo from 'postcss-svgo';
-import {terser} from 'rollup-plugin-terser';
+import { terser } from 'rollup-plugin-terser';
 import resolvePackageModule from './utils/resolve-package-module';
 import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';
 import rollupFiles from './plugins/rollup/rollup-plugin-files';
+import path from 'path';
+import { stat } from 'fs';
 
 export default function rollupConfig({
 	input,
@@ -164,6 +166,51 @@ export default function rollupConfig({
 			],
 			treeshake: input.treeshake !== false,
 			plugins: [
+				{
+					name: 'resolve-index',
+					resolveId: (importPath, modulePath) => {
+						if (!importPath || path.isAbsolute(importPath))
+						{
+							return Promise.resolve(null);
+						}
+
+						if (!modulePath)
+						{
+							return Promise.resolve(null);
+						}
+
+						const moduleDir = path.dirname(modulePath);
+						const pathsToTry = ['.js', '.css', '.jsx', '.vue'].map((ext) => {
+							return path.join(moduleDir, importPath, `index${ext}`);
+						});
+
+						return Promise
+							.all(
+								pathsToTry.map((pathToTry) => {
+									return new Promise((resolve) => {
+										stat(pathToTry, (err, stats) => {
+											if (err || !stats.isFile())
+											{
+												resolve(null);
+											}
+
+											resolve(pathToTry);
+										});
+									});
+								})
+							)
+							.then((paths) => {
+								const filteredPaths = paths.filter(Boolean);
+
+								if (filteredPaths.length > 1)
+								{
+									throw new Error(` Found multiple matching paths! \n${filteredPaths.join('\n')}`.red);
+								}
+
+								return filteredPaths.at(0);
+							});
+					}
+				},
 				(() => {
 					if (!isLoaded('url') && resolveFilesImport !== false)
 					{
