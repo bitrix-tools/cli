@@ -19,6 +19,13 @@ module.exports = [
 		}
 	},
 	{
+		input: './src/cli/bitrix.update-internals.js',
+		output: {
+			format: 'cjs',
+			file: './dist/bitrix.update-internals.js'
+		}
+	},
+	{
 		input: './src/cli/bitrix.unhandled.js',
 		output: {
 			format: 'cjs',
