@@ -9,12 +9,13 @@ function buildNamespaceName({root = '', extensionName}: BuildNamespaceOptions = 
 		const namespace = extensionName
 			.split('.')
 			.slice(0, -1)
-			.map((item) => {
-				if (item.length === 2) {
-					return item.toUpperCase();
+			.map((name) => {
+				if (name.length === 2)
+				{
+					return name.toUpperCase();
 				}
 
-				return `${item.charAt(0).toUpperCase()}${item.slice(1)}`;
+				return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 			})
 			.join('.');
 
