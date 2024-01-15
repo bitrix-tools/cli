@@ -9,7 +9,6 @@ import adjustExtension from './build/adjust-extension';
 import argv from '../process/argv';
 import isNeedInstallNpmDependencies from '../utils/is-need-install-npm-dependencies';
 import printBuildStatus from '../utils/print-build-status';
-import buildExtensionName from '../utils/build-extension-name';
 import getFileSize from '../utils/get-filesize';
 import buildName from '../utils/build-name';
 
@@ -70,7 +69,7 @@ async function buildDirectory(dir, recursive = true) {
 
 async function build(dir: string, recursive: boolean) {
 	if (Array.isArray(dir)) {
-		for (const item of dir) {
+		for await (const item of dir) {
 			Logger.log(colors.bold(`Build module ${path.basename(item)}`));
 			await buildDirectory(item, recursive);
 		}
