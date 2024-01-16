@@ -19,7 +19,7 @@ async function buildDirectory(dir, recursive = true) {
 	// @todo Remove global state change
 	global.currentDirectory = path.resolve(dir);
 
-	for await (const config of configs) {
+	for (const config of configs) {
 		let testsStatus;
 
 		const isNeedNpmInstall = isNeedInstallNpmDependencies(config);
@@ -69,7 +69,7 @@ async function buildDirectory(dir, recursive = true) {
 
 async function build(dir: string, recursive: boolean) {
 	if (Array.isArray(dir)) {
-		for await (const item of dir) {
+		for (const item of dir) {
 			Logger.log(colors.bold(`Build module ${path.basename(item)}`));
 			await buildDirectory(item, recursive);
 		}
