@@ -1,12 +1,12 @@
 {
   "name": "@bitrix/cli",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@bitrix/cli",
-      "version": "3.3.2",
+      "version": "3.3.3",
       "license": "MIT",
       "dependencies": {
         "@babel/plugin-external-helpers": "7.16.0",
