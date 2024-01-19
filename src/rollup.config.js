@@ -10,7 +10,7 @@ import resolvePackageModule from './utils/resolve-package-module';
 import postcssBackgroundUrl from './plugins/postcss/postcss-backbround-url';
 import rollupFiles from './plugins/rollup/rollup-plugin-files';
 import path from 'path';
-import { stat } from 'fs';
+import { statSync } from 'fs';
 
 export default function rollupConfig({
 	input,
@@ -171,12 +171,12 @@ export default function rollupConfig({
 					resolveId: (importPath, modulePath) => {
 						if (!importPath || path.isAbsolute(importPath))
 						{
-							return Promise.resolve(null);
+							return null;
 						}
 
 						if (!modulePath)
 						{
-							return Promise.resolve(null);
+							return null;
 						}
 
 						const moduleDir = path.dirname(modulePath);
@@ -184,31 +184,33 @@ export default function rollupConfig({
 							return path.join(moduleDir, importPath, `index${ext}`);
 						});
 
-						return Promise
-							.all(
-								pathsToTry.map((pathToTry) => {
-									return new Promise((resolve) => {
-										stat(pathToTry, (err, stats) => {
-											if (err || !stats.isFile())
-											{
-												resolve(null);
-											}
+						const paths = pathsToTry.map((pathToTry) => {
+							let stats;
+							let result = null;
 
-											resolve(pathToTry);
-										});
-									});
-								})
-							)
-							.then((paths) => {
-								const filteredPaths = paths.filter(Boolean);
-
-								if (filteredPaths.length > 1)
+							try
+							{
+								stats = statSync(pathToTry);
+								if (stats.isFile())
 								{
-									throw new Error(` Found multiple matching paths! \n${filteredPaths.join('\n')}`.red);
+									result = pathToTry;
 								}
+							}
+							catch (err)
+							{
+								result = null;
+							}
 
-								return filteredPaths.at(0);
-							});
+							return result;
+						});
+
+						const filteredPaths = paths.filter(Boolean);
+						if (filteredPaths.length > 1)
+						{
+							throw new Error(` Found multiple matching paths! \n${filteredPaths.join('\n')}`.red);
+						}
+
+						return filteredPaths.at(0);
 					}
 				},
 				(() => {
