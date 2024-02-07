@@ -1,6 +1,6 @@
 {
   "name": "@bitrix/cli",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "description": "Bitrix CLI tools",
   "main": "./src/cli/bitrix.js",
   "engines": {
@@ -12,7 +12,8 @@
     "test:cover": "LOGGER_LEVEL=0 npx istanbul cover ./node_modules/.bin/_mocha -- --exit --require @babel/register --timeout 5000 test/**/*.test.js",
     "build": "npx rollup -c",
     "dev": "npx rollup -c -w",
-    "prod": "npm run test && npm run build"
+    "prod": "npm run test && npm run build",
+    "postinstall": "node ./postinstall/index.js"
   },
   "bin": {
     "bitrix": "./bin/bitrix"
