@@ -68,10 +68,6 @@ Object.keys(DOM.window).forEach((property) => {
 	}
 });
 
-global.navigator = {
-	userAgent: 'node.js',
-};
-
 require('../public/babel-regenerator-runtime');
 
 require.extensions['.css'] = () => null;
