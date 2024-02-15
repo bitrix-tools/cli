@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import type BundleConfig from '../@types/config';
 
-export default function getGlobals(imports: string[], {context}: BundleConfig): {[key: string]: string} {
+export default function getGlobals(imports: string[], {context, globals}: BundleConfig): {[key: string]: string} {
 	return imports.reduce((accumulator, extensionName) => {
 		const parsedExtensionName = extensionName.split('.');
 		const moduleName = parsedExtensionName.shift();
@@ -44,6 +44,8 @@ export default function getGlobals(imports: string[], {context}: BundleConfig): 
 			if (config.namespace && config.namespace.length) {
 				moduleAlias = config.namespace;
 			}
+		} else if (globals.hasOwnProperty(moduleName)) {
+			moduleAlias = globals[moduleName];
 		}
 
 		accumulator[extensionName] = moduleAlias;

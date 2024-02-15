@@ -58,7 +58,11 @@ module.exports = {
 	// Обычно это ./dist/<extension_name>.bundle.js
 	// Необходимо указать относительный путь 
 	output: string || {js: string, css: string},
-	
+
+    // Алиасы для внешних импортов
+    // https://rollupjs.org/configuration-options/#output-globals
+    globals: { [id: string]: string }
+ 
 	// Неймспейс, в который будут добавлены все экспорты из файла указанного в input
 	// Например 'BX.Main.Filter'
 	namespace: string,
