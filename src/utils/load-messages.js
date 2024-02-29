@@ -63,4 +63,13 @@ export default function loadMessages(options: LoadMessageOptions = {})
 			setMessage(messages);
 		}
 	}
+
+	if (Array.isArray(options.langFile))
+	{
+		options.langFile.forEach((filePath) => {
+			loadMessages({
+				langFile: filePath,
+			});
+		});
+	}
 }
