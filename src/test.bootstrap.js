@@ -3,11 +3,13 @@ import mocha from 'mocha';
 import assert from 'assert';
 import sinon from 'sinon';
 import path from 'path';
+import fs from 'fs';
 import v8 from 'v8';
 import vm from 'vm';
 import resolvePackageModule from './utils/resolve-package-module';
 import resolveExtension from './utils/resolve-extension';
 import loadMessages from './utils/load-messages';
+import findExtensionContext from './path/find-extension-context';
 
 v8.setFlagsFromString('--expose-gc');
 global.gc = vm.runInNewContext('gc');
@@ -101,6 +103,12 @@ function moduleResolver(sourcePath, currentFile) {
 		&& !currentFile.endsWith('.test.js')
 	)
 	{
+		const context = findExtensionContext(currentFile);
+		if (context && fs.existsSync(path.join(context, 'node_modules', sourcePath)))
+		{
+			return sourcePath;
+		}
+
 		return 'assert';
 	}
 
