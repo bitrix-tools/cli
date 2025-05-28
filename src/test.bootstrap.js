@@ -140,4 +140,5 @@ require('@babel/register')({
 		resolvePackageModule('@babel/plugin-proposal-class-properties'),
 		resolvePackageModule('@babel/plugin-proposal-private-methods'),
 	],
+	cache: false,
 });

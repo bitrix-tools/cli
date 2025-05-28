@@ -57,7 +57,30 @@ export default function loadMessages(options: LoadMessageOptions = {})
 	if (typeof options.langFile === 'string')
 	{
 		const messages = fetchMessages(options.langFile);
-		const setMessage = global.window.BX.Loc.setMessage;
+		const setMessage = (() => {
+			if (global.window?.BX?.Loc?.setMessage)
+			{
+				return global.window?.BX?.Loc?.setMessage;
+			}
+
+			// if (!global.window.BX)
+			// {
+			// 	global.window.BX = {};
+			// }
+			//
+			// if (!global.window.BX.message)
+			// {
+			// 	global.window.BX.message = (messages) => {
+			// 		if (typeof messages === 'object' && messages !== null)
+			// 		{
+			// 			Object.assign(global.window.BX.message, messages);
+			// 		}
+			// 	};
+			// }
+			//
+			// return global.window.BX.message;
+		})();
+
 		if (setMessage)
 		{
 			setMessage(messages);

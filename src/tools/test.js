@@ -34,58 +34,46 @@ export async function testDirectory(dir, report = true) {
 		global.currentDirectory = path.resolve(dir);
 	}
 
-	for await (const config of configs) {
-		const tests = (() => {
-			if (fs.existsSync(path.resolve(config.context, 'test'))) {
-				return glob.sync(path.resolve(config.context, 'test/**/*.js'))
+	const mocha = new Mocha({
+		globals: Object.keys(global),
+		reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
+		checkLeaks: true,
+		timeout: 10000,
+	});
+
+	appendBootstrap();
+
+	configs.forEach((config) => {
+		if (fs.existsSync(path.resolve(config.context, 'test'))) {
+			const extensionTests = glob.sync(path.resolve(config.context, 'test/**/*.js'));
+			if (extensionTests.length > 0) {
+				if (config.tests.localization.autoLoad)
+				{
+					loadMessages({
+						extension: {
+							name: buildExtensionName(config.input, config.context),
+							lang: config.tests.localization.languageId,
+							cwd: config.context,
+						},
+					});
+				}
+
+				extensionTests.forEach((testFile) => {
+					const recursive = true;
+					invalidateModuleCache(testFile, recursive);
+					mocha.addFile(testFile);
+				});
 			}
-
-			return [];
-		})();
-
-		if (tests.length === 0) {
-			result.push('no-tests');
 		}
+	});
 
-		const mocha = new Mocha({
-			globals: Object.keys(global),
-			reporter: argv.test || argv.t || !report ? reporterStub : 'spec',
-			checkLeaks: true,
-			timeout: 10000,
-			rootHooks: {
-				beforeAll: () => {
-					if (config.tests.localization.autoLoad)
-					{
-						loadMessages({
-							extension: {
-								name: buildExtensionName(config.input, config.context),
-								lang: config.tests.localization.languageId,
-								cwd: config.context,
-							},
-						});
-					}
-				},
-			},
-		});
-
-		if (tests.length) {
-			tests.forEach((testFile) => {
-				const recursive = true;
-				invalidateModuleCache(testFile, recursive);
-				mocha.addFile(testFile);
-			});
-
-			appendBootstrap();
-
-			await new Promise((resolve) => {
-				mocha
-					.run((failures) => {
-						result.push(failures ? 'failure' : 'passed');
-					})
-					.on('end', () => resolve());
-			});
-		}
-	}
+	await new Promise((resolve) => {
+		mocha
+			.run((failures) => {
+				result.push(failures ? 'failure' : 'passed');
+			})
+			.on('end', () => resolve());
+	});
 
 	if (result.every(res => res === 'no-tests')) {
 		return 'no-tests';
