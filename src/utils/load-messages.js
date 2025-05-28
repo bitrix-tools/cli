@@ -63,22 +63,22 @@ export default function loadMessages(options: LoadMessageOptions = {})
 				return global.window?.BX?.Loc?.setMessage;
 			}
 
-			// if (!global.window.BX)
-			// {
-			// 	global.window.BX = {};
-			// }
-			//
-			// if (!global.window.BX.message)
-			// {
-			// 	global.window.BX.message = (messages) => {
-			// 		if (typeof messages === 'object' && messages !== null)
-			// 		{
-			// 			Object.assign(global.window.BX.message, messages);
-			// 		}
-			// 	};
-			// }
-			//
-			// return global.window.BX.message;
+			if (!global.window.BX)
+			{
+				global.window.BX = {};
+			}
+
+			if (!global.window.BX.message)
+			{
+				global.window.BX.message = (messages) => {
+					if (typeof messages === 'object' && messages !== null)
+					{
+						Object.assign(global.window.BX.message, messages);
+					}
+				};
+			}
+
+			return global.window.BX.message;
 		})();
 
 		if (setMessage)
