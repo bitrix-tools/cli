@@ -47,7 +47,7 @@ export async function testDirectory(dir, report = true) {
 		if (fs.existsSync(path.resolve(config.context, 'test'))) {
 			const extensionTests = glob.sync(path.resolve(config.context, 'test/**/*.js'));
 			if (extensionTests.length > 0) {
-				if (config.tests.localization.autoLoad)
+				if (config?.tests?.localization?.autoLoad !== false)
 				{
 					loadMessages({
 						extension: {

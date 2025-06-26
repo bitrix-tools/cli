@@ -10,6 +10,7 @@ import resolvePackageModule from './utils/resolve-package-module';
 import resolveExtension from './utils/resolve-extension';
 import loadMessages from './utils/load-messages';
 import findExtensionContext from './path/find-extension-context';
+import buildExtensionName from './utils/build-extension-name';
 
 v8.setFlagsFromString('--expose-gc');
 global.gc = vm.runInNewContext('gc');
@@ -80,6 +81,8 @@ function isExtensionName(value: string) {
 	return /(^\w+)\.(.*)/.test(String(value));
 }
 
+const langPhrasesLoaded = new Set();
+
 function moduleResolver(sourcePath, currentFile) {
 	if (isExtensionName(sourcePath))
 	{
@@ -90,6 +93,27 @@ function moduleResolver(sourcePath, currentFile) {
 
 		if (resolverResult)
 		{
+			if (fs.existsSync(resolverResult.bundleConfig))
+			{
+				const config = require(resolverResult.bundleConfig);
+				const extensionName = buildExtensionName(resolverResult.input, resolverResult.context);
+
+				if (
+					config?.tests?.localization?.autoLoad !== false
+					&& !langPhrasesLoaded.has(extensionName)
+				)
+				{
+					langPhrasesLoaded.add(extensionName);
+					loadMessages({
+						extension: {
+							name: extensionName,
+							lang: config?.tests?.localization?.languageId ?? 'en',
+							cwd: resolverResult.context,
+						},
+					});
+				}
+			}
+
 			return resolverResult.input;
 		}
 
