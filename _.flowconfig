@@ -1,5 +1,0 @@
-[ignore]
-<PROJECT_ROOT>/test/.*
-
-[options]
-module.ignore_non_literal_requires=true

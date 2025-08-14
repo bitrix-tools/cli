@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
-const pkg = require('../package.json');
-const command = require('../dist/process/command');
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'module';
 
-const commandHandler = path.resolve(__dirname, `../dist/bitrix.${command}.js`);
+const require = createRequire(import.meta.url);
 
-if (fs.existsSync(commandHandler)) {
-	require(commandHandler)();
-} else {
-	require('../dist/bitrix.unhandled')();
+try
+{
+	fs.accessSync(path.resolve(__dirname, '../dist/index.js'), fs.constants.F_OK);
+	require('../dist/cli.js');
+}
+catch (e)
+{
+	require('tsx').globalPreload();
+	require('../src/cli.ts');
 }

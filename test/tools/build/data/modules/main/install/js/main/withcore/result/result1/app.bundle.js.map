@@ -1,1 +1,0 @@
-{"version":3,"file":"app.bundle.js","sources":["../src/app.js"],"sourcesContent":["import {Type} from 'main.core';\nimport './main.css';\n\nif (Type.isFunction(() => {}))\n{\n\t// ...\n}"],"names":["Type","isFunction"],"mappings":";;;;CAGA,IAAIA,cAAI,CAACC,UAAU,CAAC,YAAM,EAAE,CAAC,EAC7B;;;;"}
