@@ -1,4 +1,3 @@
-import * as path from 'node:path';
 import { findRootByIndicator } from './find-root-by-indicators';
 
 const MODULE_REPO_INDICATORS = ['main', 'ui', 'crm'];

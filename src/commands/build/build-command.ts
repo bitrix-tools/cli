@@ -32,7 +32,7 @@ buildCommand
 					try
 					{
 						await extension.build();
-						spinner.succeed(`Built ${name}`);
+						spinner.succeed(`Build ${name}`);
 					}
 					catch (error)
 					{

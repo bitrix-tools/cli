@@ -24,16 +24,19 @@
   "author": "Bitrix",
   "license": "MIT",
   "devDependencies": {
+    "@types/babel__core": "^7.20.5",
     "@types/node": "^24.0.12",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@babel/core": "^7.28.3",
     "commander": "^14.0.0",
     "fast-glob": "^3.3.3",
     "ora": "^8.2.0",
-    "p-queue": "^8.1.0"
+    "p-queue": "^8.1.0",
+    "terser": "^5.43.1"
   },
   "optionalDependencies": {
     "weak": "^1.0.1"
