@@ -8,7 +8,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsup ./src/cli.ts --format esm"
+    "build": "tsup-node ./src/cli.ts --format esm"
   },
   "bin": {
     "bitrix": "./bin/bitrix"
@@ -32,11 +32,28 @@
   },
   "dependencies": {
     "@babel/core": "^7.28.3",
+    "@babel/plugin-external-helpers": "^7.27.1",
+    "@babel/plugin-transform-flow-strip-types": "^7.27.1",
+    "@babel/plugin-transform-runtime": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "browserslist": "^4.25.4",
+    "chalk": "^5.6.0",
     "commander": "^14.0.0",
+    "eslint": "^8.57.1",
     "fast-glob": "^3.3.3",
     "ora": "^8.2.0",
     "p-queue": "^8.1.0",
-    "terser": "^5.43.1"
+    "php-parser": "^3.2.5",
+    "rollup": "^4.49.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "strip-ansi": "^7.1.2",
+    "terser": "^5.43.1",
+    "text-table": "^0.2.0"
   },
   "optionalDependencies": {
     "weak": "^1.0.1"

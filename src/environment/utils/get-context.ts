@@ -1,7 +1,7 @@
 import { findRootByIndicator } from './find-root-by-indicators';
 
 const MODULE_REPO_INDICATORS = ['main', 'ui', 'crm'];
-const BITRIX_ROOT_INDICATORS = ['bitrix', 'index.php'];
+const BITRIX_ROOT_INDICATORS = ['bitrix', 'index.php', 'urlrewrite.php'];
 
 type Context = {
 	type: 'project' | 'source' | 'unknown',

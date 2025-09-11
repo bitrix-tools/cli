@@ -5,11 +5,11 @@ import { modulesOptions } from './options/modules-options';
 import { pathOption } from './options/path-option';
 import { statQueue } from './queue/stat-queue';
 import { findPackages } from '../../utils/package/find-packages';
-import { PackageFactory } from '../../modules/package-factory';
+import { PackageFactory } from '../../modules/packages/package-factory';
 import { Environment } from '../../environment/environment';
-import { sourceStrategies } from '../../modules/strategies/source';
-import { projectStrategies } from '../../modules/strategies/project';
-import { defaultStrategy } from '../../modules/strategies/default-strategy';
+import { sourceStrategies } from '../../modules/packages/strategies/source';
+import { projectStrategies } from '../../modules/packages/strategies/project';
+import { defaultStrategy } from '../../modules/packages/strategies/default-strategy';
 
 const statCommand = new Command('stat');
 

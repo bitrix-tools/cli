@@ -1,7 +1,7 @@
-import * as fg from 'fast-glob';
+import fg from 'fast-glob';
 import * as path from 'node:path';
 import { Readable, Transform } from 'node:stream';
-import { PackageFactory } from '../../modules/package-factory';
+import { PackageFactory } from '../../modules/packages/package-factory';
 
 type FindPackageOptions = {
 	startDirectory: string,

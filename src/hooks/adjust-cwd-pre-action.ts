@@ -8,7 +8,6 @@ export function adjustCwdPreAction(thisCommand: Command, actionCommand: Command)
 	const envType = Environment.getType();
 	const root = Environment.getRoot();
 
-	console.log(envType, root);
 	if (envType === 'project' && sourceCwd === root)
 	{
 		const newCwd = path.join(sourceCwd, 'local');
