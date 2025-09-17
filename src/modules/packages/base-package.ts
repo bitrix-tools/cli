@@ -270,6 +270,7 @@ export abstract class BasePackage
 			name: this.getBundleConfig().get('namespace'),
 			format: 'iife',
 			banner: '/* eslint-disable */',
+			extend: true,
 			globals: {
 				...this.getGlobals(),
 			},
