@@ -49,6 +49,7 @@
     "ora": "^8.2.0",
     "p-queue": "^8.1.0",
     "php-parser": "^3.2.5",
+    "php-writer": "^3.0.0",
     "rollup": "^4.49.0",
     "rollup-plugin-postcss": "^4.0.2",
     "strip-ansi": "^7.1.2",

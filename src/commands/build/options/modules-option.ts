@@ -1,20 +1,20 @@
 import { Option } from 'commander';
 import { parseArgValue } from '../../../utils/cli/parse-arg-value';
 
-const modulesOptions = new Option(
+const modulesOption = new Option(
 	'-m, --modules [modules...]',
 	'Specify Bitrix module names to build extensions from',
 );
 
-modulesOptions.conflicts([
+modulesOption.conflicts([
 	'extensions',
 	'path',
 ]);
 
-modulesOptions.argParser(
+modulesOption.argParser(
 	parseArgValue,
 );
 
 export {
-	modulesOptions,
+	modulesOption,
 };

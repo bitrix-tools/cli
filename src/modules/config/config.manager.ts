@@ -65,4 +65,6 @@ export abstract class ConfigManager<T>
 			};
 		}, {} as T);
 	}
+
+	abstract save(configPath: string): Promise<any>;
 }

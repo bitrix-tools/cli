@@ -33,8 +33,8 @@ export abstract class BasePackage
 {
 	readonly #path: string;
 	readonly #cache: MemoryCache = new MemoryCache();
-	readonly #warnings: Set<string> = new Set<string>();
-	readonly #errors: Set<string> = new Set<string>();
+	readonly #warnings: Set<RollupLog> = new Set<RollupLog>();
+	readonly #errors: Set<RollupLog> = new Set<RollupLog>();
 	readonly #externalDependencies: Set<string> = new Set<string>();
 
 	constructor(options: BasePackageOptions)
@@ -79,19 +79,21 @@ export abstract class BasePackage
 
 	getPhpConfig(): any
 	{
-		const config = new PhpConfigManager();
-		if (this.hasPhpConfigFile())
-		{
-			config.loadFromFile(this.getPhpConfigFilePath());
-		}
+		return this.#cache.remember('phpConfig', () => {
+			const config = new PhpConfigManager();
+			if (this.hasPhpConfigFile())
+			{
+				config.loadFromFile(this.getPhpConfigFilePath());
+			}
 
-		return config;
+			return config;
+		});
 	}
 
 	abstract getName(): string
 	abstract getModuleName(): string
 
-	getBundleConfig(): ConfigManager<BundleConfig>
+	getBundleConfig(): BundleConfigManager
 	{
 		return this.#cache.remember('bundleConfig', () => {
 			const config = new BundleConfigManager();
@@ -120,12 +122,12 @@ export abstract class BasePackage
 		return [...this.#errors];
 	}
 
-	addWarning(warning: any)
+	addWarning(warning: RollupLog)
 	{
 		this.#warnings.add(warning);
 	}
 
-	getWarnings(): Array<any>
+	getWarnings(): Array<RollupLog>
 	{
 		return [...this.#warnings];
 	}
@@ -155,7 +157,17 @@ export abstract class BasePackage
 
 	getExternalDependencies(): Array<string>
 	{
-		return [...this.#externalDependencies];
+		return [...this.#externalDependencies].sort((a: string, b: string) => {
+			const prefixA = a.split('.')[0];
+			const prefixB = b.split('.')[0];
+
+			if (prefixA !== prefixB)
+			{
+				return prefixA.localeCompare(prefixB);
+			}
+
+			return a.localeCompare(b);
+		});
 	}
 
 	getTargets(): Array<string>
@@ -260,6 +272,11 @@ export abstract class BasePackage
 				imagePlugin(),
 			],
 			onwarn: this.#onWarnHandler.bind(this),
+			treeshake: {
+				moduleSideEffects: false,
+				propertyReadSideEffects: false,
+				tryCatchDeoptimization: false,
+			},
 		};
 	}
 
@@ -278,8 +295,8 @@ export abstract class BasePackage
 	}
 
 	async build(): Promise<{
-		warnings: Array<string>,
-		errors: Array<string>,
+		warnings: Array<RollupLog>,
+		errors: Array<RollupLog>,
 		warningsSummary: string,
 		bundles: Array<{
 			fileName: string,
@@ -315,6 +332,9 @@ export abstract class BasePackage
 				type: chunk.type
 			};
 		});
+
+		this.getPhpConfig().set('rel', this.getExternalDependencies());
+		this.getPhpConfig().save(this.getPhpConfigFilePath());
 
 		this.#externalDependencies.clear();
 		this.#warnings.clear();
