@@ -53,6 +53,7 @@
     "rollup": "^4.49.0",
     "rollup-plugin-postcss": "^4.0.2",
     "strip-ansi": "^7.1.2",
+    "terminal-link": "^5.0.0",
     "terser": "^5.43.1",
     "text-table": "^0.2.0"
   },

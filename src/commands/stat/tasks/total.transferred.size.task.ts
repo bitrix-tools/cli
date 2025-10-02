@@ -1,12 +1,13 @@
-import { formatSize } from '../../../../../utils/format.size';
-import type { BasePackage } from '../../../../../modules/packages/base-package';
-import type { Task } from '../../../../../modules/task/task';
+import { formatSize } from '../../../utils/format.size';
+import type { BasePackage } from '../../../modules/packages/base-package';
+import type { Task } from '../../../modules/task/task';
+import {TASK_STATUS_ICON} from '../../../modules/task/icons';
 
 export function totalTransferredSizeTask(extension: BasePackage, args: Record<string, any>): Task
 {
 	return {
 		title: 'Total transferred size',
-		run: async (context, { level, result }) => {
+		run: async (context) => {
 			const totalTransferredSize = await extension.getTotalTransferredSize();
 			context.succeed('Total transferred size');
 
@@ -18,12 +19,8 @@ export function totalTransferredSizeTask(extension: BasePackage, args: Record<st
 				size: totalTransferredSize.css,
 			});
 
-			context.log(`    JS: ${formattedJsSize}, CSS: ${formattedCssSize}`);
-
-			return {
-				level,
-				result,
-			};
+			context.log(`    ${TASK_STATUS_ICON.arrowRight} JS: ${formattedJsSize}`);
+			context.log(`    ${TASK_STATUS_ICON.arrowRight} CSS: ${formattedCssSize}`);
 		},
 	};
 }

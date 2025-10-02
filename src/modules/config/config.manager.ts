@@ -30,10 +30,10 @@ export abstract class ConfigManager<T>
 					throw new Error(`Invalid value of '${key}'.`);
 				}
 			}
-			else
-			{
-				console.warn(`⚠️Unknown property '${key}'. Strategy not registered`);
-			}
+			// else
+			// {
+			// 	console.warn(`⚠️Unknown property '${key}'. Strategy not registered`);
+			// }
 		}
 	}
 

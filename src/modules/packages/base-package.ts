@@ -1,4 +1,3 @@
-import { ConfigManager } from '../config/config.manager';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
@@ -14,16 +13,17 @@ import presetEnv from '@babel/preset-env';
 import flowStripTypesPlugin from '@babel/plugin-transform-flow-strip-types';
 import externalHelpersPlugin from '@babel/plugin-external-helpers';
 import { isExternalDependencyName } from '../../utils/is.external.dependency.name';
-import { BundleConfig } from '../config/bundle/bundle.config';
 import { PackageResolver } from './package.resolver';
 import postcss from 'rollup-plugin-postcss';
 import jsonPlugin from '@rollup/plugin-json';
 import imagePlugin from '@rollup/plugin-image';
 import browserslist from 'browserslist';
-import {LintResult} from '../linter/lint.result';
-import {ESLint} from 'eslint';
-import {Environment} from '../../environment/environment';
-import {flattenObjectKeys} from '../../utils/flatten.object.keys';
+import { LintResult } from '../linter/lint.result';
+import { ESLint } from 'eslint';
+import { Environment } from '../../environment/environment';
+import { flattenTree } from '../../utils/flatten.tree';
+import { buildDependenciesTree } from '../../utils/package/build.dependencies.tree';
+import type { DependencyNode } from './types/dependency.node';
 
 type BasePackageOptions = {
 	path: string,
@@ -35,7 +35,7 @@ export abstract class BasePackage
 	readonly #cache: MemoryCache = new MemoryCache();
 	readonly #warnings: Set<RollupLog> = new Set<RollupLog>();
 	readonly #errors: Set<RollupLog> = new Set<RollupLog>();
-	readonly #externalDependencies: Set<string> = new Set<string>();
+	readonly #externalDependencies: Array<DependencyNode> = [];
 
 	constructor(options: BasePackageOptions)
 	{
@@ -150,23 +150,32 @@ export abstract class BasePackage
 		}).join('\n  ');
 	}
 
-	addExternalDependencies(name: string)
+	addExternalDependency(dependency: DependencyNode)
 	{
-		this.#externalDependencies.add(name);
+		const hasDependency = this.#externalDependencies.find((currentDependency: DependencyNode) => {
+			return currentDependency.name === dependency.name
+		});
+
+		if (!hasDependency)
+		{
+			this.#externalDependencies.push(dependency);
+		}
 	}
 
-	getExternalDependencies(): Array<string>
+	getExternalDependencies(): Array<DependencyNode>
 	{
-		return [...this.#externalDependencies].sort((a: string, b: string) => {
-			const prefixA = a.split('.')[0];
-			const prefixB = b.split('.')[0];
+		return this.#cache.remember('externalDependencies', () => {
+			return [...this.#externalDependencies].sort((a: DependencyNode, b: DependencyNode) => {
+				const prefixA = a.name.split('.')[0];
+				const prefixB = b.name.split('.')[0];
 
-			if (prefixA !== prefixB)
-			{
-				return prefixA.localeCompare(prefixB);
-			}
+				if (prefixA !== prefixB)
+				{
+					return prefixA.localeCompare(prefixB);
+				}
 
-			return a.localeCompare(b);
+				return a.name.localeCompare(b.name);
+			});
 		});
 	}
 
@@ -198,8 +207,8 @@ export abstract class BasePackage
 
 	getGlobals(): Record<string, string>
 	{
-		return this.getExternalDependencies().reduce((acc, name) => {
-			const extension = PackageResolver.resolve(name);
+		return this.getExternalDependencies().reduce((acc, dependency) => {
+			const extension = PackageResolver.resolve(dependency.name);
 			if (extension)
 			{
 				return { ...acc, ...extension.getGlobal() };
@@ -228,7 +237,9 @@ export abstract class BasePackage
 	{
 		if (warning.code === 'UNRESOLVED_IMPORT' && isExternalDependencyName(warning.exporter))
 		{
-			this.addExternalDependencies(warning.exporter);
+			this.addExternalDependency({
+				name: warning.exporter,
+			});
 
 			return;
 		}
@@ -333,10 +344,14 @@ export abstract class BasePackage
 			};
 		});
 
-		this.getPhpConfig().set('rel', this.getExternalDependencies());
+		const rel = this.getExternalDependencies().map((dependency: DependencyNode) => {
+			return dependency.name;
+		});
+
+		this.getPhpConfig().set('rel', rel);
 		this.getPhpConfig().save(this.getPhpConfigFilePath());
 
-		this.#externalDependencies.clear();
+		this.#externalDependencies.splice(0, this.#externalDependencies.length);
 		this.#warnings.clear();
 		this.#errors.clear();
 
@@ -365,81 +380,44 @@ export abstract class BasePackage
 		});
 	}
 
-	async getDependencies(): Promise<Array<string>>
+	async getDependencies(): Promise<Array<DependencyNode>>
 	{
-		const phpConfig = this.getPhpConfig();
-		if (phpConfig)
-		{
-			const rel = phpConfig.get('rel');
-			if (Array.isArray(rel))
+		return this.#cache.remember('dependencies', async () => {
+			const phpConfig = this.getPhpConfig();
+			if (phpConfig)
 			{
-				return rel;
-			}
-		}
-
-		void await rollup(
-			this.#getRollupInputOptions(),
-		);
-
-		return this.getExternalDependencies();
-	}
-
-	async getDependenciesTree(
-		visited = new Set<string>(),
-		isRoot = true
-	): Promise<Record<string, any>> {
-		const dependencies = await this.getDependencies();
-		const acc: Record<string, any> = {};
-
-		if (isRoot)
-		{
-			for (const name of dependencies)
-			{
-				visited.add(name);
-			}
-		}
-
-		for (const name of dependencies)
-		{
-			if (visited.has(name))
-			{
-				continue;
-			}
-
-			visited.add(name);
-			const extension = PackageResolver.resolve(name);
-			acc[name] = extension
-				? await extension.getDependenciesTree(visited, false)
-				: {};
-		}
-
-		if (isRoot)
-		{
-			const rootAcc: Record<string, any> = {};
-			for (const name of dependencies)
-			{
-				const extension = PackageResolver.resolve(name);
-				const subTree = extension ? await extension.getDependenciesTree(visited, false) : {};
-				const filtered: Record<string, any> = {};
-				for (const [subName, subDeps] of Object.entries(subTree))
+				const rel = phpConfig.get('rel');
+				if (Array.isArray(rel))
 				{
-					if (!dependencies.includes(subName))
-					{
-						filtered[subName] = subDeps;
-					}
+					return rel.map((name: string) => {
+						return { name };
+					});
 				}
-
-				rootAcc[name] = filtered;
 			}
-			return rootAcc;
-		}
 
-		return acc;
+			void await rollup(
+				this.#getRollupInputOptions(),
+			);
+
+			return this.getExternalDependencies();
+		});
 	}
 
-	async getFlattedDependenciesTree(): Promise<Array<string>>
+	async getDependenciesTree(options: { size?: boolean, unique?: boolean } = {}): Promise<Array<DependencyNode>>
 	{
-		return flattenObjectKeys(await this.getDependenciesTree());
+		return this.#cache.remember(`dependenciesTree+${options.size}+${options.unique}`, () => {
+			return buildDependenciesTree({
+				target: this,
+				...options,
+			});
+		});
+	}
+
+	async getFlattedDependenciesTree(unique: boolean = true): Promise<Array<DependencyNode>>
+	{
+		return this.#cache.remember(`flattedDependenciesTree+${unique}`, async () => {
+			return flattenTree(await this.getDependenciesTree(), unique);
+		});
 	}
 
 	normalizePath(sourcePath: string): string
@@ -457,75 +435,79 @@ export abstract class BasePackage
 
 	getBundlesSize(): { css: number, js: number }
 	{
-		let result = { css: 0, js: 0 };
-		const isExistJsBundle = fs.existsSync(this.getOutputJsPath());
-		const isExistCssBundle = fs.existsSync(this.getOutputCssPath());
-		if (isExistJsBundle || isExistCssBundle)
-		{
-			if (fs.existsSync(this.getOutputJsPath()))
+		return this.#cache.remember('bundleSize', () => {
+			let result = { css: 0, js: 0 };
+			const isExistJsBundle = fs.existsSync(this.getOutputJsPath());
+			const isExistCssBundle = fs.existsSync(this.getOutputCssPath());
+			if (isExistJsBundle || isExistCssBundle)
 			{
-				result.js = fs.statSync(this.getOutputJsPath()).size;
-			}
-
-			if (fs.existsSync(this.getOutputCssPath()))
-			{
-				result.css = fs.statSync(this.getOutputCssPath()).size;
-			}
-		}
-		else
-		{
-			const phpConfig = this.getPhpConfig();
-			const jsFiles = [phpConfig.get('js')].flat(2);
-			const cssFiles = [phpConfig.get('css')].flat(2);
-
-			result.js = jsFiles.reduce((acc, filePath) => {
-				if (filePath.length > 0)
+				if (fs.existsSync(this.getOutputJsPath()))
 				{
-					const normalizedPath = this.normalizePath(filePath);
-					const fullPath = path.join(this.getPath(), normalizedPath);
-					if (fs.existsSync(fullPath))
-					{
-						acc += fs.statSync(fullPath).size;
-					}
+					result.js = fs.statSync(this.getOutputJsPath()).size;
 				}
 
-				return acc;
-			}, 0);
-
-			result.css = cssFiles.reduce((acc, filePath) => {
-				if (filePath.length > 0)
+				if (fs.existsSync(this.getOutputCssPath()))
 				{
-					const normalizedPath = this.normalizePath(filePath);
-					const fullPath = path.join(this.getPath(), normalizedPath);
-					if (fs.existsSync(fullPath))
-					{
-						acc += fs.statSync(fullPath).size;
-					}
+					result.css = fs.statSync(this.getOutputCssPath()).size;
 				}
+			}
+			else
+			{
+				const phpConfig = this.getPhpConfig();
+				const jsFiles = [phpConfig.get('js')].flat(2);
+				const cssFiles = [phpConfig.get('css')].flat(2);
 
-				return acc;
-			}, 0);
-		}
+				result.js = jsFiles.reduce((acc, filePath) => {
+					if (filePath.length > 0)
+					{
+						const normalizedPath = this.normalizePath(filePath);
+						const fullPath = path.join(this.getPath(), normalizedPath);
+						if (fs.existsSync(fullPath))
+						{
+							acc += fs.statSync(fullPath).size;
+						}
+					}
 
-		return result;
+					return acc;
+				}, 0);
+
+				result.css = cssFiles.reduce((acc, filePath) => {
+					if (filePath.length > 0)
+					{
+						const normalizedPath = this.normalizePath(filePath);
+						const fullPath = path.join(this.getPath(), normalizedPath);
+						if (fs.existsSync(fullPath))
+						{
+							acc += fs.statSync(fullPath).size;
+						}
+					}
+
+					return acc;
+				}, 0);
+			}
+
+			return result;
+		});
 	}
 
 	async getDependenciesSize(): Promise<{ js: number, css: number }>
 	{
-		const dependencies = await this.getFlattedDependenciesTree();
+		return this.#cache.remember('getDependenciesSize', async () => {
+			const dependencies = await this.getFlattedDependenciesTree();
 
-		return dependencies.reduce((acc, name) => {
-			const extension = PackageResolver.resolve(name);
-			if (extension)
-			{
-				const { js, css } = extension.getBundlesSize();
-				acc.js += js;
-				acc.css += css;
-			}
+			return dependencies.reduce((acc, dependency: DependencyNode) => {
+				const extension = PackageResolver.resolve(dependency.name);
+				if (extension)
+				{
+					const { js, css } = extension.getBundlesSize();
+					acc.js += js;
+					acc.css += css;
+				}
 
-			return acc;
+				return acc;
 
-		}, { js: 0, css: 0 });
+			}, { js: 0, css: 0 });
+		});
 	}
 
 	async getTotalTransferredSize(): Promise<{ css: number, js: number }>

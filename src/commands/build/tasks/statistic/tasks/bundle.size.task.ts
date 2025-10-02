@@ -14,10 +14,18 @@ export function bundleSizeTask(extension: BasePackage, args: Record<string, any>
 			let totalSize = 0;
 			result.bundles.forEach((bundle) => {
 				totalSize += bundle.size;
-				context.log(`    ${TASK_STATUS_ICON.arrowRight} ${bundle.fileName}: ${formatSize(bundle.size)}`);
+				const formattedSize = formatSize({
+					size: bundle.size,
+				});
+
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} ${bundle.fileName}: ${formattedSize}`);
 			});
 
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} Total size: ${formatSize(totalSize)}`);
+			const formattedTotalSize = formatSize({
+				size: totalSize,
+			});
+
+			context.log(`    ${TASK_STATUS_ICON.arrowRight} Total size: ${formattedTotalSize}`);
 
 			return {
 				level,

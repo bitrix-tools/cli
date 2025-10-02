@@ -1,14 +1,23 @@
-export function formatSize(bytes: number, decimals: number = 2): string {
-	if (bytes === 0)
+type FormatSizeOptions = {
+	size: number;
+	decimals?: number;
+	prefix?: string;
+};
+
+const k = 1024;
+const sizes = ['B', 'KB', 'MB', 'GB'];
+
+export function formatSize(options: FormatSizeOptions): string
+{
+	const { size, decimals = 2, prefix = '' } = options;
+
+	if (size === 0)
 	{
 		return '0 B';
 	}
 
-	const k = 1024;
-	const sizes = ['B', 'KB', 'MB', 'GB'];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	const i = Math.floor(Math.log(size) / Math.log(k));
+	const formatted = (size / Math.pow(k, i)).toFixed(decimals);
 
-	const formatted = (bytes / Math.pow(k, i)).toFixed(decimals);
-
-	return `${formatted} ${sizes[i]}`;
+	return `${prefix}${formatted} ${sizes[i]}`;
 }
