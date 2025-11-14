@@ -6,10 +6,15 @@ export function directDependenciesTask(extension: BasePackage, argv: Record<stri
 {
 	return {
 		title: 'Direct dependencies',
-		run: async (context) => {
+		run: async (context, { result, level }) => {
 			const dependencies = await extension.getDependencies();
 			context.succeed(`Direct dependencies (${dependencies.length})`);
 			context.log(generateTreeString(dependencies, '    '));
+
+			return {
+				result,
+				level,
+			};
 		},
 	};
 }
