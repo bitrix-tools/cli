@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import logUpdate from 'log-update';
 import { TASK_STATUS_ICON } from './icons';
 
 export interface TaskContext {
@@ -51,20 +52,19 @@ export class TaskRunner
 				update: (message: string) => {
 					if (!isCompleted)
 					{
-						this.clearLine();
-						const firstLine = message.split('\n')[0]; // TTY показывает только первую строку
-						process.stdout.write(applyIndent(firstLine, indent));
+						const firstLine = message.split('\n')[0];
+						logUpdate(applyIndent(firstLine, indent));
 					}
 				},
 				log: (message: string) => {
-					this.clearLine();
+					logUpdate.clear();
 					console.log(applyIndent(message, indent));
 				},
 				succeed: (message: string) => {
 					if (!isCompleted)
 					{
 						isCompleted = true;
-						this.clearLine();
+						logUpdate.clear();
 						const indented = message
 							.split('\n')
 							.map(line => `${indent}[${chalk.green(TASK_STATUS_ICON.success)}] ${line}`)
@@ -76,7 +76,7 @@ export class TaskRunner
 					if (!isCompleted)
 					{
 						isCompleted = true;
-						this.clearLine();
+						logUpdate.clear();
 						const indented = message
 							.split('\n')
 							.map(line => `${indent}[${chalk.red(TASK_STATUS_ICON.fail)}] ${line}`)
@@ -88,7 +88,7 @@ export class TaskRunner
 					if (!isCompleted)
 					{
 						isCompleted = true;
-						this.clearLine();
+						logUpdate.clear();
 						const indented = message
 							.split('\n')
 							.map(line => `${indent}[${chalk.yellow(TASK_STATUS_ICON.warning)}] ${line}`)
@@ -121,7 +121,7 @@ export class TaskRunner
 			{
 				if (!isCompleted)
 				{
-					this.clearLine();
+					logUpdate.clear();
 					console.log(applyIndent(task.title, indent));
 				}
 
@@ -133,18 +133,5 @@ export class TaskRunner
 		}
 
 		return previousResult;
-	}
-
-	private static clearLine(): void
-	{
-		if (process.stdout.isTTY)
-		{
-			process.stdout.clearLine?.(0);
-			process.stdout.cursorTo?.(0);
-		}
-		else
-		{
-			process.stdout.write('\n');
-		}
 	}
 }

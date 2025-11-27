@@ -1,7 +1,7 @@
 import { program } from 'commander';
 
 import { buildCommand } from './commands/build/build-command';
-import { test } from './commands/test/test';
+import { testCommand } from './commands/test/test-command';
 import { create } from './commands/create/create';
 import { statCommand } from './commands/stat/stat-command';
 import { checkCwdPreAction } from './hooks/check-cwd-pre-action';
@@ -12,7 +12,7 @@ program
 	.description('CLI tool for building and testing bitrix extensions.')
 	.addCommand(buildCommand)
 	.addCommand(statCommand)
-	.addCommand(test)
+	.addCommand(testCommand)
 	.addCommand(create)
 	.hook('preAction', adjustCwdPreAction)
 	.hook('preAction', checkCwdPreAction)

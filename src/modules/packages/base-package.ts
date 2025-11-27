@@ -25,6 +25,11 @@ import { flattenTree } from '../../utils/flatten.tree';
 import { buildDependenciesTree } from '../../utils/package/build.dependencies.tree';
 import type { DependencyNode } from './types/dependency.node';
 
+import fg from 'fast-glob';
+import playwright from 'playwright';
+
+import { spawn } from 'node:child_process';
+
 type BasePackageOptions = {
 	path: string,
 };
@@ -231,6 +236,16 @@ export abstract class BasePackage
 	getOutputCssPath(): string
 	{
 		return path.join(this.getPath(), this.getBundleConfig().get('output').css);
+	}
+
+	getUnitTestsDirectoryPath(): string
+	{
+		return path.join(this.getPath(), 'test');
+	}
+
+	getEndToEndTestsDirectoryPath(): string
+	{
+		return path.join(this.getPath(), 'test', 'e2e');
 	}
 
 	#onWarnHandler(warning: RollupLog, warn: LoggingFunction)
@@ -519,6 +534,248 @@ export abstract class BasePackage
 			js: bundlesSize.js + dependenciesSize.js,
 			css: bundlesSize.css + dependenciesSize.css,
 		};
+	}
+
+	async getUnitTests(): Promise<Array<string>>
+	{
+		const patterns = [
+			'**/*.test.js',
+			'!**/e2e'
+		];
+
+		return fg.async(
+			patterns,
+			{
+				cwd: this.getUnitTestsDirectoryPath(),
+				dot: true,
+				onlyFiles: true,
+				unique: true,
+				absolute: true,
+			},
+		);
+	}
+
+	async getUnitTestsBundle(): Promise<string>
+	{
+		const sourceTestsCode = (await this.getUnitTests())
+			.map((filePath) => {
+				return `import './${path.relative(this.getPath(), filePath)}';`;
+			})
+			.join('\n');
+
+		const dependencies = [];
+		const rollupInputOptions = this.#getRollupInputOptions();
+		const entries = {
+			'sourceCode.js': sourceTestsCode,
+		};
+		const bundle = await rollup({
+			...rollupInputOptions,
+			input: 'sourceCode.js',
+			plugins: [
+				{
+					name: 'virtual-module-plugin',
+					resolveId(id) {
+						if (id in entries)
+						{
+							return id;
+						}
+
+						return null;
+					},
+					load(id) {
+						if (id in entries)
+						{
+							return entries[id];
+						}
+
+						return null;
+					},
+				},
+				...rollupInputOptions.plugins,
+			],
+			onwarn: (warning, warn) => {
+				if (warning.code === 'UNRESOLVED_IMPORT' && isExternalDependencyName(warning.exporter))
+				{
+					dependencies.push(warning.exporter);
+
+					return;
+				}
+
+				warn(warning);
+			},
+			treeshake: false,
+		});
+
+		const globals = dependencies.reduce((acc, dependency) => {
+			const extension = PackageResolver.resolve(dependency);
+			if (extension)
+			{
+				return { ...acc, ...extension.getGlobal() };
+			}
+
+			return acc;
+		}, {});
+
+		const result = await bundle.generate({
+			file: path.join(this.getPath(), 'test.bundle.js'),
+			format: 'iife',
+			banner: '/* eslint-disable */',
+			extend: true,
+			globals: {
+				...globals,
+			},
+		});
+
+		await bundle.close();
+
+		return result.output.at(0)?.code;
+	}
+
+	async getEndToEndTests(): Promise<Array<string>>
+	{
+		const patterns = [
+			'**/*.test.js',
+			'**/*.spec.js',
+		];
+
+		return fg.async(
+			patterns,
+			{
+				cwd: this.getEndToEndTestsDirectoryPath(),
+				dot: true,
+				onlyFiles: true,
+				unique: true,
+				absolute: true,
+			},
+		);
+	}
+
+	async runUnitTests(args: Record<string, any>): Promise<any> {
+		const browser = await playwright.chromium.launch({
+			headless: args.headed !== true,
+		});
+		const context = await browser.newContext();
+		const page = await context.newPage();
+
+		try
+		{
+			await page.goto(`https://bitrix24.io/dev/ui/cli/mocha-wrapper.php?extension=${this.getName()}`);
+
+			const testsCodeBundle = await this.getUnitTestsBundle();
+
+			const report = [];
+			page.on('console', async (message) => {
+				const values = [];
+				for (const arg of message.args())
+				{
+					values.push(await arg.jsonValue());
+				}
+
+				const [key, value] = values;
+				if (key === 'unit_report_token')
+				{
+					try
+					{
+						report.push(JSON.parse(value));
+					}
+					catch (error)
+					{
+						console.error(error);
+					}
+				}
+			});
+
+			await page.evaluate(() => {
+				globalThis.mocha.setup({
+					ui: 'bdd',
+					reporter: ProxyReporter,
+					checkLeaks: true,
+					timeout: 10000,
+					inlineDiffs: true,
+					color: true,
+				});
+			});
+
+			await page.addScriptTag({
+				content: testsCodeBundle,
+			});
+
+			type TestStats = Promise<{ stats: any }>;
+
+			const { stats } = await page.evaluate((): TestStats => {
+				return new Promise((resolve) => {
+					globalThis.mocha.run(() => {
+						resolve({
+							stats: globalThis.mocha.stats,
+						});
+					});
+				});
+			});
+
+
+			return {
+				report,
+				stats,
+			};
+		}
+		catch (error)
+		{
+			console.error('Error during test execution:', error);
+			throw error;
+		}
+	}
+
+	async runEndToEndTests(sourceArgs: Record<string, any>): Promise<any>
+	{
+		const tests = await this.getEndToEndTests();
+		if (tests.length === 0)
+		{
+			return Promise.resolve({
+				status: 'NO_TESTS_FOUND',
+				code: 1,
+			});
+		}
+
+		const args = ['playwright', 'test', ...tests];
+
+		if (Object.hasOwn(sourceArgs, 'headed'))
+		{
+			args.push('--headed');
+		}
+
+		if (Object.hasOwn(sourceArgs, 'debug'))
+		{
+			args.push('--debug');
+		}
+
+		if (Object.hasOwn(sourceArgs, 'grep'))
+		{
+			args.push('--grep');
+		}
+
+		const process = spawn('npx', args, {
+			stdio: 'inherit',
+			cwd: global.process.cwd(),
+		});
+
+		return new Promise((resolve, reject) => {
+			process.on('close', (code) => {
+				if (code === 0)
+				{
+					resolve({
+						status: 'TESTS_PASSED',
+						code: 0,
+					});
+				}
+				else
+				{
+					reject({
+						status: 'TESTS_FAILED',
+						code: 0,
+					});
+				}
+			});
+		});
 	}
 }
 
