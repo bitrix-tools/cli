@@ -6,7 +6,6 @@ export const defaultStrategy: PackageFactoryStrategy = {
 		return true;
 	},
 	create({ path }) {
-		console.trace(path);
 		return new CustomPackage({ path });
 	},
 };

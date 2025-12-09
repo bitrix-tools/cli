@@ -4,7 +4,7 @@ import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
 import { PhpConfigManager } from '../config/php/php.config.manager';
 import { MemoryCache } from '../../utils/memory-cache';
 
-import { rollup, type InputOptions, type OutputOptions, type RollupLog, type LoggingFunction } from 'rollup';
+import { rollup, type InputOptions, type OutputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
 import { babel } from '@rollup/plugin-babel';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -17,6 +17,7 @@ import { PackageResolver } from './package.resolver';
 import postcss from 'rollup-plugin-postcss';
 import jsonPlugin from '@rollup/plugin-json';
 import imagePlugin from '@rollup/plugin-image';
+import typescript, {FlexibleCompilerOptions} from '@rollup/plugin-typescript';
 import browserslist from 'browserslist';
 import { LintResult } from '../linter/lint.result';
 import { ESLint } from 'eslint';
@@ -29,6 +30,7 @@ import fg from 'fast-glob';
 import playwright from 'playwright';
 
 import { spawn } from 'node:child_process';
+import {fail} from 'node:assert';
 
 type BasePackageOptions = {
 	path: string,
@@ -93,6 +95,72 @@ export abstract class BasePackage
 
 			return config;
 		});
+	}
+
+	getBaseTSConfig(): string
+	{
+		return path.join(this.getPath(), 'tsconfig.base.json');
+	}
+
+	hasBaseTSConfig(): boolean
+	{
+		return fs.existsSync(this.getBaseTSConfig());
+	}
+
+	getTSConfigPath(): string
+	{
+		return path.join(this.getPath(), 'tsconfig.json');
+	}
+
+	hasTSConfig(): boolean
+	{
+		return fs.existsSync(this.getTSConfigPath());
+	}
+
+	generateBaseTSConfig(dependencies: Array<string>): FlexibleCompilerOptions
+	{
+		return {
+			compilerOptions: {
+				paths: dependencies.reduce((acc, extensionName) => {
+					const extension = PackageResolver.resolve(extensionName);
+					const relativeInputPath = path.relative(this.getPath(), extension.getInputPath());
+
+					acc[extensionName] = [relativeInputPath];
+
+					return acc;
+				}, {}),
+			},
+		};
+	}
+
+	generateTSConfig(): FlexibleCompilerOptions
+	{
+		return {
+			extends: './tsconfig.base.json',
+		};
+	}
+
+	generateTSConfigs()
+	{
+		if (this.getInputPath().endsWith('.ts'))
+		{
+			if (!this.hasTSConfig())
+			{
+				const tsConfig = this.generateTSConfig();
+				const tsConfigContents = JSON.stringify(tsConfig, null, 4);
+
+				fs.writeFileSync(this.getTSConfigPath(), tsConfigContents);
+			}
+
+			const dependencies = this.getExternalDependencies().map((dependencyNode) => {
+				return dependencyNode.name;
+			});
+
+			const baseTSConfig = this.generateBaseTSConfig(dependencies);
+			const baseTSConfigContents = JSON.stringify(baseTSConfig, null, 4);
+
+			fs.writeFileSync(this.getBaseTSConfig(), baseTSConfigContents, 'utf-8');
+		}
 	}
 
 	abstract getName(): string
@@ -267,6 +335,31 @@ export abstract class BasePackage
 		return {
 			input: this.getInputPath(),
 			plugins: [
+				...(() => {
+					if (this.getInputPath().endsWith('.ts'))
+					{
+						const tsconfig = JSON.parse(
+							fs.readFileSync(
+								path.join(Environment.getRoot(), 'tsconfig.json'),
+								'utf8',
+							),
+						);
+
+						return [
+							typescript({
+								tsconfig: false,
+								compilerOptions: {
+									target: 'ESNext',
+									noEmitOnError: true,
+									strict: true,
+									paths: tsconfig.compilerOptions.paths,
+								},
+							}),
+						];
+					}
+
+					return [];
+				})(),
 				nodeResolve({
 					browser: true,
 				}),
@@ -591,7 +684,14 @@ export abstract class BasePackage
 						return null;
 					},
 				},
-				...rollupInputOptions.plugins,
+				...(() => {
+					if (Array.isArray(rollupInputOptions.plugins))
+					{
+						return rollupInputOptions.plugins;
+					}
+
+					return [];
+				})(),
 			],
 			onwarn: (warning, warn) => {
 				if (warning.code === 'UNRESOLVED_IMPORT' && isExternalDependencyName(warning.exporter))
@@ -628,7 +728,9 @@ export abstract class BasePackage
 
 		await bundle.close();
 
-		return result.output.at(0)?.code;
+		const outputEntry = result.output.at(0) as OutputChunk;
+
+		return outputEntry?.code;
 	}
 
 	async getEndToEndTests(): Promise<Array<string>>
@@ -688,6 +790,7 @@ export abstract class BasePackage
 			await page.evaluate(() => {
 				globalThis.mocha.setup({
 					ui: 'bdd',
+					// @ts-ignore
 					reporter: ProxyReporter,
 					checkLeaks: true,
 					timeout: 10000,
