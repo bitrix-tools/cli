@@ -1,36 +1,35 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
-import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
-import { PhpConfigManager } from '../config/php/php.config.manager';
-import { MemoryCache } from '../../utils/memory-cache';
+import fg from 'fast-glob';
+import { spawn } from 'node:child_process';
 
-import { rollup, type InputOptions, type OutputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
+import playwright from 'playwright';
+import browserslist from 'browserslist';
+import { ESLint } from 'eslint';
+
 import { babel } from '@rollup/plugin-babel';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-
 import presetEnv from '@babel/preset-env';
 import flowStripTypesPlugin from '@babel/plugin-transform-flow-strip-types';
 import externalHelpersPlugin from '@babel/plugin-external-helpers';
-import { isExternalDependencyName } from '../../utils/is.external.dependency.name';
-import { PackageResolver } from './package.resolver';
+
+import { rollup, type InputOptions, type OutputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
 import postcss from 'rollup-plugin-postcss';
 import jsonPlugin from '@rollup/plugin-json';
 import imagePlugin from '@rollup/plugin-image';
-import typescript, {FlexibleCompilerOptions} from '@rollup/plugin-typescript';
-import browserslist from 'browserslist';
+import typescript, { FlexibleCompilerOptions } from '@rollup/plugin-typescript';
+
+import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
+import { PhpConfigManager } from '../config/php/php.config.manager';
+import { MemoryCache } from '../../utils/memory-cache';
+import { isExternalDependencyName } from '../../utils/is.external.dependency.name';
+import { PackageResolver } from './package.resolver';
 import { LintResult } from '../linter/lint.result';
-import { ESLint } from 'eslint';
 import { Environment } from '../../environment/environment';
 import { flattenTree } from '../../utils/flatten.tree';
 import { buildDependenciesTree } from '../../utils/package/build.dependencies.tree';
 import type { DependencyNode } from './types/dependency.node';
-
-import fg from 'fast-glob';
-import playwright from 'playwright';
-
-import { spawn } from 'node:child_process';
-import {fail} from 'node:assert';
 
 type BasePackageOptions = {
 	path: string,
@@ -38,6 +37,13 @@ type BasePackageOptions = {
 
 export abstract class BasePackage
 {
+	static TYPESCRIPT_EXTENSION = 'ts';
+	static JAVASCRIPT_EXTENSION = 'js';
+	static SOURCE_FILES_PATTERN: Array<string> = [
+		`**/*.${BasePackage.JAVASCRIPT_EXTENSION}`,
+		`**/*.${BasePackage.TYPESCRIPT_EXTENSION}`,
+	];
+
 	readonly #path: string;
 	readonly #cache: MemoryCache = new MemoryCache();
 	readonly #warnings: Set<RollupLog> = new Set<RollupLog>();
@@ -304,6 +310,86 @@ export abstract class BasePackage
 	getOutputCssPath(): string
 	{
 		return path.join(this.getPath(), this.getBundleConfig().get('output').css);
+	}
+
+	getSourceDirectoryPath(): string
+	{
+		return path.join(this.getPath(), 'src');
+	}
+
+	getSourceFiles(): Array<string>
+	{
+		return this.#cache.remember('sourceFiles', () => {
+			return fg.sync(
+				BasePackage.SOURCE_FILES_PATTERN,
+				{
+					cwd: this.getSourceDirectoryPath(),
+					dot: true,
+					onlyFiles: true,
+					unique: true,
+					absolute: true,
+				},
+			);
+		});
+	}
+
+	getJavaScriptSourceFiles(): Array<string>
+	{
+		return this.#cache.remember('javaScriptSourceFiles', () => {
+			return this.getSourceFiles().filter((sourceFile) => {
+				return sourceFile.endsWith(`.${BasePackage.JAVASCRIPT_EXTENSION}`);
+			});
+		});
+	}
+
+	removeJavaScriptSourceFiles()
+	{
+		this.getJavaScriptSourceFiles().forEach((sourceFile) => {
+			if (fs.existsSync(sourceFile))
+			{
+				fs.unlinkSync(sourceFile);
+			}
+		});
+
+		this.#cache.forget('sourceFiles');
+		this.#cache.forget('javaScriptSourceFiles');
+	}
+
+	getTypeScriptSourceFiles(): Array<string>
+	{
+		return this.#cache.remember('typeScriptSourceFiles', () => {
+			return this.getSourceFiles().filter((sourceFile) => {
+				return sourceFile.endsWith(`.${BasePackage.TYPESCRIPT_EXTENSION}`);
+			});
+		});
+	}
+
+	removeTypeScriptSourceFiles()
+	{
+		this.getTypeScriptSourceFiles().forEach((sourceFile) => {
+			if (fs.existsSync(sourceFile))
+			{
+				fs.unlinkSync(sourceFile);
+			}
+		});
+
+		this.#cache.forget('sourceFiles');
+		this.#cache.forget('typeScriptSourceFiles');
+	}
+
+	getActualSourceFiles(): Array<string>
+	{
+		if (this.isTypeScriptMode())
+		{
+			return this.getTypeScriptSourceFiles();
+		}
+
+		return this.getJavaScriptSourceFiles();
+	}
+
+	isTypeScriptMode(): boolean
+	{
+		return this.getInputPath().endsWith('.ts');
 	}
 
 	getUnitTestsDirectoryPath(): string
@@ -788,6 +874,7 @@ export abstract class BasePackage
 			});
 
 			await page.evaluate(() => {
+				// @ts-ignore
 				globalThis.mocha.setup({
 					ui: 'bdd',
 					// @ts-ignore
@@ -807,8 +894,10 @@ export abstract class BasePackage
 
 			const { stats } = await page.evaluate((): TestStats => {
 				return new Promise((resolve) => {
+					// @ts-ignore
 					globalThis.mocha.run(() => {
 						resolve({
+							// @ts-ignore
 							stats: globalThis.mocha.stats,
 						});
 					});
