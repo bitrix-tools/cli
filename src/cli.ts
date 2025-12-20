@@ -4,9 +4,10 @@ import { buildCommand } from './commands/build/build-command';
 import { testCommand } from './commands/test/test-command';
 import { create } from './commands/create/create';
 import { statCommand } from './commands/stat/stat-command';
-import { regenerateCommand } from './commands/regenerate/regenerate.command';
+import { generateTsconfigCommand } from "./commands/generate-tsconfig/generate-tsconfig.command";
 import { checkCwdPreAction } from './hooks/check-cwd-pre-action';
 import { adjustCwdPreAction } from './hooks/adjust-cwd-pre-action';
+import { flowToTsCommand } from './commands/flow-to-ts/flow-to-ts.command';
 
 program
 	.name('bitrix')
@@ -15,7 +16,8 @@ program
 	.addCommand(statCommand)
 	.addCommand(testCommand)
 	.addCommand(create)
-	.addCommand(regenerateCommand)
+	.addCommand(generateTsconfigCommand)
+	.addCommand(flowToTsCommand)
 	.hook('preAction', adjustCwdPreAction)
 	.hook('preAction', checkCwdPreAction)
 	.parse(process.argv);
