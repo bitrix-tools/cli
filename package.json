@@ -8,7 +8,9 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsup-node ./src/cli.ts --format esm"
+    "build": "tsup-node ./src/cli.ts --format esm",
+    "test": "tsx --import=tsx/esm ./node_modules/.bin/mocha ./test/**/*.test.ts --inline-diffs --color=true",
+    "test:watch": "tsx watch --import=tsx/esm ./node_modules/.bin/mocha ./test/**/*.test.ts --inline-diffs --color=true"
   },
   "bin": {
     "bitrix": "./bin/bitrix"
@@ -43,7 +45,10 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
     "browserslist": "^4.25.4",
+    "chai": "^6.2.1",
     "chalk": "^5.6.0",
     "commander": "^14.0.0",
     "eslint": "^8.57.1",
@@ -55,6 +60,8 @@
     "php-parser": "^3.2.5",
     "php-writer": "^3.0.0",
     "playwright": "^1.57.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-brace-style": "^0.8.2",
     "rollup": "^4.49.0",
     "rollup-plugin-postcss": "^4.0.2",
     "strip-ansi": "^7.1.2",
