@@ -1,3 +1,4 @@
+import * as fs from 'node:fs/promises';
 import { ConfigStrategy } from './config.strategy';
 
 export abstract class ConfigManager<T>
@@ -66,5 +67,37 @@ export abstract class ConfigManager<T>
 		}, {} as T);
 	}
 
-	abstract save(configPath: string): Promise<any>;
+	async save(configPath: string): Promise<any>
+	{
+		const configFileExists = await (async () => {
+			try
+			{
+				await fs.access(configPath, fs.constants.F_OK);
+				return true;
+			}
+			catch(error)
+			{
+				return false;
+			}
+		})();
+
+		if (configFileExists)
+		{
+			const configContent = await fs.readFile(configPath, 'utf8');
+			const newConfigContent = Object.entries(this.getAll()).reduce((acc, [key, value]) => {
+				const strategy = this.#registry.get(key);
+				if (typeof strategy?.save === 'function')
+				{
+					return strategy.save(acc, value);
+				}
+
+				return acc;
+			}, configContent);
+
+			if (configContent !== newConfigContent)
+			{
+				await fs.writeFile(configPath, newConfigContent);
+			}
+		}
+	}
 }

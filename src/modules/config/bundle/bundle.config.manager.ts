@@ -26,9 +26,4 @@ export class BundleConfigManager extends ConfigManager<BundleConfig>
 			this.set(key, value);
 		});
 	}
-
-	async save(configPath: string): Promise<any>
-	{
-		return Promise<any>
-	}
 }

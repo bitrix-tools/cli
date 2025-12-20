@@ -14,4 +14,10 @@ export const inputStrategy = {
 	{
 		return true;
 	},
+	save(configContent: string, value: string): string
+	{
+		const regexp = /input:(?:\s+)?(['"])(.*)(['"])/g;
+
+		return configContent.replace(regexp, `input: $1${value}$3`);
+	},
 } satisfies ConfigStrategy<string>
