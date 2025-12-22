@@ -10,6 +10,7 @@ import { TaskContext, TaskRunner } from '../../modules/task/task';
 import { renameFileTask } from './tasks/rename-file.task';
 import { BundleConfigManager } from '../../modules/config/bundle/bundle.config.manager';
 import { convertFlowSyntaxTask } from './tasks/convert-flow-syntax.task';
+import { hgRename } from '../../utils/vcs/hg/rename';
 
 import type { BasePackage } from '../../modules/packages/base-package';
 
@@ -78,13 +79,31 @@ flowToTsCommand
 													const tsEntryPoint = input.replace(/\.js$/, '.ts');
 													bundleConfig.set('input', tsEntryPoint);
 
-													await bundleConfig.save(extension.getBundleConfigFilePath());
+													await bundleConfig.save(extension.getBundleConfigJsFilePath());
 
 													context.succeed(`Entry point changed to ${tsEntryPoint}`);
 												}
 												else
 												{
 													context.warn(`Entry point not set`);
+												}
+											},
+										},
+										{
+											title: 'Rename bundle.config.js...',
+											run: async (context: TaskContext) => {
+												const bundleConfigJsPath = extension.getBundleConfigJsFilePath();
+												const bundleConfigTsPath = bundleConfigJsPath.replace(/\.js$/, '.ts');
+
+												const renameResult = await hgRename(bundleConfigJsPath, bundleConfigTsPath);
+
+												if (renameResult.status === 'ok')
+												{
+													context.succeed(`Bundle config renamed to bundle.config${chalk.bold.green('.ts')}`);
+												}
+												else
+												{
+													context.fail(`Rename failed: ${bundleConfigJsPath}`);
 												}
 											},
 										},
