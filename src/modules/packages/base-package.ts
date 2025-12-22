@@ -260,20 +260,24 @@ export abstract class BasePackage
 
 	getTargets(): Array<string>
 	{
-		const bundleConfig = this.getBundleConfig();
-		if (bundleConfig.get('browserslist') === true)
-		{
-			const targets = browserslist.loadConfig({
-				path: this.getPath(),
-			});
-
-			if (targets.length > 0)
+		const query = (() => {
+			const bundleConfig = this.getBundleConfig();
+			if (bundleConfig.get('browserslist') === true)
 			{
-				return targets;
-			}
-		}
+				const targets = browserslist.loadConfig({
+					path: this.getPath(),
+				});
 
-		return bundleConfig.get('browserslist');
+				if (targets.length > 0)
+				{
+					return targets;
+				}
+			}
+
+			return bundleConfig.get('browserslist');
+		})();
+
+		return browserslist(query);
 	}
 
 	getGlobal(): { [name: string]: string }
@@ -422,14 +426,19 @@ export abstract class BasePackage
 			input: this.getInputPath(),
 			plugins: [
 				...(() => {
-					if (this.getInputPath().endsWith('.ts'))
+					if (this.isTypeScriptMode())
 					{
-						const tsconfig = JSON.parse(
-							fs.readFileSync(
-								path.join(Environment.getRoot(), 'tsconfig.json'),
-								'utf8',
-							),
-						);
+						const tsconfig = (() => {
+							const rootTSConfigPath = path.join(Environment.getRoot(), 'tsconfig.json');
+							if (fs.existsSync(rootTSConfigPath))
+							{
+								return JSON.parse(
+									fs.readFileSync(rootTSConfigPath, 'utf8'),
+								);
+							}
+
+							return {};
+						})();
 
 						return [
 							typescript({
@@ -438,7 +447,7 @@ export abstract class BasePackage
 									target: 'ESNext',
 									noEmitOnError: true,
 									strict: true,
-									paths: tsconfig.compilerOptions.paths,
+									paths: tsconfig?.compilerOptions?.paths ?? {},
 								},
 							}),
 						];
