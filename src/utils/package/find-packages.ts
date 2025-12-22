@@ -12,6 +12,7 @@ export function findPackages({ startDirectory, packageFactory }: FindPackageOpti
 {
 	const patterns = [
 		'**/bundle.config.js',
+		'**/bundle.config.ts',
 		'**/script.es6.js',
 	];
 

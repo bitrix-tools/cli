@@ -60,14 +60,24 @@ export abstract class BasePackage
 		return this.#path;
 	}
 
-	getBundleConfigFilePath(): string
+	getBundleConfigJsFilePath(): string
 	{
 		return path.join(this.getPath(), 'bundle.config.js');
 	}
 
-	hasBundleConfigFile(): boolean
+	hasBundleConfigJsFile(): boolean
 	{
-		return fs.existsSync(this.getBundleConfigFilePath());
+		return fs.existsSync(this.getBundleConfigJsFilePath());
+	}
+
+	getBundleConfigTsFilePath(): string
+	{
+		return path.join(this.getPath(), 'bundle.config.ts');
+	}
+
+	hasBundleConfigTsFile(): boolean
+	{
+		return fs.existsSync(this.getBundleConfigTsFilePath());
 	}
 
 	getScriptEs6FilePath(): string
@@ -176,9 +186,13 @@ export abstract class BasePackage
 	{
 		return this.#cache.remember('bundleConfig', () => {
 			const config = new BundleConfigManager();
-			if (this.hasBundleConfigFile())
+			if (this.hasBundleConfigJsFile())
 			{
-				config.loadFromFile(this.getBundleConfigFilePath());
+				config.loadFromFile(this.getBundleConfigJsFilePath());
+			}
+			else if (this.hasBundleConfigTsFile())
+			{
+				config.loadFromFile(this.getBundleConfigTsFilePath());
 			}
 			else if (this.hasScriptEs6FilePath())
 			{
