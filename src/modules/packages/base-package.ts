@@ -14,7 +14,7 @@ import presetEnv from '@babel/preset-env';
 import flowStripTypesPlugin from '@babel/plugin-transform-flow-strip-types';
 import externalHelpersPlugin from '@babel/plugin-external-helpers';
 
-import { rollup, type InputOptions, type OutputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
+import { rollup, type InputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
 import postcss from 'rollup-plugin-postcss';
 import jsonPlugin from '@rollup/plugin-json';
 import imagePlugin from '@rollup/plugin-image';
@@ -29,6 +29,9 @@ import { LintResult } from '../linter/lint.result';
 import { Environment } from '../../environment/environment';
 import { flattenTree } from '../../utils/flatten.tree';
 import { buildDependenciesTree } from '../../utils/package/build.dependencies.tree';
+import { BuildService } from '../services/build/build.service';
+import { RollupBuildStrategy } from '../services/build/strategies/rollup.strategy';
+import type { BuildOptions, BuildResult } from '../services/build/types/build.service.types';
 import type { DependencyNode } from './types/dependency.node';
 
 type BasePackageOptions = {
@@ -53,6 +56,15 @@ export abstract class BasePackage
 	constructor(options: BasePackageOptions)
 	{
 		this.#path = options.path;
+	}
+
+	#getBuildService(): BuildService
+	{
+		return this.#cache.remember('buildService', () => {
+			return new BuildService(
+				new RollupBuildStrategy(),
+			);
+		});
 	}
 
 	getPath(): string
@@ -223,24 +235,6 @@ export abstract class BasePackage
 	getWarnings(): Array<RollupLog>
 	{
 		return [...this.#warnings];
-	}
-
-	getWarningsSummary(): string
-	{
-		const counts = this.getWarnings().reduce((acc, warning) => {
-			if (!Object.hasOwn(acc, warning.code))
-			{
-				acc[warning.code] = 0;
-			}
-
-			acc[warning.code] += 1;
-
-			return acc;
-		}, {});
-
-		return Object.entries(counts).map(([key, count]) => {
-			return `${key}: ${count}`;
-		}).join('\n  ');
 	}
 
 	addExternalDependency(dependency: DependencyNode)
@@ -454,14 +448,28 @@ export abstract class BasePackage
 							return {};
 						})();
 
+						const paths = (() => {
+							if (tsconfig?.compilerOptions?.paths)
+							{
+								return Object.entries(tsconfig.compilerOptions.paths).reduce((acc, [key, value]) => {
+									return {
+										...acc,
+										[key]: [path.join(tsconfig.compilerOptions.baseUrl, String(value[0]))],
+									}
+								}, {});
+							}
+
+							return {};
+						})();
+
 						return [
 							typescript({
 								tsconfig: false,
 								compilerOptions: {
 									target: 'ESNext',
 									noEmitOnError: true,
-									strict: true,
-									paths: tsconfig?.compilerOptions?.paths ?? {},
+									strict: false,
+									paths,
 								},
 							}),
 						];
@@ -508,76 +516,47 @@ export abstract class BasePackage
 		};
 	}
 
-	#getRollupOutputOptions(): OutputOptions
+	#getBuildOptions(): BuildOptions
 	{
 		return {
-			file: this.getOutputJsPath(),
-			name: this.getBundleConfig().get('namespace'),
-			format: 'iife',
-			banner: '/* eslint-disable */',
-			extend: true,
-			globals: {
-				...this.getGlobals(),
+			input: this.getInputPath(),
+			output: {
+				js: this.getOutputJsPath(),
+				css: this.getOutputCssPath(),
 			},
+			targets: this.getTargets(),
+			namespace: this.getBundleConfig().get('namespace'),
+			typescript: this.isTypeScriptMode(),
 		};
 	}
 
 	async build(): Promise<{
 		warnings: Array<RollupLog>,
 		errors: Array<RollupLog>,
-		warningsSummary: string,
 		bundles: Array<{
 			fileName: string,
 			size: number,
-			type: 'chunk' | 'asset';
 		}>,
-		externalDependenciesCount: number,
+		dependenciesCount: number,
 	}>
 	{
-		const bundle = await rollup(
-			this.#getRollupInputOptions(),
-		);
+		const buildService = this.#getBuildService();
 
-		const result = await bundle.write(
-			this.#getRollupOutputOptions(),
-		);
+		const {
+			warnings,
+			errors,
+			dependencies,
+			bundles,
+		}: BuildResult = await buildService.build(this.#getBuildOptions());
 
-		await bundle.close();
-
-		const warnings = this.getWarnings();
-		const warningsSummary = this.getWarningsSummary();
-		const errors = this.getErrors();
-		const externalDependenciesCount = this.getExternalDependencies().length;
-		const bundles = result.output.map((chunk) => {
-			const size =
-				chunk.type === 'asset'
-					? Buffer.byteLength(chunk.source, 'utf8')
-					: Buffer.byteLength(chunk.code, 'utf8');
-
-			return {
-				fileName: chunk.fileName,
-				size,
-				type: chunk.type
-			};
-		});
-
-		const rel = this.getExternalDependencies().map((dependency: DependencyNode) => {
-			return dependency.name;
-		});
-
-		this.getPhpConfig().set('rel', rel);
+		this.getPhpConfig().set('rel', dependencies);
 		this.getPhpConfig().save(this.getPhpConfigFilePath());
-
-		this.#externalDependencies.splice(0, this.#externalDependencies.length);
-		this.#warnings.clear();
-		this.#errors.clear();
 
 		return {
 			warnings,
-			warningsSummary,
 			errors,
 			bundles,
-			externalDependenciesCount,
+			dependenciesCount: dependencies.length,
 		};
 	}
 
@@ -612,11 +591,13 @@ export abstract class BasePackage
 				}
 			}
 
-			void await rollup(
-				this.#getRollupInputOptions(),
-			);
+			const buildService = this.#getBuildService();
+			const buildOptions = this.#getBuildOptions();
+			const { dependencies } = await buildService.build(buildOptions);
 
-			return this.getExternalDependencies();
+			return dependencies.map((name: string) => {
+				return { name };
+			});
 		});
 	}
 
