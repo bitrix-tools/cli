@@ -20,9 +20,9 @@ export class BundleConfigManager extends ConfigManager<BundleConfig>
 	loadFromFile(configPath: string): any
 	{
 		const require = createRequire(import.meta.url);
-		const sourceBundleConfig: SourceBundleConfig = require(path.resolve(configPath));
+		const sourceBundleConfig: { default: SourceBundleConfig } & SourceBundleConfig = require(path.resolve(configPath));
 
-		Object.entries(sourceBundleConfig).forEach(([key, value]) => {
+		Object.entries(sourceBundleConfig?.default ?? sourceBundleConfig).forEach(([key, value]) => {
 			this.set(key, value);
 		});
 	}
