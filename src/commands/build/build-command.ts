@@ -16,6 +16,7 @@ import { TaskRunner } from '../../modules/task/task';
 import { lintTask } from './tasks/lint/lint.task';
 import { buildTask } from './tasks/build/build.task';
 import { statisticTask } from './tasks/statistic/statistic.task';
+import { runAfterBuildHooksTask } from './tasks/hooks/run-after-build-hooks.task';
 
 import type { BasePackage } from '../../modules/packages/base-package';
 
@@ -52,6 +53,7 @@ buildCommand
 								lintTask(extension, args),
 								buildTask(extension, args),
 								statisticTask(extension, args),
+								runAfterBuildHooksTask(extension, args),
 							],
 						}
 					]);

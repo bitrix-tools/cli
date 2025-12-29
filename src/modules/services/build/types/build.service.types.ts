@@ -10,6 +10,7 @@ export interface BuildResult {
 	errors: RollupLog[];
 	bundles: BundleFileInfo[];
 	dependencies: string[];
+	standalone: boolean;
 }
 
 export type BuildOptions = {
@@ -18,6 +19,7 @@ export type BuildOptions = {
 	targets: string[];
 	namespace: string;
 	typescript?: boolean;
+	standalone?: boolean;
 };
 
 export type BuildCodeOptions = {

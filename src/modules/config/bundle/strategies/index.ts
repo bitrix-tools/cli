@@ -14,3 +14,4 @@ export * from './tests.strategy';
 export * from './concat.strategy';
 export * from './treeshake.strategy';
 export * from './resolve.files.import.strategy';
+export * from './hooks.strategy';

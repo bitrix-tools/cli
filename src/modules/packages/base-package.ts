@@ -7,23 +7,9 @@ import playwright from 'playwright';
 import browserslist from 'browserslist';
 import { ESLint } from 'eslint';
 
-import { babel } from '@rollup/plugin-babel';
-import nodeResolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import presetEnv from '@babel/preset-env';
-import flowStripTypesPlugin from '@babel/plugin-transform-flow-strip-types';
-import externalHelpersPlugin from '@babel/plugin-external-helpers';
-
-import { rollup, type InputOptions, type RollupLog, type LoggingFunction, OutputChunk } from 'rollup';
-import postcss from 'rollup-plugin-postcss';
-import jsonPlugin from '@rollup/plugin-json';
-import imagePlugin from '@rollup/plugin-image';
-import typescript, { FlexibleCompilerOptions } from '@rollup/plugin-typescript';
-
 import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
 import { PhpConfigManager } from '../config/php/php.config.manager';
 import { MemoryCache } from '../../utils/memory-cache';
-import { isExternalDependencyName } from '../../utils/is.external.dependency.name';
 import { PackageResolver } from './package.resolver';
 import { LintResult } from '../linter/lint.result';
 import { Environment } from '../../environment/environment';
@@ -49,9 +35,6 @@ export abstract class BasePackage
 
 	readonly #path: string;
 	readonly #cache: MemoryCache = new MemoryCache();
-	readonly #warnings: Set<RollupLog> = new Set<RollupLog>();
-	readonly #errors: Set<RollupLog> = new Set<RollupLog>();
-	readonly #externalDependencies: Array<DependencyNode> = [];
 
 	constructor(options: BasePackageOptions)
 	{
@@ -102,6 +85,31 @@ export abstract class BasePackage
 		return fs.existsSync(this.getScriptEs6FilePath());
 	}
 
+	getBundleConfigFilePath(): string | null
+	{
+		if (this.hasBundleConfigJsFile())
+		{
+			return this.getBundleConfigJsFilePath()
+		}
+
+		if (this.hasBundleConfigTsFile())
+		{
+			return this.getBundleConfigTsFilePath();
+		}
+
+		return null;
+	}
+
+	hasBundleConfigFile(): boolean
+	{
+		const bundleConfigFilePath = this.getBundleConfigFilePath();
+
+		return (
+			bundleConfigFilePath
+			&& fs.existsSync(bundleConfigFilePath)
+		);
+	}
+
 	getPhpConfigFilePath(): string
 	{
 		return path.join(this.getPath(), 'config.php');
@@ -125,72 +133,6 @@ export abstract class BasePackage
 		});
 	}
 
-	getBaseTSConfig(): string
-	{
-		return path.join(this.getPath(), 'tsconfig.base.json');
-	}
-
-	hasBaseTSConfig(): boolean
-	{
-		return fs.existsSync(this.getBaseTSConfig());
-	}
-
-	getTSConfigPath(): string
-	{
-		return path.join(this.getPath(), 'tsconfig.json');
-	}
-
-	hasTSConfig(): boolean
-	{
-		return fs.existsSync(this.getTSConfigPath());
-	}
-
-	generateBaseTSConfig(dependencies: Array<string>): FlexibleCompilerOptions
-	{
-		return {
-			compilerOptions: {
-				paths: dependencies.reduce((acc, extensionName) => {
-					const extension = PackageResolver.resolve(extensionName);
-					const relativeInputPath = path.relative(this.getPath(), extension.getInputPath());
-
-					acc[extensionName] = [relativeInputPath];
-
-					return acc;
-				}, {}),
-			},
-		};
-	}
-
-	generateTSConfig(): FlexibleCompilerOptions
-	{
-		return {
-			extends: './tsconfig.base.json',
-		};
-	}
-
-	generateTSConfigs()
-	{
-		if (this.getInputPath().endsWith('.ts'))
-		{
-			if (!this.hasTSConfig())
-			{
-				const tsConfig = this.generateTSConfig();
-				const tsConfigContents = JSON.stringify(tsConfig, null, 4);
-
-				fs.writeFileSync(this.getTSConfigPath(), tsConfigContents);
-			}
-
-			const dependencies = this.getExternalDependencies().map((dependencyNode) => {
-				return dependencyNode.name;
-			});
-
-			const baseTSConfig = this.generateBaseTSConfig(dependencies);
-			const baseTSConfigContents = JSON.stringify(baseTSConfig, null, 4);
-
-			fs.writeFileSync(this.getBaseTSConfig(), baseTSConfigContents, 'utf-8');
-		}
-	}
-
 	abstract getName(): string
 	abstract getModuleName(): string
 
@@ -198,13 +140,9 @@ export abstract class BasePackage
 	{
 		return this.#cache.remember('bundleConfig', () => {
 			const config = new BundleConfigManager();
-			if (this.hasBundleConfigJsFile())
+			if (this.hasBundleConfigFile())
 			{
-				config.loadFromFile(this.getBundleConfigJsFilePath());
-			}
-			else if (this.hasBundleConfigTsFile())
-			{
-				config.loadFromFile(this.getBundleConfigTsFilePath());
+				config.loadFromFile(this.getBundleConfigFilePath());
 			}
 			else if (this.hasScriptEs6FilePath())
 			{
@@ -214,55 +152,6 @@ export abstract class BasePackage
 			}
 
 			return config;
-		});
-	}
-
-	addError(error: any)
-	{
-		this.#errors.add(error);
-	}
-
-	getErrors(): Array<any>
-	{
-		return [...this.#errors];
-	}
-
-	addWarning(warning: RollupLog)
-	{
-		this.#warnings.add(warning);
-	}
-
-	getWarnings(): Array<RollupLog>
-	{
-		return [...this.#warnings];
-	}
-
-	addExternalDependency(dependency: DependencyNode)
-	{
-		const hasDependency = this.#externalDependencies.find((currentDependency: DependencyNode) => {
-			return currentDependency.name === dependency.name
-		});
-
-		if (!hasDependency)
-		{
-			this.#externalDependencies.push(dependency);
-		}
-	}
-
-	getExternalDependencies(): Array<DependencyNode>
-	{
-		return this.#cache.remember('externalDependencies', () => {
-			return [...this.#externalDependencies].sort((a: DependencyNode, b: DependencyNode) => {
-				const prefixA = a.name.split('.')[0];
-				const prefixB = b.name.split('.')[0];
-
-				if (prefixA !== prefixB)
-				{
-					return prefixA.localeCompare(prefixB);
-				}
-
-				return a.name.localeCompare(b.name);
-			});
 		});
 	}
 
@@ -294,19 +183,6 @@ export abstract class BasePackage
 		const namespace = this.getBundleConfig().get('namespace');
 
 		return { [name]: namespace };
-	}
-
-	getGlobals(): Record<string, string>
-	{
-		return this.getExternalDependencies().reduce((acc, dependency) => {
-			const extension = PackageResolver.resolve(dependency.name);
-			if (extension)
-			{
-				return { ...acc, ...extension.getGlobal() };
-			}
-
-			return acc;
-		}, {});
 	}
 
 	getInputPath(): string
@@ -354,19 +230,6 @@ export abstract class BasePackage
 		});
 	}
 
-	removeJavaScriptSourceFiles()
-	{
-		this.getJavaScriptSourceFiles().forEach((sourceFile) => {
-			if (fs.existsSync(sourceFile))
-			{
-				fs.unlinkSync(sourceFile);
-			}
-		});
-
-		this.#cache.forget('sourceFiles');
-		this.#cache.forget('javaScriptSourceFiles');
-	}
-
 	getTypeScriptSourceFiles(): Array<string>
 	{
 		return this.#cache.remember('typeScriptSourceFiles', () => {
@@ -374,19 +237,6 @@ export abstract class BasePackage
 				return sourceFile.endsWith(`.${BasePackage.TYPESCRIPT_EXTENSION}`);
 			});
 		});
-	}
-
-	removeTypeScriptSourceFiles()
-	{
-		this.getTypeScriptSourceFiles().forEach((sourceFile) => {
-			if (fs.existsSync(sourceFile))
-			{
-				fs.unlinkSync(sourceFile);
-			}
-		});
-
-		this.#cache.forget('sourceFiles');
-		this.#cache.forget('typeScriptSourceFiles');
 	}
 
 	getActualSourceFiles(): Array<string>
@@ -414,108 +264,6 @@ export abstract class BasePackage
 		return path.join(this.getPath(), 'test', 'e2e');
 	}
 
-	#onWarnHandler(warning: RollupLog, warn: LoggingFunction)
-	{
-		if (warning.code === 'UNRESOLVED_IMPORT' && isExternalDependencyName(warning.exporter))
-		{
-			this.addExternalDependency({
-				name: warning.exporter,
-			});
-
-			return;
-		}
-
-		this.addWarning(warning);
-	}
-
-	#getRollupInputOptions(): InputOptions
-	{
-		return {
-			input: this.getInputPath(),
-			plugins: [
-				...(() => {
-					if (this.isTypeScriptMode())
-					{
-						const tsconfig = (() => {
-							const rootTSConfigPath = path.join(Environment.getRoot(), 'tsconfig.json');
-							if (fs.existsSync(rootTSConfigPath))
-							{
-								return JSON.parse(
-									fs.readFileSync(rootTSConfigPath, 'utf8'),
-								);
-							}
-
-							return {};
-						})();
-
-						const paths = (() => {
-							if (tsconfig?.compilerOptions?.paths)
-							{
-								return Object.entries(tsconfig.compilerOptions.paths).reduce((acc, [key, value]) => {
-									return {
-										...acc,
-										[key]: [path.join(tsconfig.compilerOptions.baseUrl, String(value[0]))],
-									}
-								}, {});
-							}
-
-							return {};
-						})();
-
-						return [
-							typescript({
-								tsconfig: false,
-								compilerOptions: {
-									target: 'ESNext',
-									noEmitOnError: true,
-									strict: false,
-									paths,
-								},
-							}),
-						];
-					}
-
-					return [];
-				})(),
-				nodeResolve({
-					browser: true,
-				}),
-				babel({
-					babelHelpers: 'external',
-					presets: [
-						[
-							presetEnv,
-							{
-								targets: this.getTargets(),
-								modules: false,
-							},
-						],
-					],
-					plugins: [
-						flowStripTypesPlugin,
-						externalHelpersPlugin,
-					],
-				}),
-				commonjs(),
-				postcss({
-					extract: this.getOutputCssPath(),
-					sourceMap: false,
-					plugins: [
-
-					]
-				}),
-				jsonPlugin(),
-				imagePlugin(),
-			],
-			onwarn: this.#onWarnHandler.bind(this),
-			treeshake: {
-				moduleSideEffects: false,
-				propertyReadSideEffects: false,
-				tryCatchDeoptimization: false,
-			},
-		};
-	}
-
 	#getBuildOptions(): BuildOptions
 	{
 		return {
@@ -530,34 +278,18 @@ export abstract class BasePackage
 		};
 	}
 
-	async build(): Promise<{
-		warnings: Array<RollupLog>,
-		errors: Array<RollupLog>,
-		bundles: Array<{
-			fileName: string,
-			size: number,
-		}>,
-		dependenciesCount: number,
-	}>
+	async build(): Promise<BuildResult>
 	{
 		const buildService = this.#getBuildService();
+		const buildOptions = this.#getBuildOptions();
 
-		const {
-			warnings,
-			errors,
-			dependencies,
-			bundles,
-		}: BuildResult = await buildService.build(this.#getBuildOptions());
+		const buildResult = await buildService.build(buildOptions);
 
-		this.getPhpConfig().set('rel', dependencies);
-		this.getPhpConfig().save(this.getPhpConfigFilePath());
+		const phpConfig = this.getPhpConfig();
+		phpConfig.set('rel', buildResult.dependencies);
+		phpConfig.save(this.getPhpConfigFilePath());
 
-		return {
-			warnings,
-			errors,
-			bundles,
-			dependenciesCount: dependencies.length,
-		};
+		return buildResult;
 	}
 
 	async lint(): Promise<LintResult>
@@ -591,13 +323,18 @@ export abstract class BasePackage
 				}
 			}
 
-			const buildService = this.#getBuildService();
-			const buildOptions = this.#getBuildOptions();
-			const { dependencies } = await buildService.build(buildOptions);
+			if (this.hasBundleConfigJsFile())
+			{
+				const buildService = this.#getBuildService();
+				const buildOptions = this.#getBuildOptions();
+				const { dependencies } = await buildService.build(buildOptions);
 
-			return dependencies.map((name: string) => {
-				return { name };
-			});
+				return dependencies.map((name: string) => {
+					return { name };
+				});
+			}
+
+			return [];
 		});
 	}
 
@@ -746,81 +483,14 @@ export abstract class BasePackage
 			})
 			.join('\n');
 
-		const dependencies = [];
-		const rollupInputOptions = this.#getRollupInputOptions();
-		const entries = {
-			'sourceCode.js': sourceTestsCode,
-		};
-		const bundle = await rollup({
-			...rollupInputOptions,
-			input: 'sourceCode.js',
-			plugins: [
-				{
-					name: 'virtual-module-plugin',
-					resolveId(id) {
-						if (id in entries)
-						{
-							return id;
-						}
-
-						return null;
-					},
-					load(id) {
-						if (id in entries)
-						{
-							return entries[id];
-						}
-
-						return null;
-					},
-				},
-				...(() => {
-					if (Array.isArray(rollupInputOptions.plugins))
-					{
-						return rollupInputOptions.plugins;
-					}
-
-					return [];
-				})(),
-			],
-			onwarn: (warning, warn) => {
-				if (warning.code === 'UNRESOLVED_IMPORT' && isExternalDependencyName(warning.exporter))
-				{
-					dependencies.push(warning.exporter);
-
-					return;
-				}
-
-				warn(warning);
-			},
-			treeshake: false,
+		const buildResult = await this.#getBuildService().buildCode({
+			code: sourceTestsCode,
+			targets: this.getTargets(),
+			typescript: false,
+			namespace: 'BX.TestsBundle',
 		});
 
-		const globals = dependencies.reduce((acc, dependency) => {
-			const extension = PackageResolver.resolve(dependency);
-			if (extension)
-			{
-				return { ...acc, ...extension.getGlobal() };
-			}
-
-			return acc;
-		}, {});
-
-		const result = await bundle.generate({
-			file: path.join(this.getPath(), 'test.bundle.js'),
-			format: 'iife',
-			banner: '/* eslint-disable */',
-			extend: true,
-			globals: {
-				...globals,
-			},
-		});
-
-		await bundle.close();
-
-		const outputEntry = result.output.at(0) as OutputChunk;
-
-		return outputEntry?.code;
+		return buildResult.code;
 	}
 
 	async getEndToEndTests(): Promise<Array<string>>
@@ -842,7 +512,7 @@ export abstract class BasePackage
 		);
 	}
 
-	async runUnitTests(args: Record<string, any>): Promise<any> {
+	async runUnitTests(args: Record<string, any> = {}): Promise<any> {
 		const browser = await playwright.chromium.launch({
 			headless: args.headed !== true,
 		});
@@ -921,7 +591,7 @@ export abstract class BasePackage
 		}
 	}
 
-	async runEndToEndTests(sourceArgs: Record<string, any>): Promise<any>
+	async runEndToEndTests(sourceArgs: Record<string, any> = {}): Promise<any>
 	{
 		const tests = await this.getEndToEndTests();
 		if (tests.length === 0)

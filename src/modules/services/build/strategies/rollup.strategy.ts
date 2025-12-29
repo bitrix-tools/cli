@@ -95,6 +95,45 @@ export class RollupBuildStrategy extends BuildStrategy
 		};
 	}
 
+	protected static createVirtualEntryPlugin(entries: Record<string, string>): Plugin
+	{
+		return {
+			name: 'virtual-module-plugin',
+			resolveId(id) {
+				if (id in entries)
+				{
+					return id;
+				}
+
+				return null;
+			},
+			load(id) {
+				if (id in entries)
+				{
+					return entries[id];
+				}
+
+				return null;
+			},
+		}
+	}
+
+	protected static createStandalonePlugin(): Plugin
+	{
+		return {
+			name: 'standalone-plugin',
+			resolveId(id) {
+				const extension = PackageResolver.resolve(id);
+				if (extension)
+				{
+					return extension.getInputPath();
+				}
+
+				return null;
+			},
+		}
+	}
+
 	async build(options: BuildOptions): Promise<BuildResult>
 	{
 		const { onWarning, warningsRef, dependenciesRef } = RollupBuildStrategy.createOnWarningHandler();
@@ -102,40 +141,46 @@ export class RollupBuildStrategy extends BuildStrategy
 
 		const bundle: RollupBuild = await rollup(inputOptions);
 
-		const outputOptions: OutputOptions = this.#buildOutputOptions(options);
+		const outputOptions: OutputOptions = this.#buildRollupOutputOptions(options);
 		const globals = RollupBuildStrategy.makeGlobals(dependenciesRef);
 		const result: RollupOutput = await bundle.write({ ...outputOptions, globals });
 
 		await bundle.close();
 
 		const bundlesSize = RollupBuildStrategy.calculateBundlesSize(result.output);
+		const sortedDependencies = RollupBuildStrategy.sortDependencies(dependenciesRef)
 
 		return {
-			dependencies: [...dependenciesRef],
+			dependencies: sortedDependencies,
 			bundles: bundlesSize,
 			warnings: [...warningsRef],
 			errors: [],
+			standalone: options.standalone ?? false,
 		};
 	}
 
 	async buildCode(options: BuildCodeOptions): Promise<BuildCodeResult>
 	{
 		const { onWarning, warningsRef, dependenciesRef } = RollupBuildStrategy.createOnWarningHandler();
-		const inputOptions: InputOptions = await this.#buildRollupInputOptions(options, onWarning);
+		const rollupInputOptions: InputOptions = await this.#buildRollupBuildCodeInputOptions(
+			options,
+			onWarning,
+		);
 
-		const bundle: RollupBuild = await rollup(inputOptions);
+		const bundle: RollupBuild = await rollup(rollupInputOptions);
 
-		const outputOptions: OutputOptions = this.#buildOutputOptions(options);
+		const outputOptions: OutputOptions = this.#buildRollupBuildCodeOutputOptions(options);
+
 		const globals = RollupBuildStrategy.makeGlobals(dependenciesRef);
-		const result: RollupOutput = await bundle.write({ ...outputOptions, globals });
+		const result: RollupOutput = await bundle.generate({ ...outputOptions, globals });
 
 		await bundle.close();
 
-		const bundlesSize = RollupBuildStrategy.calculateBundlesSize(result.output);
+		const outputEntry = result.output.at(0) as OutputChunk;
 
 		return {
+			code: outputEntry?.code,
 			dependencies: [...dependenciesRef],
-			code: '',
 			warnings: [...warningsRef],
 			errors: [],
 		};
@@ -148,7 +193,7 @@ export class RollupBuildStrategy extends BuildStrategy
 
 		const bundle: RollupBuild = await rollup(inputOptions);
 
-		const outputOptions: OutputOptions = this.#buildOutputOptions(options);
+		const outputOptions: OutputOptions = this.#buildRollupOutputOptions(options);
 		const globals = RollupBuildStrategy.makeGlobals(dependenciesRef);
 		const result: RollupOutput = await bundle.generate({ ...outputOptions, globals });
 
@@ -161,6 +206,7 @@ export class RollupBuildStrategy extends BuildStrategy
 			bundles: bundlesSize,
 			warnings: [...warningsRef],
 			errors: [],
+			standalone: options.standalone ?? false,
 		};
 	}
 
@@ -214,6 +260,14 @@ export class RollupBuildStrategy extends BuildStrategy
 			input: options.input,
 			plugins: [
 				...(() => {
+					if (options.standalone)
+					{
+						return [RollupBuildStrategy.createStandalonePlugin()];
+					}
+
+					return [];
+				})(),
+				...(() => {
 					if (options.typescript)
 					{
 						return [
@@ -262,10 +316,50 @@ export class RollupBuildStrategy extends BuildStrategy
 		}
 	}
 
-	#buildOutputOptions(options: BuildOptions): OutputOptions
+	#buildRollupOutputOptions(options: BuildOptions): OutputOptions
 	{
 		return {
 			file: options.output.js,
+			name: options.namespace,
+			format: 'iife',
+			banner: '/* eslint-disable */',
+			extend: true,
+		};
+	}
+
+	async #buildRollupBuildCodeInputOptions(options: BuildCodeOptions, onWarning: WarningHandlerWithDefault): Promise<InputOptions>
+	{
+		const sourceRollupInputOptions: InputOptions = await this.#buildRollupInputOptions(
+			{
+				input: 'source-code.js',
+				output: {
+					js: 'source-code.bundle.js',
+					css: 'source-code.bundle.css',
+				},
+				typescript: options.typescript,
+				targets: options.targets,
+				namespace: options.namespace,
+			},
+			onWarning,
+		);
+
+		return {
+			...sourceRollupInputOptions,
+			plugins: [
+				RollupBuildStrategy.createVirtualEntryPlugin({
+					'source-code.js': options.code,
+				}),
+				// @ts-ignore
+				...sourceRollupInputOptions.plugins,
+			],
+			treeshake: false,
+		}
+	}
+
+	#buildRollupBuildCodeOutputOptions(options: BuildCodeOptions): OutputOptions
+	{
+		return {
+			file: 'source-code.bundle.js',
 			name: options.namespace,
 			format: 'iife',
 			banner: '/* eslint-disable */',
