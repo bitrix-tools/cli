@@ -10,7 +10,8 @@ import {
 	type RollupBuild,
 	type RollupOutput,
 	type WarningHandlerWithDefault,
-} from "rollup";
+	type OutputChunk,
+} from 'rollup';
 
 import nodeResolve from '@rollup/plugin-node-resolve';
 import babelPlugin from '@rollup/plugin-babel';

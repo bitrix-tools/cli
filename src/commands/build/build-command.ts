@@ -13,10 +13,7 @@ import { PackageFactoryProvider } from '../../modules/packages/providers/package
 import { findPackages } from '../../utils/package/find-packages';
 
 import { TaskRunner } from '../../modules/task/task';
-import { lintTask } from './tasks/lint/lint.task';
 import { buildTask } from './tasks/build/build.task';
-import { statisticTask } from './tasks/statistic/statistic.task';
-import { runAfterBuildHooksTask } from './tasks/hooks/run-after-build-hooks.task';
 
 import type { BasePackage } from '../../modules/packages/base-package';
 
@@ -50,10 +47,7 @@ buildCommand
 								return Promise.resolve();
 							},
 							subtasks: [
-								lintTask(extension, args),
 								buildTask(extension, args),
-								statisticTask(extension, args),
-								runAfterBuildHooksTask(extension, args),
 							],
 						}
 					]);

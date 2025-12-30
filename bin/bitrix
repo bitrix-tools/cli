@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { createRequire } from 'module';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 
 if (fs.existsSync(path.resolve(import.meta.dirname, '../dist/cli.js')))
 {
-	require('../dist/cli.js');
+		require('../dist/cli.js');
 }
 else
 {
-	require('tsx').globalPreload();
-	require('../src/cli.ts');
+		require('tsx').globalPreload();
+		require('../src/cli.ts');
 }
