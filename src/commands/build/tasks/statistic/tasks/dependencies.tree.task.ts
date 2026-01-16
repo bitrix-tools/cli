@@ -7,18 +7,13 @@ export function dependenciesTreeTask(extension: BasePackage, args: Record<string
 {
 	return {
 		title: 'Dependencies tree',
-		run: async (context, { result, level }) => {
+		run: async (context) => {
 			const dependenciesTree = await extension.getDependenciesTree({ size: true });
 			const uniqueDependencies = await extension.getFlattedDependenciesTree();
 			const allDependencies = await extension.getFlattedDependenciesTree(false);
 
 			context.succeed(`Dependencies tree (${uniqueDependencies.length} (${chalk.grey(allDependencies.length)}))`);
 			context.log(generateTreeString(dependenciesTree, '    '));
-
-			return {
-				result,
-				level,
-			};
 		},
 	};
 }

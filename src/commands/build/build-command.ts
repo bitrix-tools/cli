@@ -14,6 +14,8 @@ import { findPackages } from '../../utils/package/find-packages';
 
 import { TaskRunner } from '../../modules/task/task';
 import { buildTask } from './tasks/build/build.task';
+import { lintTask } from './tasks/lint/lint.task';
+import { runAfterBuildHooksTask } from './tasks/hooks/run-after-build-hooks.task';
 
 import type { BasePackage } from '../../modules/packages/base-package';
 
@@ -40,22 +42,59 @@ buildCommand
 				buildQueue.add(async () => {
 					const name = extension.getName();
 
-					await TaskRunner.run([
-						{
-							title: chalk.bold(name),
-							run: () => {
-								return Promise.resolve();
-							},
-							subtasks: [
-								buildTask(extension, args),
-							],
-						}
-					]);
+					if (args.verbose)
+					{
+						return await TaskRunner.run([
+							{
+								title: chalk.bold(name),
+								run: () => {
+									return Promise.resolve();
+								},
+								subtasks: [
+									lintTask(extension, args),
+									buildTask(extension, args),
+									runAfterBuildHooksTask(extension, args),
+								],
+							}
+						]);
+					}
+
+					await TaskRunner.runTask({
+						title: chalk.bold(name),
+						run: async (context) => {
+							const result = await extension.build();
+							if (result.errors.length === 0 && result.warnings.length === 0)
+							{
+								context.succeed(chalk.bold(name));
+							}
+
+							if (result.errors.length > 0)
+							{
+								context.fail(chalk.bold(name));
+
+								result.errors.forEach((error) => {
+									context.border(error.message, 'red', 2);
+								});
+							}
+
+							if (result.warnings.length > 0)
+							{
+								context.warn(chalk.bold(name));
+
+								result.warnings.forEach((error) => {
+									context.border(error.message, 'yellow', 2);
+								});
+							}
+						},
+					});
 				});
 			})
 			.on('done', async ({ count }) => {
 				await buildQueue.onIdle();
-				console.log(`\n✔ Complete! For all ${count} extensions`);
+				if (count > 1)
+				{
+					console.log(`\n✔ Complete! For all ${count} extensions`);
+				}
 			})
 			.on('error', (err) => {
 				console.error('❌ Error while reading packages:', err);

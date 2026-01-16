@@ -29,12 +29,8 @@ export function lintTask(extension: BasePackage, args: Record<string, any>): Tas
 
 			if (text.length > 0)
 			{
-				context.log(text);
+				context.border(text, null, 3);
 			}
-
-			return {
-				level,
-			};
 		},
 	};
 }

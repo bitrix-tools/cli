@@ -1,6 +1,10 @@
 import chalk from 'chalk';
 import type { Task } from '../../../../modules/task/task';
 import type { BasePackage } from '../../../../modules/packages/base-package';
+import {directDependenciesTask} from '../statistic/tasks/direct.dependencies.task';
+import {dependenciesTreeTask} from '../statistic/tasks/dependencies.tree.task';
+import {bundleSizeTask} from '../statistic/tasks/bundle.size.task';
+import {totalTransferredSizeTask} from '../statistic/tasks/total.transferred.size.task';
 
 export function buildTask(extension: BasePackage, args: Record<string, any>): Task
 {
@@ -18,7 +22,7 @@ export function buildTask(extension: BasePackage, args: Record<string, any>): Ta
 			{
 				context.fail('Build failed');
 				result.errors.forEach((error) => {
-					context.log(`    ${chalk.red('✖')} ${error.message}`);
+					context.border(error.message, 'red', 2);
 				});
 			}
 
@@ -26,9 +30,15 @@ export function buildTask(extension: BasePackage, args: Record<string, any>): Ta
 			{
 				context.warn('Build with issues');
 				result.warnings.forEach((error) => {
-					context.log(`    ${chalk.yellow('⚠')} ${error.message}`);
+					context.border(error.message, 'yellow', 2);
 				});
 			}
 		},
+		subtasks: [
+			bundleSizeTask(extension, args),
+			totalTransferredSizeTask(extension, args),
+			directDependenciesTask(extension, args),
+			dependenciesTreeTask(extension, args),
+		],
 	};
 }

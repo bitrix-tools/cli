@@ -3,7 +3,7 @@ import type { BasePackage } from '../../../modules/packages/base-package';
 import type { Task } from '../../../modules/task/task';
 import {TASK_STATUS_ICON} from '../../../modules/task/icons';
 
-export function totalTransferredSizeTask(extension: BasePackage, args: Record<string, any>): Task
+export function totalTransferredSizeTask(extension: BasePackage): Task
 {
 	return {
 		title: 'Total transferred size',
@@ -11,16 +11,23 @@ export function totalTransferredSizeTask(extension: BasePackage, args: Record<st
 			const totalTransferredSize = await extension.getTotalTransferredSize();
 			context.succeed('Total transferred size');
 
-			const formattedJsSize = formatSize({
-				size: totalTransferredSize.js,
-			});
+			if (totalTransferredSize.js > 0)
+			{
+				const formattedJsSize = formatSize({
+					size: totalTransferredSize.js,
+				});
 
-			const formattedCssSize = formatSize({
-				size: totalTransferredSize.css,
-			});
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} JS: ${formattedJsSize}`);
+			}
 
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} JS: ${formattedJsSize}`);
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} CSS: ${formattedCssSize}`);
+			if (totalTransferredSize.css > 0)
+			{
+				const formattedCssSize = formatSize({
+					size: totalTransferredSize.css,
+				});
+
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} CSS: ${formattedCssSize}`);
+			}
 		},
 	};
 }

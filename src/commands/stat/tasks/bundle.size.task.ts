@@ -10,23 +10,33 @@ export function bundleSizeTask(extension: BasePackage, args: Record<string, any>
 		title: 'Bundle size',
 		run: async (context) => {
 			context.succeed('Bundle size');
-			const sizes = extension.getBundlesSize();
 
-			const formattedJsSize = formatSize({
-				size: sizes.js,
-			});
+			const bundleSize = extension.getBundlesSize();
 
-			const formattedCssSize = formatSize({
-				size: sizes.css,
-			});
+			if (bundleSize.js > 0)
+			{
+				const formattedJsSize = formatSize({
+					size: bundleSize.js,
+				});
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} JS: ${formattedJsSize}`);
+			}
 
-			const formattedTotalSize = formatSize({
-				size: sizes.js + sizes.css,
-			});
+			if (bundleSize.css > 0)
+			{
+				const formattedCssSize = formatSize({
+					size: bundleSize.css,
+				});
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} CSS: ${formattedCssSize}`);
+			}
 
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} JS: ${formattedJsSize}`);
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} CSS: ${formattedCssSize}`);
-			context.log(`    ${TASK_STATUS_ICON.arrowRight} Total size: ${formattedTotalSize}`);
+			if (bundleSize.js > 0 && bundleSize.css > 0)
+			{
+				const formattedTotalSize = formatSize({
+					size: bundleSize.js + bundleSize.css,
+				});
+
+				context.log(`    ${TASK_STATUS_ICON.arrowRight} Total size: ${formattedTotalSize}`);
+			}
 		},
 	};
 }

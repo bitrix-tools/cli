@@ -3,9 +3,7 @@ import * as fs from 'node:fs';
 import fg from 'fast-glob';
 import { spawn } from 'node:child_process';
 
-import playwright from 'playwright';
 import browserslist from 'browserslist';
-import { ESLint } from 'eslint';
 
 import { BundleConfigManager } from '../config/bundle/bundle.config.manager';
 import { PhpConfigManager } from '../config/php/php.config.manager';
@@ -15,8 +13,9 @@ import { LintResult } from '../linter/lint.result';
 import { Environment } from '../../environment/environment';
 import { flattenTree } from '../../utils/flatten.tree';
 import { buildDependenciesTree } from '../../utils/package/build.dependencies.tree';
-import { BuildService } from '../services/build/build.service';
 import { RollupBuildStrategy } from '../services/build/strategies/rollup.strategy';
+
+import type { BuildService } from '../services/build/build.service';
 import type { BuildOptions, BuildResult } from '../services/build/types/build.service.types';
 import type { DependencyNode } from './types/dependency.node';
 
@@ -41,9 +40,11 @@ export abstract class BasePackage
 		this.#path = options.path;
 	}
 
-	#getBuildService(): BuildService
+	#getBuildService(): Promise<BuildService>
 	{
-		return this.#cache.remember('buildService', () => {
+		return this.#cache.remember('buildService', async () => {
+			const { BuildService } = await import('../services/build/build.service');
+
 			return new BuildService(
 				new RollupBuildStrategy(),
 			);
@@ -280,7 +281,7 @@ export abstract class BasePackage
 
 	async build(): Promise<BuildResult>
 	{
-		const buildService = this.#getBuildService();
+		const buildService = await this.#getBuildService();
 		const buildOptions = this.#getBuildOptions();
 
 		const buildResult = await buildService.build(buildOptions);
@@ -292,8 +293,18 @@ export abstract class BasePackage
 		return buildResult;
 	}
 
+	async generate(): Promise<BuildResult>
+	{
+		const buildService = await this.#getBuildService();
+		const buildOptions = this.#getBuildOptions();
+
+		return buildService.generate(buildOptions);
+	}
+
 	async lint(): Promise<LintResult>
 	{
+		const { ESLint } = await import('eslint');
+
 		const eslint = new ESLint({
 			errorOnUnmatchedPattern: false,
 			cwd: Environment.getRoot(),
@@ -325,7 +336,7 @@ export abstract class BasePackage
 
 			if (this.hasBundleConfigJsFile())
 			{
-				const buildService = this.#getBuildService();
+				const buildService = await this.#getBuildService();
 				const buildOptions = this.#getBuildOptions();
 				const { dependencies } = await buildService.build(buildOptions);
 
@@ -483,7 +494,8 @@ export abstract class BasePackage
 			})
 			.join('\n');
 
-		const buildResult = await this.#getBuildService().buildCode({
+		const buildService = await this.#getBuildService();
+		const buildResult = await buildService.buildCode({
 			code: sourceTestsCode,
 			targets: this.getTargets(),
 			typescript: false,
@@ -512,7 +524,9 @@ export abstract class BasePackage
 		);
 	}
 
-	async runUnitTests(args: Record<string, any> = {}): Promise<any> {
+	async runUnitTests(args: Record<string, any> = {}): Promise<any>
+	{
+		const playwright = await import('playwright');
 		const browser = await playwright.chromium.launch({
 			headless: args.headed !== true,
 		});
@@ -582,12 +596,15 @@ export abstract class BasePackage
 			return {
 				report,
 				stats,
+				errors: [],
 			};
 		}
 		catch (error)
 		{
-			console.error('Error during test execution:', error);
-			throw error;
+			return {
+				report: [],
+				errors: [error],
+			};
 		}
 	}
 

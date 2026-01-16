@@ -9,13 +9,8 @@ export function statisticTask(extension: BasePackage, args: Record<string, any>)
 {
 	return {
 		title: 'Make build statistics...',
-		run: async (context, { level, result }) => {
+		run: async (context) => {
 			context.succeed('Build statistics');
-
-			return {
-				level,
-				result,
-			};
 		},
 		subtasks: [
 			directDependenciesTask(extension, args),

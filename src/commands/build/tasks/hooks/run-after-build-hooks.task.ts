@@ -7,7 +7,7 @@ export function runAfterBuildHooksTask(extension: BasePackage, args: Record<stri
 {
 	return {
 		title: 'Run hooks...',
-		run: async (context, { level, result }) => {
+		run: async (context) => {
 			const hooks = extension.getBundleConfig().get('hooks');
 			if (Array.isArray(hooks?.afterBuild))
 			{
@@ -67,11 +67,6 @@ export function runAfterBuildHooksTask(extension: BasePackage, args: Record<stri
 
 				context.succeed('After build hooks completed');
 			}
-
-			return {
-				level,
-				result,
-			};
 		},
 	};
 }

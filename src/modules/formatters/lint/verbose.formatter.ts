@@ -50,11 +50,11 @@ export async function verboseFormatter(result: LintResult): Promise<{ text: stri
 			return resultItem.messages.length > 0
 		})
 		.map((resultItem: ESLint.LintResult) => {
-			const head = `  ${chalk.bold(resultItem.filePath.split('/src/')[1])}`;
+			const head = `${chalk.bold(resultItem.filePath.split('/src/')[1])}`;
 			const messages = table(
 				resultItem.messages.map((message) => {
 					return [
-						`    ${getLevelIcon(message.severity)}`,
+						` ${getLevelIcon(message.severity)}`,
 						`${message.line}:${message.column}`,
 						message.ruleId ?? '',
 						truncateWords(message.message, 60),
@@ -65,7 +65,7 @@ export async function verboseFormatter(result: LintResult): Promise<{ text: stri
 				},
 			);
 
-			return `${head}\n${messages}\n`;
+			return `${head}\n${messages}`;
 		}).join('\n');
 
 	return {

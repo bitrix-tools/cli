@@ -140,11 +140,40 @@ export class RollupBuildStrategy extends BuildStrategy
 		const { onWarning, warningsRef, dependenciesRef } = RollupBuildStrategy.createOnWarningHandler();
 		const inputOptions: InputOptions = await this.#buildRollupInputOptions(options, onWarning);
 
-		const bundle: RollupBuild = await rollup(inputOptions);
+		let bundle: RollupBuild;
+		try
+		{
+			bundle = await rollup(inputOptions);
+		}
+		catch (error)
+		{
+			return {
+				dependencies: [],
+				bundles: [],
+				warnings: [],
+				errors: [error],
+				standalone: options.standalone ?? false,
+			};
+		}
 
 		const outputOptions: OutputOptions = this.#buildRollupOutputOptions(options);
 		const globals = RollupBuildStrategy.makeGlobals(dependenciesRef);
-		const result: RollupOutput = await bundle.write({ ...outputOptions, globals });
+
+		let result: RollupOutput;
+		try
+		{
+			result = await bundle.write({ ...outputOptions, globals })
+		}
+		catch (error)
+		{
+			return {
+				dependencies: [],
+				bundles: [],
+				warnings: [],
+				errors: [error],
+				standalone: options.standalone ?? false,
+			};
+		}
 
 		await bundle.close();
 
@@ -192,18 +221,48 @@ export class RollupBuildStrategy extends BuildStrategy
 		const { onWarning, warningsRef, dependenciesRef } = RollupBuildStrategy.createOnWarningHandler();
 		const inputOptions: InputOptions = await this.#buildRollupInputOptions(options, onWarning);
 
-		const bundle: RollupBuild = await rollup(inputOptions);
+		let bundle: RollupBuild;
+		try
+		{
+			bundle = await rollup(inputOptions);
+		}
+		catch (error)
+		{
+			return {
+				dependencies: [],
+				bundles: [],
+				warnings: [],
+				errors: [error],
+				standalone: options.standalone ?? false,
+			};
+		}
 
 		const outputOptions: OutputOptions = this.#buildRollupOutputOptions(options);
 		const globals = RollupBuildStrategy.makeGlobals(dependenciesRef);
-		const result: RollupOutput = await bundle.generate({ ...outputOptions, globals });
+
+		let result: RollupOutput;
+		try
+		{
+			result = await bundle.generate({ ...outputOptions, globals })
+		}
+		catch (error)
+		{
+			return {
+				dependencies: [],
+				bundles: [],
+				warnings: [],
+				errors: [error],
+				standalone: options.standalone ?? false,
+			};
+		}
 
 		await bundle.close();
 
 		const bundlesSize = RollupBuildStrategy.calculateBundlesSize(result.output);
+		const sortedDependencies = RollupBuildStrategy.sortDependencies(dependenciesRef)
 
 		return {
-			dependencies: [...dependenciesRef],
+			dependencies: sortedDependencies,
 			bundles: bundlesSize,
 			warnings: [...warningsRef],
 			errors: [],
