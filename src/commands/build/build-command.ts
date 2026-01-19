@@ -82,6 +82,8 @@ buildCommand
 					{
 						console.log(`\n${chalk.green('✔')} Build ${count} extensions successfully`);
 					}
+
+					process.exit(0);
 				}
 			})
 			.on('error', (err) => {
@@ -89,22 +91,25 @@ buildCommand
 				process.exit(1);
 			});
 
-		const shutdown = createShutdown(async () => {
-			console.log('\n🛑 Watcher stopped...');
+		if (args.watch)
+		{
+			const shutdown = createShutdown(async () => {
+				console.log('\n🛑 Watcher stopped...');
 
-			for await (const watcher of watchers)
-			{
-				await watcher.close();
-			}
+				for await (const watcher of watchers)
+				{
+					await watcher.close();
+				}
 
-			await buildQueue.onIdle();
+				await buildQueue.onIdle();
 
-			console.log('👋 Goodbye!');
-		});
+				console.log('👋 Goodbye!');
+			});
 
-		process.on('SIGINT', shutdown);
-		process.on('SIGTERM', shutdown);
-		process.on('SIGTSTP', shutdown);
+			process.on('SIGINT', shutdown);
+			process.on('SIGTERM', shutdown);
+			process.on('SIGTSTP', shutdown);
+		}
 	});
 
 export {

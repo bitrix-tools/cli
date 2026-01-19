@@ -490,7 +490,7 @@ export abstract class BasePackage
 	{
 		const sourceTestsCode = (await this.getUnitTests())
 			.map((filePath) => {
-				return `import './${path.relative(this.getPath(), filePath)}';`;
+				return `import '${filePath}';`;
 			})
 			.join('\n');
 
