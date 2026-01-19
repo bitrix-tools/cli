@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Command } from 'commander';
 
 import { watchOption } from './options/watch-option';
@@ -11,13 +10,13 @@ import { buildQueue } from './queue/build-queue';
 
 import { PackageFactoryProvider } from '../../modules/packages/providers/package-factory-provider';
 import { findPackages } from '../../utils/package/find-packages';
+import { createShutdown } from '../../utils/create.shutdown';
 
-import { TaskRunner } from '../../modules/task/task';
-import { buildTask } from './tasks/build/build.task';
-import { lintTask } from './tasks/lint/lint.task';
-import { runAfterBuildHooksTask } from './tasks/hooks/run-after-build-hooks.task';
+import { build } from './internal/build';
 
+import type { FSWatcher } from 'chokidar';
 import type { BasePackage } from '../../modules/packages/base-package';
+import chalk from 'chalk';
 
 
 const buildCommand = new Command('build');
@@ -37,69 +36,75 @@ buildCommand
 			packageFactory,
 		});
 
+		const watchers: Array<FSWatcher> = [];
+
 		extensionsStream
-			.on('data', ({ extension }: { extension: BasePackage }) => {
-				buildQueue.add(async () => {
-					const name = extension.getName();
+			.on('data', async ({ extension }: { extension: BasePackage }) => {
+				if (args.watch)
+				{
+					await buildQueue.add(async () => {
+						const chokidar = await import('chokidar');
+						const watcher = chokidar.watch(
+							extension.getSourceDirectoryPath(),
+						);
 
-					if (args.verbose)
-					{
-						return await TaskRunner.run([
-							{
-								title: chalk.bold(name),
-								run: () => {
-									return Promise.resolve();
-								},
-								subtasks: [
-									lintTask(extension, args),
-									buildTask(extension, args),
-									runAfterBuildHooksTask(extension, args),
-								],
-							}
-						]);
-					}
+						watchers.push(watcher);
 
-					await TaskRunner.runTask({
-						title: chalk.bold(name),
-						run: async (context) => {
-							const result = await extension.build();
-							if (result.errors.length === 0 && result.warnings.length === 0)
-							{
-								context.succeed(chalk.bold(name));
-							}
-
-							if (result.errors.length > 0)
-							{
-								context.fail(chalk.bold(name));
-
-								result.errors.forEach((error) => {
-									context.border(error.message, 'red', 2);
-								});
-							}
-
-							if (result.warnings.length > 0)
-							{
-								context.warn(chalk.bold(name));
-
-								result.warnings.forEach((error) => {
-									context.border(error.message, 'yellow', 2);
-								});
-							}
-						},
+						watcher.on('change', async () => {
+							await buildQueue.add(
+								build(extension, args),
+							);
+						});
 					});
-				});
+				}
+
+				await buildQueue.add(
+					build(extension, args),
+				);
 			})
 			.on('done', async ({ count }) => {
 				await buildQueue.onIdle();
-				if (count > 1)
+
+				if (args.watch)
 				{
-					console.log(`\n✔ Complete! For all ${count} extensions`);
+					if (count === 1)
+					{
+						console.log(`\n${chalk.green('✔')} Watcher started`);
+					}
+					else
+					{
+						console.log(`\n${chalk.green('✔')} Watcher started for ${count} extensions`);
+					}
+				}
+				else
+				{
+					if (count > 1)
+					{
+						console.log(`\n${chalk.green('✔')} Build ${count} extensions successfully`);
+					}
 				}
 			})
 			.on('error', (err) => {
 				console.error('❌ Error while reading packages:', err);
 				process.exit(1);
 			});
+
+		const shutdown = createShutdown(async () => {
+			console.log('\n🛑 Watcher stopped...');
+
+			for await (const watcher of watchers)
+			{
+				await watcher.close();
+			}
+
+			await buildQueue.onIdle();
+
+			console.log('👋 Goodbye!');
+		});
+
+		process.on('SIGINT', shutdown);
+		process.on('SIGTERM', shutdown);
+		process.on('SIGTSTP', shutdown);
 	});
 
 export {
