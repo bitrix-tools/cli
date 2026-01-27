@@ -3,7 +3,7 @@ import { Environment } from '../../environment/environment';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { PackageFactoryProvider } from './providers/package-factory-provider';
-import {MemoryCache} from '../../utils/memory-cache';
+import { MemoryCache } from '../../utils/memory-cache';
 
 const isExtensionName = (name: string) => {
 	return /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(name);
