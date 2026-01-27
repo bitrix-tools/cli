@@ -10,7 +10,6 @@ import { TaskRunner } from '../../modules/task/task';
 import { runUnitTestsTask } from './tasks/run.unit.tests.task';
 import { runEndToEndTestsTask } from './tasks/run.e2e.tests.task';
 
-
 import type { BasePackage } from '../../modules/packages/base-package';
 import type { FSWatcher } from 'chokidar';
 
@@ -105,6 +104,8 @@ testCommand
 					{
 						console.log(`\n${chalk.green('✔')} Test ${count} extensions successfully`);
 					}
+
+					process.exit(0);
 				}
 			})
 			.on('error', (err: Error) => {
@@ -112,20 +113,23 @@ testCommand
 				process.exit(1);
 			});
 
-		const shutdown = createShutdown(async () => {
-			console.log('\n🛑 Watcher stopped...');
+		if (args.watch)
+		{
+			const shutdown = createShutdown(async () => {
+				console.log('\n🛑 Watcher stopped...');
 
-			for await (const watcher of watchers)
-			{
-				await watcher.close();
-			}
+				for await (const watcher of watchers)
+				{
+					await watcher.close();
+				}
 
-			await testQueue.onIdle();
+				await testQueue.onIdle();
 
-			console.log('👋 Goodbye!');
-		});
+				console.log('👋 Goodbye!');
+			});
 
-		process.on('SIGINT', shutdown);
-		process.on('SIGTERM', shutdown);
-		process.on('SIGTSTP', shutdown);
+			process.on('SIGINT', shutdown);
+			process.on('SIGTERM', shutdown);
+			process.on('SIGTSTP', shutdown);
+		}
 	});
