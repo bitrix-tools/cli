@@ -24,6 +24,7 @@ testCommand
 	.option('--headed', 'Run in headed mode')
 	.option('--debug', 'Run in debug mode')
 	.option('--grep <pattern>', 'Filter tests by pattern')
+	.option('--project <projects...>', 'Run tests on different browsers')
 	.action((args): void => {
 		const packageFactory = PackageFactoryProvider.create();
 		const extensionsStream: NodeJS.ReadableStream = findPackages({

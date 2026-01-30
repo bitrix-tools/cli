@@ -509,7 +509,9 @@ export abstract class BasePackage
 	{
 		const patterns = [
 			'**/*.test.js',
+			'**/*.test.ts',
 			'**/*.spec.js',
+			'**/*.spec.ts',
 		];
 
 		return fg.async(
@@ -526,6 +528,13 @@ export abstract class BasePackage
 
 	async runUnitTests(args: Record<string, any> = {}): Promise<any>
 	{
+		const playwrightConfigPath = path.join(
+			Environment.getRoot(),
+			'playwright.config.ts',
+		);
+		const playwrightConfigModule = await import(playwrightConfigPath);
+		const playwrightConfig = playwrightConfigModule.default || playwrightConfigModule;
+
 		const playwright = await import('playwright');
 		const browser = await playwright.chromium.launch({
 			headless: args.headed !== true,
@@ -535,7 +544,12 @@ export abstract class BasePackage
 
 		try
 		{
-			await page.goto(`https://bitrix24.io/dev/ui/cli/mocha-wrapper.php?extension=${this.getName()}`);
+			const testsPage = path.join(
+				playwrightConfig.use.baseURL,
+				`/dev/ui/cli/mocha-wrapper.php?extension=${this.getName()}`,
+			);
+
+			await page.goto(testsPage);
 
 			const testsCodeBundle = await this.getUnitTestsBundle();
 
@@ -618,8 +632,7 @@ export abstract class BasePackage
 				code: 1,
 			});
 		}
-
-		const args = ['playwright', 'test', ...tests];
+		const args = ['playwright', 'test'];
 
 		if (Object.hasOwn(sourceArgs, 'headed'))
 		{
@@ -633,12 +646,21 @@ export abstract class BasePackage
 
 		if (Object.hasOwn(sourceArgs, 'grep'))
 		{
-			args.push('--grep');
+			args.push(`--grep=${sourceArgs.grep}`);
+		}
+
+		if (Object.hasOwn(sourceArgs, 'project'))
+		{
+			args.push(`--project=${sourceArgs.project}`);
 		}
 
 		const process = spawn('npx', args, {
 			stdio: 'inherit',
-			cwd: global.process.cwd(),
+			cwd: Environment.getRoot(),
+			env: {
+				...global.process.env,
+				TESTS_DIR: this.getEndToEndTestsDirectoryPath(),
+			},
 		});
 
 		return new Promise((resolve, reject) => {
