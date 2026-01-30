@@ -1,12 +1,15 @@
-import { Command } from 'commander';
-import { PackageFactoryProvider } from '../../modules/packages/providers/package-factory-provider';
-import { findPackages } from '../../utils/package/find-packages';
-import type { BasePackage } from '../../modules/packages/base-package';
-import { FlexibleCompilerOptions } from '@rollup/plugin-typescript';
+import chalk from 'chalk';
 import * as fs from 'node:fs';
 import * as path from 'path';
+import { Command } from 'commander';
+
+import { PackageFactoryProvider } from '../../modules/packages/providers/package-factory-provider';
+import { findPackages } from '../../utils/package/find-packages';
+import { FlexibleCompilerOptions } from '@rollup/plugin-typescript';
 import { Environment } from '../../environment/environment';
 import { pathOption } from '../build/options/path-option';
+
+import type { BasePackage } from '../../modules/packages/base-package';
 
 export const generateTsconfigCommand = new Command('generate-tsconfig');
 
@@ -22,18 +25,12 @@ generateTsconfigCommand
 
 		const tsconfig: FlexibleCompilerOptions = {
 			compilerOptions: {
-				module: 'ESNext',
-				target: 'ESNext',
-				allowJs: true,
-				checkJs: false,
-				strict: true,
-				lib: ['ESNext', 'DOM'],
 				baseUrl: Environment.getRoot(),
 				paths: {},
 			},
 		};
 
-		let totalCount = 0;
+		let aliasesCount = 0;
 
 		extensionsStream
 			.on('data', ({ extension }: { extension: BasePackage }) => {
@@ -42,19 +39,19 @@ generateTsconfigCommand
 					const relativePath = path.relative(Environment.getRoot(), extension.getInputPath());
 					tsconfig.compilerOptions.paths[extension.getName()] = [`./${relativePath}`];
 
-					console.log(`${extension.getName()} processed`);
+					console.log(`Alias created for: ${extension.getName()}`);
 
-					totalCount++;
+					aliasesCount++;
 				}
 			})
-			.on('done', async ({ count }) => {
+			.on('done', async () => {
 				fs.writeFileSync(
-					path.join(Environment.getRoot(), 'tsconfig.json'),
+					path.join(Environment.getRoot(), 'aliases.tsconfig.json'),
 					JSON.stringify(tsconfig, null, 4),
 				);
 
-				console.log(`\n✔ tsconfig.json generated successfully. Added ${totalCount} aliases\n`);
-				process.exit(1);
+				console.log(`\n${chalk.green('✔')} aliases.tsconfig.json generated successfully with ${aliasesCount} aliases\n`);
+				process.exit(0);
 			})
 			.on('error', (err: Error) => {
 				console.error('❌ Error while reading packages:', err);
