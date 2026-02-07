@@ -1,9 +1,9 @@
 import { ConfigStrategy } from '../../config.strategy';
-import type { SourceBundleConfig } from '../source.bundle.config';
+import type { BundleConfig } from '../bundle.config';
 
 export const resolveFilesImportStrategy = {
 	key: 'resolveFilesImport',
-	getDefault(): SourceBundleConfig['resolveFilesImport']
+	getDefault(): BundleConfig['resolveFilesImport']
 	{
 		return {
 			output: './dist',
@@ -11,7 +11,7 @@ export const resolveFilesImportStrategy = {
 			exclude: [],
 		};
 	},
-	prepare(value: any): SourceBundleConfig['resolveFilesImport']
+	prepare(value: any): BundleConfig['resolveFilesImport']
 	{
 		if (value && typeof value === 'object')
 		{
@@ -29,4 +29,4 @@ export const resolveFilesImportStrategy = {
 
 		return 'Invalid \'resolveFilesImport\' value.';
 	},
-} satisfies ConfigStrategy<SourceBundleConfig['resolveFilesImport']>
+} satisfies ConfigStrategy<BundleConfig['resolveFilesImport']>

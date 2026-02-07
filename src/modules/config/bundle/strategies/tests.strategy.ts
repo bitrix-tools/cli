@@ -1,9 +1,9 @@
 import { ConfigStrategy } from '../../config.strategy';
-import {SourceBundleConfig} from '../source.bundle.config';
+import { BundleConfig } from '../bundle.config';
 
 export const testsStrategy = {
 	key: 'tests',
-	getDefault(): SourceBundleConfig['tests']
+	getDefault(): BundleConfig['tests']
 	{
 		return {
 			localization: {
@@ -12,7 +12,7 @@ export const testsStrategy = {
 			},
 		};
 	},
-	prepare(value: any): SourceBundleConfig['tests']
+	prepare(value: any): BundleConfig['tests']
 	{
 		if (value && typeof value === 'object')
 		{
@@ -30,4 +30,4 @@ export const testsStrategy = {
 
 		return 'Invalid \'test\' value';
 	},
-} satisfies ConfigStrategy<SourceBundleConfig['tests']>
+} satisfies ConfigStrategy<BundleConfig['tests']>

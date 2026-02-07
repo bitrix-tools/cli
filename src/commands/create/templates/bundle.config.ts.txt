@@ -1,0 +1,8 @@
+import type { BundleConfig } from '@bitrix/cli';
+
+export default {
+	input: '{{inputPath}}',
+	output: '{{outputPath}}',
+	namespace: '{{namespace}}',
+	browserslist: true,
+} as BundleConfig;

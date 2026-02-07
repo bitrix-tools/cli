@@ -1,0 +1,18 @@
+import { it, describe } from 'mocha';
+import { assert } from 'chai';
+
+import { {{name}} } from '../../src/{{inputPath}}';
+
+describe('{{extensionName}}', () => {
+	it('Should return name', () => {
+		const instance = new {{name}}('testName');
+
+		assert.equal(instance.getName(), 'testName');
+	});
+
+	it('Should throw if create instance without options', () => {
+		assert.throws(() => {
+			void new {{name}}();
+		});
+	});
+});

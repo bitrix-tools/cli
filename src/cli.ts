@@ -2,7 +2,7 @@ import { program } from 'commander';
 
 import { buildCommand } from './commands/build/build-command';
 import { testCommand } from './commands/test/test-command';
-import { create } from './commands/create/create';
+import { createCommand } from './commands/create/create-command';
 import { statCommand } from './commands/stat/stat-command';
 import { generateTsconfigCommand } from "./commands/generate-tsconfig/generate-tsconfig.command";
 import { checkCwdPreAction } from './hooks/check-cwd-pre-action';
@@ -15,7 +15,7 @@ program
 	.addCommand(buildCommand)
 	.addCommand(statCommand)
 	.addCommand(testCommand)
-	.addCommand(create)
+	.addCommand(createCommand)
 	.addCommand(generateTsconfigCommand)
 	.addCommand(flowToTsCommand)
 	.hook('preAction', adjustCwdPreAction)

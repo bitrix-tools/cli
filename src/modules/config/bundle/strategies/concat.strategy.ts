@@ -1,13 +1,13 @@
 import { ConfigStrategy } from '../../config.strategy';
-import type { SourceBundleConfig } from '../source.bundle.config';
+import type { BundleConfig } from '../bundle.config';
 
 export const concatStrategy = {
 	key: 'concat',
-	getDefault(): SourceBundleConfig['concat']
+	getDefault(): BundleConfig['concat']
 	{
 		return {};
 	},
-	prepare(value: any): SourceBundleConfig['concat']
+	prepare(value: any): BundleConfig['concat']
 	{
 		if (value && typeof value === 'object')
 		{
@@ -25,4 +25,4 @@ export const concatStrategy = {
 
 		return 'Invalid \'concat\' value.';
 	},
-} satisfies ConfigStrategy<SourceBundleConfig['concat']>
+} satisfies ConfigStrategy<BundleConfig['concat']>

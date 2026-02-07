@@ -1,5 +1,5 @@
 import { ConfigStrategy } from '../../config.strategy';
-import type { SourceBundleConfig } from '../source.bundle.config';
+import type { BundleConfig } from '../bundle.config';
 
 export const pluginsStrategy = {
 	key: 'plugins',
@@ -7,7 +7,7 @@ export const pluginsStrategy = {
 	{
 		return {};
 	},
-	prepare(value: any): SourceBundleConfig['plugins']
+	prepare(value: any): BundleConfig['plugins']
 	{
 		if (value && typeof value === 'object')
 		{
@@ -25,4 +25,4 @@ export const pluginsStrategy = {
 
 		return 'Invalid \'plugins\' value';
 	},
-} satisfies ConfigStrategy<SourceBundleConfig['plugins']>
+} satisfies ConfigStrategy<BundleConfig['plugins']>

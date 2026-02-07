@@ -1,9 +1,9 @@
 import { ConfigStrategy } from '../../config.strategy';
-import { SourceBundleConfig } from '../source.bundle.config';
+import { BundleConfig } from '../bundle.config';
 
 export const cssImagesStrategy = {
 	key: 'cssImages',
-	getDefault(): SourceBundleConfig['cssImages']
+	getDefault(): BundleConfig['cssImages']
 	{
 		return {
 			type: 'inline',
@@ -11,7 +11,7 @@ export const cssImagesStrategy = {
 			svgo: true,
 		};
 	},
-	prepare(value: any): SourceBundleConfig['cssImages']
+	prepare(value: any): BundleConfig['cssImages']
 	{
 		if (value && typeof value === 'object')
 		{
@@ -27,4 +27,4 @@ export const cssImagesStrategy = {
 
 		return 'Invalid \'cssImages\' value.';
 	},
-} satisfies ConfigStrategy<SourceBundleConfig['cssImages']>
+} satisfies ConfigStrategy<BundleConfig['cssImages']>

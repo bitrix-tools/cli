@@ -3,6 +3,11 @@
   "version": "4.0.0",
   "description": "Bitrix frontend tool",
   "main": "./dist/cli.js",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts"
+    }
+  },
   "engines": {
     "node": ">=22"
   },
@@ -39,6 +44,7 @@
     "@babel/plugin-transform-flow-strip-types": "^7.27.1",
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
+    "@inquirer/prompts": "^8.2.0",
     "@playwright/test": "^1.57.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.6",

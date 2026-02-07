@@ -1,0 +1,28 @@
+import { Type } from 'main.core';
+
+export class {{name}}
+{
+	#name: string | null = null;
+
+	constructor(name: string | null)
+	{
+		this.setName(name);
+	}
+
+	setName(name: string | null)
+	{
+		if (Type.isString(name) || Type.isNull(name))
+		{
+			this.#name = name;
+		}
+		else
+		{
+		    throw new Error('Name is not string or null');
+		}
+	}
+
+	getName(): string | null
+	{
+	    return this.#name;
+	}
+}
