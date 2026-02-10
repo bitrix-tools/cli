@@ -21,6 +21,10 @@ export function plainBuild(extension: BasePackage, args: Record<string, any>): P
 
 				result.errors.forEach((error) => {
 					context.border(error.message, 'red', 2);
+					if (error.frame)
+					{
+						context.border(error?.frame, 'red', 2);
+					}
 				});
 			}
 
@@ -30,6 +34,10 @@ export function plainBuild(extension: BasePackage, args: Record<string, any>): P
 
 				result.warnings.forEach((error) => {
 					context.border(error.message, 'yellow', 2);
+					if (error.frame)
+					{
+						context.border(error?.frame, 'yellow', 2);
+					}
 				});
 			}
 		},
