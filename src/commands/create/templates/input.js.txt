@@ -17,12 +17,12 @@ export class {{name}}
 		}
 		else
 		{
-		    throw new Error('Name is not string or null');
+			throw new TypeError('Name is not string or null');
 		}
 	}
 
 	getName(): string | null
 	{
-	    return this.#name;
+		return this.#name;
 	}
 }

@@ -81,8 +81,8 @@ createCommand
 		const bundleConfigTemplate = await fs.readFile(bundleConfigTemplatePath, 'utf8');
 
 		const bundleConfigOptions = {
-			inputPath: `./${createInputFileName(extensionName, useTS ? 'ts' : 'js')}`,
-			outputPath: `./${createOutputFileName(extensionName, 'js')}`,
+			inputPath: `./src/${createInputFileName(extensionName, useTS ? 'ts' : 'js')}`,
+			outputPath: `./dist/${createOutputFileName(extensionName, 'js')}`,
 			namespace: createNamespace(extensionName),
 			browserslist: useBrowserslist,
 		};
@@ -95,8 +95,8 @@ createCommand
 		const configPhpTemplatePath = path.join(__dirname, 'templates', 'config.php.txt');
 		const configPhpTemplate = await fs.readFile(configPhpTemplatePath, 'utf8');
 		const templatePhpConfigOptions = {
-			jsPath: `./${createOutputFileName(extensionName, 'js')}`,
-			cssPath: `./${createOutputFileName(extensionName, 'css')}`,
+			jsPath: `./dist/${createOutputFileName(extensionName, 'js')}`,
+			cssPath: `./dist/${createOutputFileName(extensionName, 'css')}`,
 		};
 		const configPhpContent = renderTemplate({
 			template: configPhpTemplate,
@@ -148,11 +148,11 @@ createCommand
 		await fs.writeFile(inputFilePath, inputFileContent, 'utf8');
 
 		await fs.mkdir(path.join(packagePath, 'test', 'unit'), { recursive: true });
-		const unitTestPath = path.join(packagePath, 'test', 'unit', createInputFileName(extensionName, useTS ? 'test.ts' : '.test.js'));
+		const unitTestPath = path.join(packagePath, 'test', 'unit', createInputFileName(extensionName, useTS ? 'test.ts' : 'test.js'));
 		await fs.writeFile(unitTestPath, unitTestContent, 'utf8');
 
 		await fs.mkdir(path.join(packagePath, 'test', 'e2e'), { recursive: true });
-		const endToEndTestPath = path.join(packagePath, 'test', 'e2e', createInputFileName(extensionName, useTS ? 'spec.ts' : '.spec.js'));
+		const endToEndTestPath = path.join(packagePath, 'test', 'e2e', createInputFileName(extensionName, useTS ? 'spec.ts' : 'spec.js'));
 		await fs.writeFile(endToEndTestPath, endToEndTestContent, 'utf8');
 	});
 
