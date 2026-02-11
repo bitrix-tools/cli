@@ -1,5 +1,4 @@
 import path from 'node:path';
-import fs from 'node:fs';
 
 import {
 	rollup,
@@ -12,6 +11,8 @@ import {
 	type WarningHandlerWithDefault,
 	type OutputChunk,
 } from 'rollup';
+
+import type { ParsedCommandLine } from 'typescript';
 
 import nodeResolve from '@rollup/plugin-node-resolve';
 import babelPlugin from '@rollup/plugin-babel';
@@ -28,6 +29,7 @@ import { Environment } from '../../../../environment/environment';
 import { PackageResolver } from '../../../packages/package.resolver';
 import { isExternalDependencyName } from '../../../../utils/is.external.dependency.name';
 import { BuildStrategy } from './build.strategy';
+import { FileFinder } from '../../../../utils/file.finder';
 
 import type {
 	BuildResult,
@@ -36,7 +38,6 @@ import type {
 	BuildCodeOptions,
 	BuildCodeResult,
 } from '../types/build.service.types';
-import type { FlexibleCompilerOptions } from '@rollup/plugin-typescript';
 
 
 export class RollupBuildStrategy extends BuildStrategy
@@ -270,36 +271,33 @@ export class RollupBuildStrategy extends BuildStrategy
 		};
 	}
 
-	#generatePaths(): FlexibleCompilerOptions['paths']
+	async #loadTsConfig(configPath: string): Promise<ParsedCommandLine>
 	{
-		const tsconfig = (() => {
-			const rootTSConfigPath = path.join(Environment.getRoot(), 'tsconfig.json');
-			if (fs.existsSync(rootTSConfigPath))
-			{
-				return JSON.parse(
-					fs.readFileSync(rootTSConfigPath, 'utf8'),
-				);
-			}
+		const { default: ts } = await import('typescript');
+		const tsConfig = ts.readConfigFile(configPath, ts.sys.readFile);
+		const host = ts.createCompilerHost({}, true);
 
-			return {};
-		})();
+		const config = ts.parseJsonConfigFileContent(
+			tsConfig.config,
+			// @ts-ignore
+			host,
+			path.dirname(configPath)
+		);
 
-		return (() => {
-			if (tsconfig?.compilerOptions?.paths)
-			{
-				return Object.entries(tsconfig.compilerOptions.paths).reduce((acc, [key, value]) => {
-					return {
-						...acc,
-						[key]: [path.join(tsconfig.compilerOptions.baseUrl, String(value[0]))],
-					}
-				}, {});
-			}
+		const configDirname = path.dirname(configPath);
 
-			return {};
-		})();
+		config.options.paths = Object.entries(config.options.paths).reduce((acc, [extensionName, paths]) => {
+			acc[extensionName] = paths.map((filePath) => {
+				return path.join(configDirname, filePath.replace('./', ''));
+			});
+
+			return acc;
+		}, {});
+
+		return config;
 	}
 
-	async #createTypeScriptPlugin(): Promise<Plugin>
+	async #createTypeScriptPlugin(tsConfig: ParsedCommandLine): Promise<Plugin>
 	{
 		const { default: typescriptPlugin } = await import('@rollup/plugin-typescript');
 
@@ -308,8 +306,10 @@ export class RollupBuildStrategy extends BuildStrategy
 			compilerOptions: {
 				target: 'ESNext',
 				noEmitOnError: true,
-				strict: false,
-				paths: this.#generatePaths(),
+				strict: true,
+				allowJs: true,
+				checkJs: false,
+				paths: tsConfig.options.paths,
 			},
 		});
 	}
@@ -327,15 +327,24 @@ export class RollupBuildStrategy extends BuildStrategy
 
 					return [];
 				})(),
-				...(() => {
+				await (async () => {
 					if (options.typescript)
 					{
-						return [
-							this.#createTypeScriptPlugin(),
-						];
+						const tsConfigPath = FileFinder.findUpFile({
+							fileName: 'tsconfig.json',
+							fromDir: path.dirname(options.input),
+							rootDir: Environment.getRoot(),
+						});
+
+						if (typeof tsConfigPath === 'string' && tsConfigPath.length > 0)
+						{
+							const tsConfig = await this.#loadTsConfig(tsConfigPath);
+
+							return await this.#createTypeScriptPlugin(tsConfig);
+						}
 					}
 
-					return [];
+					return Promise.resolve();
 				})(),
 				nodeResolve({
 					browser: true,
