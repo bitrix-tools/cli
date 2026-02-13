@@ -30,6 +30,7 @@ import { PackageResolver } from '../../../packages/package.resolver';
 import { isExternalDependencyName } from '../../../../utils/is.external.dependency.name';
 import { BuildStrategy } from './build.strategy';
 import { FileFinder } from '../../../../utils/file.finder';
+import concatPlugin from './rollup/plugin/concat-plugin';
 
 import type {
 	BuildResult,
@@ -148,6 +149,7 @@ export class RollupBuildStrategy extends BuildStrategy
 		}
 		catch (error)
 		{
+			console.error(error);
 			return {
 				dependencies: [],
 				bundles: [],
@@ -284,6 +286,8 @@ export class RollupBuildStrategy extends BuildStrategy
 			path.dirname(configPath)
 		);
 
+		// console.log(config);
+
 		const configDirname = path.dirname(configPath);
 
 		config.options.paths = Object.entries(config.options.paths).reduce((acc, [extensionName, paths]) => {
@@ -297,20 +301,21 @@ export class RollupBuildStrategy extends BuildStrategy
 		return config;
 	}
 
-	async #createTypeScriptPlugin(tsConfig: ParsedCommandLine): Promise<Plugin>
+	async #createTypeScriptPlugin(tsConfig: ParsedCommandLine, srcPath: string): Promise<Plugin>
 	{
 		const { default: typescriptPlugin } = await import('@rollup/plugin-typescript');
 
 		return typescriptPlugin({
 			tsconfig: false,
-			compilerOptions: {
-				target: 'ESNext',
-				noEmitOnError: true,
-				strict: true,
-				allowJs: true,
-				checkJs: false,
-				paths: tsConfig.options.paths,
-			},
+			target: 'esnext',
+			include: [
+				`${srcPath}/**`,
+			],
+			exclude: [
+				'**/dist/**',
+				'**/test/**',
+				'bundle.config.ts',
+			]
 		});
 	}
 
@@ -338,9 +343,15 @@ export class RollupBuildStrategy extends BuildStrategy
 
 						if (typeof tsConfigPath === 'string' && tsConfigPath.length > 0)
 						{
+							console.time('loadConfig');
 							const tsConfig = await this.#loadTsConfig(tsConfigPath);
+							console.timeEnd('loadConfig');
 
-							return await this.#createTypeScriptPlugin(tsConfig);
+							console.time('createPlugin');
+							const plugin = await this.#createTypeScriptPlugin({}, path.dirname(options.input));
+							console.timeEnd('createPlugin');
+
+							return plugin;
 						}
 					}
 
@@ -375,6 +386,9 @@ export class RollupBuildStrategy extends BuildStrategy
 				}),
 				jsonPlugin(),
 				imagePlugin(),
+				// concatPlugin({
+				//
+				// }),
 			],
 			onwarn: onWarn,
 			treeshake: {

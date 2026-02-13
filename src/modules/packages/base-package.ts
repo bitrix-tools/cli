@@ -276,6 +276,7 @@ export abstract class BasePackage
 			targets: this.getTargets(),
 			namespace: this.getBundleConfig().get('namespace'),
 			typescript: this.isTypeScriptMode(),
+			concat: this.getBundleConfig().get('concat'),
 		};
 	}
 

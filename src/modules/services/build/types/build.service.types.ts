@@ -20,6 +20,10 @@ export type BuildOptions = {
 	namespace: string;
 	typescript?: boolean;
 	standalone?: boolean;
+	concat?: {
+		js?: Array<string>;
+		css?: Array<string>;
+	};
 };
 
 export type BuildCodeOptions = {
